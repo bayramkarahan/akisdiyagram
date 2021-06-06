@@ -1,6 +1,6 @@
 # Akış Diyagramı
 Kodlama için Flowchart Yazılımına Alternatif Yazılım.
-![akisdiyagram](akis.mp4)
+![akisdiyagram](akis.gif)
 
 Uygulama Qt ortamında c++ ile yazılmıştır..
 <br/>Qt 5.11.2 versiyonu ile yazılmıştır.
