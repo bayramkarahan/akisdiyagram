@@ -88,7 +88,7 @@ MainWindow::MainWindow()
     setCentralWidget(widget);
     setWindowIcon(QIcon(":images/prg.png"));
     setUnifiedTitleAndToolBarOnMac(true);
-    setWindowTitle("Akış Diyagramı 1.0");
+    setWindowTitle("Akış Diyagramı 1.2");
 
     this->setWindowState(Qt::WindowMaximized);
    // sceneScaleChanged("75%");
