@@ -185,9 +185,10 @@ public:
     bool input2=false;
 
     int counter=0;
+    bool renkdrm;
 
   public slots:
-
+      void renk();
 signals:
     void rectChanged(DiagramItem *rect);
     void previousPositionChanged();
@@ -211,6 +212,7 @@ private:
     unsigned int m_actionFlags;
 
     bool drm;
+
     bool rotateState=false;
     bool m_leftMouseButtonPressed;
     QPointF m_previousPosition;

@@ -150,16 +150,23 @@ void DotSignal::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     // fill the box with solid color, use sharp corners
      _outterborderPen.setCapStyle(Qt::SquareCap);
     _outterborderPen.setStyle(Qt::SolidLine);
-    _outterborderPen.setColor(QColor(0,0,0,25));
+    //_outterborderPen.setColor(QColor(0,0,0,50));
     _outterborderPen.setWidth(1);
-    painter->setPen(_outterborderPen);
+
     //painter->setPen(_outterborderColor);
 
     QPointF topLeft (0, 0);
     QPointF bottomRight ( 10, 10);//dikkat bura ayarlanacak
 
     QRectF rect (topLeft, bottomRight);
+    if (renkdrm)
+         _outterborderPen.setColor(QColor(255,0,0,150));
+        else
+         _outterborderPen.setColor(QColor(0,0,0,0));
+
+ painter->setPen(_outterborderPen);
     painter->drawRoundRect(rect,90,90);
+
    // QPixmap p1(":/icons/erase.png");
     //QPixmap p2(":/icons/arrow-up-down.png");
     //QPixmap p3(":/icons/rotate-right.png");

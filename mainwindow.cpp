@@ -379,7 +379,7 @@ void MainWindow::about()
 void MainWindow::worker()
 {
 
-    diagramItem->setText("stop",QColor(255,255,0,50));
+    diagramItem->setText("stop",QColor(255,0,0,100));
     /*************************************************/
 
     if(diagramItem->myDiagramType==Diagram::DiagramType::Input)

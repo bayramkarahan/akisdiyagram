@@ -242,6 +242,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             break;
 //! [6] //! [7]
         case InsertLine:
+
             line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
                                         mouseEvent->scenePos()));
             line->setPen(QPen(myLineColor, 2));
@@ -305,6 +306,26 @@ void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (myMode == InsertLine && line != 0) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
+         QList<QGraphicsItem *> endItems = items(line->line().p2());
+         /**************************************************************************************/
+         foreach (QGraphicsItem *item, items()) {
+             DiagramItem *eleman = qgraphicsitem_cast<DiagramItem *>(item);
+             if(eleman!=0)
+             {
+             eleman->renkdrm=false;
+             }
+         }
+     /****************************************************************************************/
+         DiagramItem *endItem = qgraphicsitem_cast<DiagramItem *>(endItems.last());
+        if(endItem!=0)
+        {
+            //qDebug()<<"tür";
+            if (endItem->type() == DiagramItem::Type){
+
+                endItem->renkdrm=true;
+             }
+        }
+/****************************************************************************************************/
     } else if (myMode == MoveItem) {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
@@ -314,14 +335,23 @@ void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //! [11]
 void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
-{QPointF startPoint,endPoint;
+{
+    foreach (QGraphicsItem *item, items()) {
+        DiagramItem *eleman = qgraphicsitem_cast<DiagramItem *>(item);
+        if(eleman!=0)
+        {
+        eleman->renkdrm=false;
+        }
+    }
+
+    QPointF startPoint,endPoint;
     if (line != 0 && myMode == InsertLine) {
 
         QList<QGraphicsItem *> startItems = items(line->line().p1());
         if (startItems.count() && startItems.first() == line)
             startItems.removeFirst();
         QList<QGraphicsItem *> endItems = items(line->line().p2());
-       /************************************************/
+        /************************************************/
         startPoint=line->line().p1();
         endPoint=line->line().p2();
         if (endItems.count() && endItems.first() == line)
@@ -373,6 +403,7 @@ void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //! [12] //! [13]
     line = 0;
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
+    update();
 }
 //! [13]
 QString DiagramScene::polarDiagramItem(DiagramItem *diagramItem, QPointF point,DiagramItem *myStartItem,DiagramItem *myEndItem)

@@ -91,6 +91,7 @@ rightArrow=0;
 //hideGrabbers();
 
 setVisibilityGrabbers();
+//drm=false;
 }
 void DiagramItem::setVisibilityGrabbers()
 {
@@ -125,6 +126,7 @@ void DiagramItem::setPositionGrabbers()
     cornerGrabber[GrabberTop]->setZValue(-100);
     cornerGrabber[GrabberTop]->setDotFlags(GrabberTop);
 
+
     cornerGrabber[GrabberBottom]->setPos(tmpRect.left() + tmpRect.width()/2-w, tmpRect.bottom()-h-h);
     cornerGrabber[GrabberBottom]->setFlag(QGraphicsItem::ItemIsSelectable,false);
     cornerGrabber[GrabberBottom]->setFlag(QGraphicsItem::ItemIsMovable,false);
@@ -135,12 +137,12 @@ void DiagramItem::setPositionGrabbers()
     cornerGrabber[GrabberLeft]->setFlag(QGraphicsItem::ItemIsMovable,false);
     cornerGrabber[GrabberLeft]->setDotFlags(GrabberLeft);
 
-
-    cornerGrabber[GrabberRight]->setPos(tmpRect.right()-w-w-wx, tmpRect.top() + tmpRect.height()/2-h);
+      cornerGrabber[GrabberRight]->setPos(tmpRect.right()-w-w-wx, tmpRect.top() + tmpRect.height()/2-h);
     cornerGrabber[GrabberRight]->setFlag(QGraphicsItem::ItemIsSelectable,false);
     cornerGrabber[GrabberRight]->setFlag(QGraphicsItem::ItemIsMovable,false);
     cornerGrabber[GrabberRight]->setDotFlags(GrabberRight);
 
+/**********************************************************************************************************************/
 
     cornerGrabber[GrabberTopLeft]->setPos(tmpRect.topLeft().x(), tmpRect.topLeft().y());
     cornerGrabber[GrabberTopLeft]->setFlag(QGraphicsItem::ItemIsSelectable,false);
@@ -166,6 +168,7 @@ void DiagramItem::setPositionGrabbers()
     cornerGrabber[GrabberBottomRight]->setFlag(QGraphicsItem::ItemIsMovable,false);
     cornerGrabber[GrabberBottomRight]->setZValue(-100);
     cornerGrabber[GrabberBottomRight]->setDotFlags(GrabberBottomRight);
+
 update();
 
 }
@@ -590,7 +593,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void DiagramItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
- //   qDebug() <<"move yapıldı";
+  // qDebug() <<"move yapıldı";
  //  qDebug() <<"üzerine geldi"<<drm<<rotateState;
    if(drm)
    {
@@ -642,29 +645,27 @@ void DiagramItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     } else {
         //qDebug() <<"abc";
         switch (m_cornerFlags) {
-        case TopLeft:{
-            resizeLeft(pt);
+        case Top:{
+
             resizeTop(pt);
             break;
         }
-        case TopRight:{
-            rotateItem(pt);
+        case Right:{
+            resizeRight(pt);
 
             break;
         }
-        case BottomLeft: {
+        case Left: {
           //  Scene * _scene = dynamic_cast<Scene *>(parent);
             ///if(sekilTr!=Diagram::DiagramType::Pdf) scn->removeItem(this);
-           // resizeBottom(pt);
+            resizeLeft(pt);
 
            // qDebug() <<"siliniyorrr";
 
            break;
         }
-        case BottomRight: {
+        case Bottom: {
             resizeBottom(pt);
-            resizeRight(pt);
-            //rotateItem(pt);
             break;
         }
         default:
@@ -730,10 +731,14 @@ void DiagramItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
    // QGraphicsItem::mouseReleaseEvent(event);
 }
-
+void DiagramItem::renk()
+{
+    qDebug() <<"renk"<<drm;//<<myDiagramType;
+    renkdrm=true;
+}
 void DiagramItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-   // qDebug() <<"üzerine geldi"<<drm;
+    //qDebug() <<"üzerine geldi"<<drm;
   /* if(drm)
    {
     setPositionGrabbers();
@@ -745,7 +750,8 @@ void DiagramItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void DiagramItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-
+//renkdrm=false;
+//update();
    //  qDebug() <<"üzerine ayrıldı"<<drm;
   /*
      m_cornerFlags = 0;
@@ -759,9 +765,10 @@ void DiagramItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void DiagramItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-  //  qDebug() <<"üzerindesin"<<drm;
-   //
-   /* if(drm)
+  //  renkdrm=true;
+   // qDebug() <<"üzerindesin"<<drm<<renkdrm;
+
+  /*  if(drm)
     {
     //qDebug() <<"hoverMoveEvent";
     QPointF pt = event->pos();              // The current position of the mouse
@@ -781,91 +788,35 @@ void DiagramItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     if( (dty < alan && dty > -alan)|| (dty < -alan && dty > alan)) m_cornerFlags |= Bottom;    // Bottom side
     if( (drx < alan && drx > -alan )||(drx < -alan && drx > alan )) m_cornerFlags |= Right;     // Right side
     if( (dlx < alan && dlx > -alan)||  (dlx < -alan && dlx > alan)) m_cornerFlags |= Left;      // Left side
-    QPixmap p(":/icons/arrow-up-down.png");
-    QPixmap px(":/icons/rotate-right.png");
-    QPixmap pd(":/icons/erase.png");
-
-    QPixmap pResult;
-    QTransform trans = transform();
-    if(m_actionFlags == ResizeState){
 
 
         switch (m_cornerFlags) {
         case Top:
-        case Bottom:
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
-            break;
-        case Left:
-        case Right:
-            trans.rotate(90);
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
-            break;
-        case TopRight:
-
-            trans.rotate(0);
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
-            break;
-
-        case BottomLeft:
-           // qDebug() <<"hoverMoveEvent BottomLeft";
-            trans.rotate(45);
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
-
-            break;
-        case TopLeft:
-
-        case BottomRight:
-
-            trans.rotate(135);
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
-            break;
-        default:
-            setCursor(Qt::ArrowCursor);
-            break;
-        }
-    } else {
-        switch (m_cornerFlags) {
-        case TopLeft:
         {
-            trans.rotate(135);
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
+            qDebug() <<"top";
             break;
 
         }
-        case TopRight: {
-                   // trans.rotate(135);
-                    pResult = px.transformed(trans);
-                    setCursor(px.scaled(40,40,Qt::KeepAspectRatio));
+        case Right: {
+                  qDebug() <<"right";
                     break;
                 }
-        case BottomLeft:
-        {
-                  //  trans.rotate(135);
-                   /* pResult = pd.transformed(trans);
-                    setCursor(pResult.scaled(30,30,Qt::KeepAspectRatio));
-                    */
-            //qDebug() <<"hoverMoveEvent BottomLeft";
-           /* break;
+        case Left:
+        {   
+            qDebug() <<"Left";
+            break;
                 }
-
-        case BottomRight: {
-            trans.rotate(135);
-            pResult = p.transformed(trans);
-            setCursor(pResult.scaled(24,24,Qt::KeepAspectRatio));
+        case Bottom: {
+            qDebug() <<"bottom";
             break;
         }
         default:
             setCursor(Qt::ArrowCursor);
             break;
         }
+
     }
-    }*/
+*/
     QGraphicsItem::hoverMoveEvent( event );
 }
 
@@ -1050,6 +1001,24 @@ void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         text.setText("<font size=1>as</font>");
         painter->drawStaticText(QPoint(this->boundingRect().center().x(),this->boundingRect().center().y()), text);
     }*/
+    if(renkdrm)
+    {
+        // painter->setPen(QPen(QColor(255,0,0,75), 3, Qt::DashLine));
+        // renkdrm=false;
+        cornerGrabber[GrabberRight]->renkdrm=renkdrm;
+        cornerGrabber[GrabberLeft]->renkdrm=renkdrm;
+        cornerGrabber[GrabberBottom]->renkdrm=renkdrm;
+        cornerGrabber[GrabberTop]->renkdrm=renkdrm;
+
+    }else
+    {
+        //painter->setPen(QPen(QColor(0,0,0,255), 3, Qt::SolidLine));
+        cornerGrabber[GrabberRight]->renkdrm=renkdrm;
+        cornerGrabber[GrabberLeft]->renkdrm=renkdrm;
+        cornerGrabber[GrabberBottom]->renkdrm=renkdrm;
+        cornerGrabber[GrabberTop]->renkdrm=renkdrm;
+
+    }
     painter->setBrush(myBackground);
     painter->drawPolygon(myPolygon);
     setPolygon(myPolygon);

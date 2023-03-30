@@ -65,7 +65,8 @@ public:
     void setPreviousPosition(const QPointF previousPosition);
 
     void setDotFlags(unsigned int flags);
- unsigned int m_flags;
+    unsigned int m_flags;
+    bool renkdrm;
 signals:
     void previousPositionChanged();
     void signalMouseRelease();
