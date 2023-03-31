@@ -50,16 +50,24 @@
 
 #include "diagramtextitem.h"
 #include "diagramscene.h"
+#include <QGraphicsScene>
+#include <QGraphicsSceneContextMenuEvent>
 
 //! [0]
-DiagramTextItem::DiagramTextItem(QGraphicsItem *parent)
+DiagramTextItem::DiagramTextItem(QMenu *contextMenu, QGraphicsItem *parent)
     : QGraphicsTextItem(parent)
 {
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
+       myContextMenu = contextMenu;
 }
 //! [0]
-
+void DiagramTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    scene()->clearSelection();
+    setSelected(true);
+    myContextMenu->exec(event->screenPos());
+}
 //! [1]
 QVariant DiagramTextItem::itemChange(GraphicsItemChange change,
                      const QVariant &value)

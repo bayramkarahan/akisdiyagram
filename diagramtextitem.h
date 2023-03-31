@@ -53,6 +53,7 @@
 
 #include <QGraphicsTextItem>
 #include <QPen>
+#include<QMenu>
 
 QT_BEGIN_NAMESPACE
 class QFocusEvent;
@@ -69,7 +70,7 @@ class DiagramTextItem : public QGraphicsTextItem
 public:
     enum { Type = UserType + 3 };
 
-    DiagramTextItem(QGraphicsItem *parent = 0);
+    DiagramTextItem(QMenu *contextMenu,QGraphicsItem *parent = 0);
 
     int type() const override { return Type; }
 
@@ -81,6 +82,10 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     void focusOutEvent(QFocusEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+
+private:
+        QMenu *myContextMenu;
 };
 //! [0]
 

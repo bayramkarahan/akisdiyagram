@@ -765,7 +765,7 @@ void DiagramItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void DiagramItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-  //  renkdrm=true;
+   // renkdrm=true;
    // qDebug() <<"üzerindesin"<<drm<<renkdrm;
 
   /*  if(drm)
@@ -966,8 +966,6 @@ void DiagramItem::rotateItem(const QPointF &pt)
     cy=corner.y();//-boundingRect().height();
     */
 }
-
-
 
 void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
           QWidget *)

@@ -50,19 +50,21 @@
 
 
 #include "arrow.h"
-
+#include <QGraphicsScene>
+#include <QGraphicsSceneContextMenuEvent>
 #include <qmath.h>
 #include <QPen>
 #include <QPainter>
 
 //! [0]
-Arrow::Arrow(DiagramItem *startItem, DiagramItem *endItem ,QString startPolar,QString endPolar, QGraphicsItem *parent)
+Arrow::Arrow(DiagramItem *startItem, DiagramItem *endItem , QString startPolar, QString endPolar, QMenu *contextMenu, QGraphicsItem *parent)
     : QGraphicsLineItem(parent)
 {
     myStartItem = startItem;
     myEndItem = endItem;
     myStartPolar=startPolar;
     myEndPolar=endPolar;
+      myContextMenu = contextMenu;
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     //setFlags(ItemIsSelectable | ItemIsMovable);
     //setAcceptHoverEvents(true);
@@ -70,7 +72,12 @@ Arrow::Arrow(DiagramItem *startItem, DiagramItem *endItem ,QString startPolar,QS
     setPen(QPen(myColor, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
 //! [0]
-
+void Arrow::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    scene()->clearSelection();
+    setSelected(true);
+    myContextMenu->exec(event->screenPos());
+}
 //! [1]
 QRectF Arrow::boundingRect() const
 {

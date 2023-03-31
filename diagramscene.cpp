@@ -192,7 +192,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 addItem(leftLinkItem);
                 leftLinkItem->setPos(mouseEvent->scenePos().x()-250,mouseEvent->scenePos().y());
 
-                Arrow *arrow1 = new Arrow(item,endLinkItem,"end","start");
+                Arrow *arrow1 = new Arrow(item,endLinkItem,"end","start",myItemMenu);
                 arrow1->setColor(myLineColor);
                 item->addArrowState(arrow1,"end","O");
                 endLinkItem->addArrowState(arrow1,"start","I");
@@ -200,7 +200,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 addItem(arrow1);
                 arrow1->updatePosition();
 
-                Arrow *arrow2 = new Arrow(endLinkItem,leftEndLinkItem,"left","right");
+                Arrow *arrow2 = new Arrow(endLinkItem,leftEndLinkItem,"left","right",myItemMenu);
                 arrow2->setColor(myLineColor);
                 endLinkItem->addArrowState(arrow2,"left","O");
                 leftEndLinkItem->addArrowState(arrow2,"right","I");
@@ -208,7 +208,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 addItem(arrow2);
                 arrow2->updatePosition();
 
-                Arrow *arrow3 = new Arrow(leftEndLinkItem,leftLinkItem,"start","end");
+                Arrow *arrow3 = new Arrow(leftEndLinkItem,leftLinkItem,"start","end",myItemMenu);
                 arrow3->setColor(myLineColor);
                 leftEndLinkItem->addArrowState(arrow3,"start","O");
                 leftLinkItem->addArrowState(arrow3,"end","I");
@@ -216,7 +216,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 addItem(arrow3);
                 arrow3->updatePosition();
 
-                Arrow *arrow4 = new Arrow(leftLinkItem,item,"right","left");
+                Arrow *arrow4 = new Arrow(leftLinkItem,item,"right","left",myItemMenu);
                 arrow4->setColor(myLineColor);
                 leftLinkItem->addArrowState(arrow4,"right","O");
                 item->addArrowState(arrow4,"left","I");
@@ -250,7 +250,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             break;
 //! [7] //! [8]
     case InsertText:
-        textItem = new DiagramTextItem();
+        textItem = new DiagramTextItem(myItemMenu);
         textItem->setFont(myFont);
         textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         textItem->setZValue(1000.0);
@@ -373,7 +373,7 @@ void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
            /// qDebug()<<"son"<<startPolar<<endPolar;
             if(startPolar!=""&&endPolar!="")
             {
-                Arrow *arrow = new Arrow(startItem,endItem,startPolar,endPolar);
+                Arrow *arrow = new Arrow(startItem,endItem,startPolar,endPolar,myItemMenu);
                 arrow->setColor(myLineColor);
                 bool startAddStatus=startItem->addArrowState(arrow,startPolar,"O");
                 bool endAddStatus=endItem->addArrowState(arrow,endPolar,"I");
@@ -438,35 +438,42 @@ QString DiagramScene::polarDiagramItem(DiagramItem *diagramItem, QPointF point,D
     bool right=false;
     bool start=false;
     bool end=false;
-   tx=diagramItem->boundingRect().width()/4;
-   ty=diagramItem->boundingRect().height()/4;
+    tx=diagramItem->boundingRect().width()/4;
+    ty=diagramItem->boundingRect().height()/4;
 
-            auto startxy = diagramItem->mapToScene(diagramItem->boundingRect().center());
+    //auto cxy = diagramItem->mapToScene(diagramItem->boundingRect().center());
+    int startx,starty,leftx,lefty,rightx,righty,endx,endy;
+    int cx=diagramItem->mapToScene(diagramItem->boundingRect().center()).toPoint().x();
+    int cy=diagramItem->mapToScene(diagramItem->boundingRect().center()).toPoint().y();
 
-            int startx,starty,leftx,lefty,rightx,righty,endx,endy;
-
-                int xx=startxy.toPoint().x();
-                int yy=startxy.toPoint().y();
-                startx=xx;
-                starty=yy-ty*2;
-                endx=xx;
-                endy=yy+ty*2;
-                leftx=xx-tx*2;
-                lefty=yy;
-                rightx=xx+tx*2;
-                righty=yy;
-                ///qDebug()<<x<<tx<<y<<ty<<xx<<yy;
-                tx=tx*4/3;
-                ty=ty*4/3;
-                if(x-tx<leftx&&x+tx>leftx) left=true;
-                if(x-tx<rightx&&x+tx>rightx) right=true;
-                if(y-ty<starty&&y+ty>starty) start=true;
-                if(y-ty<endy&&y+ty>endy) end=true;
+    startx=cx;
+    starty=cy-ty*2;
+    endx=cx;
+    endy=cy+ty*2;
+    leftx=cx-tx*2;
+    lefty=cy;
+    rightx=cx+tx*2;
+    righty=cy;
+    //qDebug()<<point<<cx<<cy;
+    //tx=tx*3/4;
+    //ty=ty*3/4;
+  /*
+    if(x-tx<leftx&&x+tx>leftx) left=true;
+    if(x-tx<rightx&&x+tx>rightx) right=true;
+    if(y-ty<starty&&y+ty>starty) start=true;
+    if(y-ty<endy&&y+ty>endy) end=true;
+    */
+    if(x>leftx-tx*1.8&&x<leftx+tx*1.8) left=true;
+    if(x>rightx-tx*1.8&&x<rightx+tx*1.8) right=true;
+    if(y>starty-ty*1.8&&y<starty+ty*1.8) start=true;
+    if(y>endy-ty*1.8&&y<endy+ty*1.8) end=true;
+   //qDebug()<<left<<right<<start<<end;
     if(left&&!right&&!start&&!end) return "left";
     if(!left&&right&&!start&&!end) return "right";
     if(!left&&!right&&start&&!end) return "start";
     if(!left&&!right&&!start&&end) return "end";
-return "";
+
+    return "";
 }
 //! [14]
 bool DiagramScene::isItemChange(int type)

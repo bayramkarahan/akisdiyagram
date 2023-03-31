@@ -56,6 +56,7 @@
 #include<QInputDialog>
 #include<QMessageBox>
 #include<QDate>
+#include<QMenu>
 
 QT_BEGIN_NAMESPACE
 class QGraphicsPolygonItem;
@@ -75,7 +76,7 @@ public:
     enum { Type = UserType + 4 };
 
     Arrow(DiagramItem *startItem, DiagramItem *endItem, QString startPolar, QString endPolar,
-      QGraphicsItem *parent = 0);
+     QMenu *contextMenu,QGraphicsItem *parent = 0);
 
     int type() const override { return Type; }
     QRectF boundingRect() const override;
@@ -94,6 +95,8 @@ public:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+
    // void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
    // void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -101,6 +104,7 @@ private:
    QColor myColor;
     QPolygonF arrowHead;
    bool m_leftMouseButtonPressed;
+    QMenu *myContextMenu;
 };
 //! [0]
 

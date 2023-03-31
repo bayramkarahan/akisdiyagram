@@ -88,7 +88,7 @@ MainWindow::MainWindow()
     setCentralWidget(widget);
     setWindowIcon(QIcon(":images/prg.png"));
     setUnifiedTitleAndToolBarOnMac(true);
-    setWindowTitle("Akış Diyagramı 1.2");
+    setWindowTitle("Akış Diyagramı 1.3");
 
     this->setWindowState(Qt::WindowMaximized);
    // sceneScaleChanged("75%");
@@ -96,7 +96,18 @@ MainWindow::MainWindow()
 }
 //! [0]
 
-
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+qDebug()<<"main move";
+}
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+qDebug()<<"mainpress";
+}
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+qDebug()<<"mainrelease";
+}
 
 //! [1]
 void MainWindow::backgroundButtonGroupClicked(QAbstractButton *button)
@@ -170,6 +181,12 @@ void MainWindow::deleteItem()
                 scene->removeItem(item);
                 delete item;
             }
+            if (item->type() == DiagramTextItem::Type){
+                // qgraphicsitem_cast<DiagramItem *>(item)->removeArrows();
+
+                scene->removeItem(item);
+                delete item;
+            }
         }
     }
     scene->update();
@@ -194,7 +211,8 @@ void MainWindow::bringToFront()
 
     qreal zValue = 0;
     foreach (QGraphicsItem *item, overlapItems) {
-        if (item->zValue() >= zValue && item->type() == DiagramItem::Type)
+        // if (item->zValue() >= zValue && item->type() == DiagramItem::Type)
+        if (item->zValue() >= zValue)
             zValue = item->zValue() + 0.1;
     }
     selectedItem->setZValue(zValue);
@@ -212,7 +230,8 @@ void MainWindow::sendToBack()
 
     qreal zValue = 0;
     foreach (QGraphicsItem *item, overlapItems) {
-        if (item->zValue() <= zValue && item->type() == DiagramItem::Type)
+        //if (item->zValue() <= zValue && item->type() == DiagramItem::Type)
+         if (item->zValue() >= zValue)
             zValue = item->zValue() - 0.1;
     }
     selectedItem->setZValue(zValue);
@@ -348,16 +367,22 @@ void MainWindow::about()
 {
     QMessageBox::about(this, tr("Akış Diyagramı"),
                        tr("Bu uygulama Linux tabanlı sistemlerde(<b>Pardus</b>); "
-                          "<br/>Programlama mantığını anlama"
-                          "<br/><b>Akış Diyagramı</b> oluştumak"
-                          "<br/>Gerçek zamanlı Akış Diyagramı çalıştırmak için yazılmıştır"
+                          "<br/>Programlama mantığını anlama, <b>Akış Diyagramı</b> oluştumak ve"
+                          "<br/><b>Gerçek Zamanlı Akış Diyagramı Çalıştırmak</b> için yazılmıştır"
                           "<br/>"
                           "<br/>*****************************************************************************"
-                          "<br/>   Copyright (C) 2021 by Bayram KARAHAN                                    "
+                          "<br/>   Copyright (C) 2023 by Bayram KARAHAN                                    "
                           "<br/>\tkod.pardus.org.tr/karahan/akisdiyagrami"
                           "<br/>\tgithub.com/bayramkarahan/akisdiyagrami"
                           "<br/>\tbayramkarahan.blogspot.com"
                           "<br/>\tbayramk@gmail.com  "
+                          "<br/>*****************************************************************************"
+
+                          "<br/>akisdiyagramı 1.0:Temel özellikler."
+                          "<br/>akisdiyagramı 1.1:Bağlantı renklendirmeleri eklendi."
+                          "<br/>akisdiyagramı 1.2:Ok ve text nesnesine sağtuş menüsü eklendi."
+                          "<br/>akisdiyagramı 1.3:Sağtuş menü özellikleri bütün nesnelere eklendi."
+
                           "<br/>*****************************************************************************"
                            "<br/>   This program is free software; you can redistribute it and/or modify    "
                            "<br/>   it under the terms of the GNU General Public License as published by    "

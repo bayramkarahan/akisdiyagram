@@ -162,7 +162,7 @@ void DotSignal::paint (QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     if (renkdrm)
          _outterborderPen.setColor(QColor(255,0,0,150));
         else
-         _outterborderPen.setColor(QColor(0,0,0,0));
+         _outterborderPen.setColor(QColor(0,0,0,20));
 
  painter->setPen(_outterborderPen);
     painter->drawRoundRect(rect,90,90);
