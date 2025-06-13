@@ -56,7 +56,7 @@
 
 #include <QtWidgets>
 #include <QThread>
-
+#include "variableeditordialog.h"
 const int InsertTextButton = 10;
 
 
@@ -93,6 +93,8 @@ MainWindow::MainWindow()
     this->setWindowState(Qt::WindowMaximized);
    // sceneScaleChanged("75%");
     stopAction->setEnabled(false);
+    auto  dlg=new VariableEditorDialog(this);
+    dlg->show();
 }
 //! [0]
 

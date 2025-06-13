@@ -229,34 +229,26 @@ void DiagramItem::removeArrows()
 bool DiagramItem::addArrowState(Arrow *arrow,QString polar,QString rota)
 {
    // qDebug()<<"nesne"<<this->myDiagramType;
+    int polarCount=0;
+    if(startArrow!=0) polarCount++;
+    if(endArrow!=0) polarCount++;
+    if(leftArrow!=0) polarCount++;
+    if(rightArrow!=0) polarCount++;
     if(this->myDiagramType==Diagram::DiagramType::Start
             ||this->myDiagramType==Diagram::DiagramType::End)
     {
-        int polarCount=0;
-        if(startArrow!=0) polarCount++;
-        if(endArrow!=0) polarCount++;
-        if(leftArrow!=0) polarCount++;
-        if(rightArrow!=0) polarCount++;
+
        if(polarCount>0)return false;
     }
     if(this->myDiagramType==Diagram::DiagramType::Input
-            ||this->myDiagramType==Diagram::DiagramType::Process)
-    {
-        int polarCount=0;
-        if(startArrow!=0) polarCount++;
-        if(endArrow!=0) polarCount++;
-        if(leftArrow!=0) polarCount++;
-        if(rightArrow!=0) polarCount++;
-       if(polarCount>2)return false;
+            ||this->myDiagramType==Diagram::DiagramType::Process
+        ||this->myDiagramType==Diagram::DiagramType::Output)
+    {     
+       if(polarCount>1)return false;
     }
     if(this->myDiagramType==Diagram::DiagramType::Conditional
             ||this->myDiagramType==Diagram::DiagramType::Link)
     {
-        int polarCount=0;
-        if(startArrow!=0) polarCount++;
-        if(endArrow!=0) polarCount++;
-        if(leftArrow!=0) polarCount++;
-        if(rightArrow!=0) polarCount++;
        if(polarCount>2)return false;
     }
     //arrows.append(arrow);
@@ -970,7 +962,33 @@ void DiagramItem::rotateItem(const QPointF &pt)
 void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
           QWidget *)
 {
+    int polarCount=0;
+    if(startArrow!=0) polarCount++;
+    if(endArrow!=0) polarCount++;
+    if(leftArrow!=0) polarCount++;
+    if(rightArrow!=0) polarCount++;
+
     Diagram *item=new Diagram();
+    if(this->myDiagramType==Diagram::DiagramType::Start
+        ||this->myDiagramType==Diagram::DiagramType::End)
+    {
+        //tek bağlantı olmalı
+        if(polarCount>0)renkdrm= false;
+        else  renkdrm= true;
+    }
+    if(this->myDiagramType==Diagram::DiagramType::Input
+        ||this->myDiagramType==Diagram::DiagramType::Process
+        ||this->myDiagramType==Diagram::DiagramType::Output)
+    {
+        if(polarCount>1)renkdrm= false;
+        else  renkdrm= true;
+    }
+    if(this->myDiagramType==Diagram::DiagramType::Conditional
+        ||this->myDiagramType==Diagram::DiagramType::Link)
+    {
+        if(polarCount>2)renkdrm= false;
+        else  renkdrm= true;
+    }
 
     myPolygon=item->sekilStore(myDiagramType,this->boundingRect());
     if(myDiagramType==Diagram::DiagramType::Start)label.setText("Başla");

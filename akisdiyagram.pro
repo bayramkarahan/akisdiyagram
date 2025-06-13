@@ -7,14 +7,18 @@ HEADERS	    =   mainwindow.h \
 		arrow.h \
 		diagramtextitem.h \
     diagram.h \
-    dotsignal.h
+    dotsignal.h \
+    variable.h \
+    variableeditordialog.h
 SOURCES	    =   mainwindow.cpp \
 		diagramitem.cpp \
 		main.cpp \
 		arrow.cpp \
 		diagramtextitem.cpp \
 		diagramscene.cpp \
-    dotsignal.cpp
+    dotsignal.cpp \
+    variable.cpp \
+    variableeditordialog.cpp
 RESOURCES   =	diagramscene.qrc
 
 
