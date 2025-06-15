@@ -57,8 +57,10 @@
 #include <QPainter>
 #include<QThread>
 #include<QCheckBox>
-
+#include<variable.h>
 //extern QString varMain0;
+#include<QTableWidget>
+#include<QHeaderView>
 
 //! [0]
 DiagramItem::DiagramItem(Diagram::DiagramType diagramType, QMenu *contextMenu,
@@ -243,7 +245,7 @@ bool DiagramItem::addArrowState(Arrow *arrow,QString polar,QString rota)
     if(this->myDiagramType==Diagram::DiagramType::Input
             ||this->myDiagramType==Diagram::DiagramType::Process
         ||this->myDiagramType==Diagram::DiagramType::Output)
-    {     
+    {
        if(polarCount>1)return false;
     }
     if(this->myDiagramType==Diagram::DiagramType::Conditional
@@ -312,174 +314,94 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     rotateState=  !rotateState;
     //qDebug() <<"çift tıklama1 "<<rotateState;
-
     if(this->myDiagramType==Diagram::DiagramType::Input)
     {
-        QDialog * d = new QDialog();
-        // QComboBox * comboBoxA = new QComboBox();
-      //  comboBoxA->addItems(QStringList() <<varMain0<<varMain1 << varMain2);
-      //  QComboBox * comboBoxB = new QComboBox();
-      //  comboBoxB->addItems(QStringList() << "=" << "<" << ">");
-        QLineEdit * lineEditA = new QLineEdit();
-        QLineEdit * lineEditB = new QLineEdit();
-        QLineEdit * lineEditC = new QLineEdit();
-        QCheckBox *cha=new QCheckBox("Girdi Değeri");
-        QCheckBox *chb=new QCheckBox("Girdi Değeri");
-        QCheckBox *chc=new QCheckBox("Girdi Değeri");
+        VariableSelectionDialog dlg;
 
-        QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                            | QDialogButtonBox::Cancel);
-
-        QObject::connect(buttonBox, SIGNAL(accepted()), d, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), d, SLOT(reject()));
-
-        QVBoxLayout * vbox = new QVBoxLayout();
-        QHBoxLayout * hbox1 = new QHBoxLayout();
-        hbox1->addWidget(lineEditA);
-        hbox1->addWidget(cha);
-
-        QHBoxLayout * hbox2 = new QHBoxLayout();
-        hbox2->addWidget(lineEditB);
-        hbox2->addWidget(chb);
-
-        QHBoxLayout * hbox3 = new QHBoxLayout();
-        hbox3->addWidget(lineEditC);
-        hbox3->addWidget(chc);
-
-        vbox->addLayout(hbox1);
-        vbox->addLayout(hbox2);
-        vbox->addLayout(hbox3);
-        vbox->addWidget(buttonBox);
-
-        d->setLayout(vbox);
-        lineEditA->setText(varMain0);
-        lineEditB->setText(varMain1);
-        lineEditC->setText(varMain2);
-        cha->setChecked(input0);
-        chb->setChecked(input1);
-        chc->setChecked(input2);
-
-
-        int result = d->exec();
-        if(result == QDialog::Accepted)
-        {
-            if(lineEditA->text()!="")varMain0=lineEditA->text();else varMain0="";
-            if(lineEditB->text()!="")varMain1=lineEditB->text();else varMain1="";
-            if(lineEditC->text()!="")varMain2=lineEditC->text();else varMain2="";
-            input0=cha->checkState();
-            input1=chb->checkState();
-            input2=chc->checkState();
+        for (int j = 0; j < selectedVariables.size(); ++j) {
+            VariableRecord varselect = selectedVariables[j];
+            ///qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
+            dlg.addVariableRow(varselect);
         }
+        if (dlg.exec() == QDialog::Accepted) {
+            selectedVariables.clear();
+            label.setTextFormat(Qt::RichText);
+            label.setText("");
 
-        label.setText("");
-        if(varMain0!=""&&input0)label.setText(varMain0);
-        if(varMain1!=""&&input1)label.setText(label.text()+", "+varMain1);
-        if(varMain2!=""&&input2)label.setText(label.text()+", "+varMain2);
-          if(label.text()!="")
-        {
-            if(label.text()[0]==",")
-            {
-                QStringRef z = label.text().midRef(1);
-                label.setText(z.toString());
+            for (const VariableRecord &selected : dlg.getSelectedVariables()) {
+                selectedVariables.append(selected);
+                qDebug() << "seçilen:" << selected.label << selected.value << selected.type<<selected.isInput;
+
+                if (selected.isInput) {
+                    label.setText(label.text() + "<br>" + selected.label + " = ?");
+                } else if (selected.type == "number") {
+                    label.setText(label.text() + "<br>" + selected.label + " = " + selected.value);
+                } else {
+                    label.setText(label.text() + "<br>" + selected.label + " = \"" + selected.value + "\"");
+                }
             }
         }
+
 
      }
     if(this->myDiagramType==Diagram::DiagramType::Output)
     {
-        QDialog * d = new QDialog();
-        QVBoxLayout * vbox = new QVBoxLayout();
-        QComboBox * comboBoxA = new QComboBox();
-        comboBoxA->addItems(QStringList()<<"" <<varMain0<<varMain1 << varMain2);
-        QComboBox * comboBoxB = new QComboBox();
-        comboBoxB->addItems(QStringList()<<"" <<varMain0<<varMain1 << varMain2);
-        QComboBox * comboBoxC = new QComboBox();
-        comboBoxC->addItems(QStringList()<<"" <<varMain0<<varMain1 << varMain2);
+         VariableOutputDialog dlg;
 
-        QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                            | QDialogButtonBox::Cancel);
+         // Önceki seçimleri yeniden yükle
+         for (const VariableRecord &var : selectedVariables) {
+             dlg.addVariableRow(var);
+         }
 
-        QObject::connect(buttonBox, SIGNAL(accepted()), d, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), d, SLOT(reject()));
+         if (dlg.exec() == QDialog::Accepted) {
+             selectedVariables.clear();
+             label.setTextFormat(Qt::RichText);
+             label.setText("");
 
-        vbox->addWidget(comboBoxA);
-        vbox->addWidget(comboBoxB);
-        vbox->addWidget(comboBoxC);
-        vbox->addWidget(buttonBox);
+             for (const VariableRecord &selected : dlg.getSelectedVariables()) {
+                 selectedVariables.append(selected);
+                 //qDebug() << "çıktı:" << selected.label << selected.value << selected.type;
+                 if(label.text()=="")
+                     label.setText(selected.label);
+                 else
+                     label.setText(label.text()+"<br>"+selected.label);
+             }
+         }
 
-        d->setLayout(vbox);
-        comboBoxA->setCurrentText(var0);
-        comboBoxB->setCurrentText(var1);
-        comboBoxC->setCurrentText(var2);
-
-        int result = d->exec();
-        if(result == QDialog::Accepted)
-        {
-            if(comboBoxA->currentText()!="")var0=comboBoxA->currentText();else var0="";
-            if(comboBoxB->currentText()!="")var1=comboBoxB->currentText();else var1="";
-            if(comboBoxC->currentText()!="")var2=comboBoxC->currentText();else var2="";
-
-        }
-        label.setText("");
-        if(var0!="")label.setText(var0);
-        if(var1!="")label.setText(label.text()+", "+var1);
-        if(var2!="")label.setText(label.text()+", "+var2);
-        if(label.text()!="")
-        {
-            if(label.text()[0]==",")
-            {
-                QStringRef z = label.text().midRef(1);
-                label.setText(z.toString());
-            }
-        }
     }
     if(this->myDiagramType==Diagram::DiagramType::Process)
     {
-        QDialog * d = new QDialog();
-        QHBoxLayout * vbox = new QHBoxLayout();
-        QComboBox * comboBoxA = new QComboBox();
-        comboBoxA->addItems(QStringList()<<"" <<varMain0<<varMain1 << varMain2);
-        QLineEdit * lineEditB = new QLineEdit();
-        QLineEdit * lineEditC = new QLineEdit();
-
-        QComboBox * comboBoxD = new QComboBox();
-        comboBoxD->addItems(QStringList()<<"" <<"+"<<"-" << "/"<<"*");
-
-        QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                            | QDialogButtonBox::Cancel);
-
-        QObject::connect(buttonBox, SIGNAL(accepted()), d, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), d, SLOT(reject()));
-
-        vbox->addWidget(comboBoxA);
-         vbox->addWidget(new QLabel("="));
-        vbox->addWidget(lineEditB);
-        vbox->addWidget(comboBoxD);
-        vbox->addWidget(lineEditC);
-        vbox->addWidget(buttonBox);
-
-        d->setLayout(vbox);
-        comboBoxA->setCurrentText(var0);
-        lineEditB->setText(var1);
-        lineEditC->setText(var2);
-        comboBoxD->setCurrentText(varOperator0);
-
-
-        int result = d->exec();
-        if(result == QDialog::Accepted)
-        {
-            if(comboBoxA->currentText()!="")var0=comboBoxA->currentText();else var0="";
-            if(lineEditB->text()!="")var1=lineEditB->text();else var1="";
-            if(lineEditC->text()!="")var2=lineEditC->text();else var2="";
-            if(comboBoxD->currentText()!="")varOperator0=comboBoxD->currentText();else varOperator0="";
+        VariableExpressionDialog dlg;
+        for (int j = 0; j < selectedVariables.size(); ++j) {
+            const VariableRecord &varselect = selectedVariables[j];
+            ///qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
+            dlg.addExpressionRowparametre(varselect.operationType, varselect.expression);
         }
-        label.setText("");
-        if(varOperator0!=""&&var0!=""&&var1!=""&&var2!="")
-        {
-            label.setText(var0+" = "+var1+" "+varOperator0+" "+var2);
-        }
-           else
+        if (dlg.exec() == QDialog::Accepted) {
+            selectedVariables.clear();
+            auto exprList = dlg.getExpressionsWithType();
             label.setText("");
+            label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+            for (const auto &pair : exprList) {
+                int type = pair.first;
+                QString expr = pair.second;
+
+                if(expr.split("=")[1].trimmed()!=""){
+                     ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
+                    VariableRecord selected;
+                    selected.label = expr.split("=")[0].trimmed();
+                    selected.expression=expr;
+                    selected.operationType=type;
+                    selectedVariables.append(selected);
+                    /**********************************************/
+                    if(label.text()=="")
+                        label.setText(selected.expression);
+                    else
+                        label.setText(label.text()+"<br>"+selected.expression);
+                    /*********************************************/
+                }
+            }
+        }
     }
     if(this->myDiagramType==Diagram::DiagramType::Loop)
     {
@@ -794,7 +716,7 @@ void DiagramItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
                     break;
                 }
         case Left:
-        {   
+        {
             qDebug() <<"Left";
             break;
                 }
@@ -998,9 +920,13 @@ void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     //if(myDiagramType==Diagram::DiagramType::Input)label.setText("Input");
     //if(myDiagramType==Diagram::DiagramType::Conditional)label.setText("Conditional");
     //if(myDiagramType==Diagram::DiagramType::Process)label.setText("Process");
-    QString lbl=label.text();
-    label.setTextWidth(lbl.length()*8);
-    painter->drawStaticText(QPoint(this->boundingRect().center().x()-label.textWidth()/2,this->boundingRect().center().y()), label);
+    // Çokgenin alanı
+    QRectF rect = this->boundingRect();    // label boyutunu al
+    QSizeF textSize = label.size();  // QStaticText boyutu
+    // Ortalanmış pozisyon (x, y)
+    QPointF textPos(rect.left() + (rect.width()  - textSize.width()) / 2,
+                    rect.top()  + (rect.height() - textSize.height()) / 2);
+    painter->drawStaticText(textPos, label);// Metni çiz
 
     // qDebug()<<myDiagramType;
    /* if(rotateState)

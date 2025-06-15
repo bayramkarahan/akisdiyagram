@@ -63,6 +63,13 @@
 #include<QVBoxLayout>
 #include<QComboBox>
 #include<QDialogButtonBox>
+#include<variable.h>
+#include<QListWidget>
+#include<QPushButton>
+#include<variableexpressiondialog.h>
+#include<variable_selection_dialog.h>
+#include<variableoutputdialog.h>
+
 extern QString varMain0;
 extern QString varMain1;
 extern QString varMain2;
@@ -186,7 +193,9 @@ public:
 
     int counter=0;
     bool renkdrm;
-
+    // Seçilenler listesi
+    QList<VariableRecord> selectedVariables;
+    //VariableExpressionDialog dlg;
   public slots:
       void renk();
 signals:

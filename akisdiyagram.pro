@@ -9,7 +9,10 @@ HEADERS	    =   mainwindow.h \
     diagram.h \
     dotsignal.h \
     variable.h \
-    variableeditordialog.h
+    variable_selection_dialog.h \
+    variableeditordialog.h \
+    variableexpressiondialog.h \
+    variableoutputdialog.h
 SOURCES	    =   mainwindow.cpp \
 		diagramitem.cpp \
 		main.cpp \
@@ -18,7 +21,10 @@ SOURCES	    =   mainwindow.cpp \
 		diagramscene.cpp \
     dotsignal.cpp \
     variable.cpp \
-    variableeditordialog.cpp
+    variable_selection_dialog.cpp \
+    variableeditordialog.cpp \
+    variableexpressiondialog.cpp \
+    variableoutputdialog.cpp
 RESOURCES   =	diagramscene.qrc
 
 

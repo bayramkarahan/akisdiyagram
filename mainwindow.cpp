@@ -63,6 +63,7 @@ const int InsertTextButton = 10;
 //! [0]
 MainWindow::MainWindow()
 {
+    variableWidget=new VariableEditorDialog();
     createActions();
     createToolBox();
     createMenus();
@@ -93,8 +94,8 @@ MainWindow::MainWindow()
     this->setWindowState(Qt::WindowMaximized);
    // sceneScaleChanged("75%");
     stopAction->setEnabled(false);
-    auto  dlg=new VariableEditorDialog(this);
-    dlg->show();
+   // auto  dlg=new VariableEditorDialog(this);
+    //dlg->show();
 }
 //! [0]
 
@@ -373,7 +374,7 @@ void MainWindow::about()
                           "<br/><b>Gerçek Zamanlı Akış Diyagramı Çalıştırmak</b> için yazılmıştır"
                           "<br/>"
                           "<br/>*****************************************************************************"
-                          "<br/>   Copyright (C) 2023 by Bayram KARAHAN                                    "
+                          "<br/>   Copyright (C) 2025 by Bayram KARAHAN                                    "
                           "<br/>\tkod.pardus.org.tr/karahan/akisdiyagrami"
                           "<br/>\tgithub.com/bayramkarahan/akisdiyagrami"
                           "<br/>\tbayramkarahan.blogspot.com"
@@ -411,106 +412,77 @@ void MainWindow::worker()
 
     if(diagramItem->myDiagramType==Diagram::DiagramType::Input)
     {
-        if(varMain0!=""&&diagramItem->input0)
-        {
-            bool ok;
-            QString text = QInputDialog::getText(0, "Girdi",
-                                                 varMain0, QLineEdit::Normal,
-                                                 "", &ok);
-            if (ok && !text.isEmpty()) {
-               // diagramItems[index]->varAnswer0= text;
-               varAnswerMain0=text;
+        for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
+             VariableRecord varselect =diagramItem->selectedVariables[j];
+            qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.type<<varselect.value<<varselect.isInput;
+            if(varselect.isInput)
+            {
+                bool ok;
+                QString text = QInputDialog::getText(0, "Girdi",
+                                                     varselect.label, QLineEdit::Normal,
+                                                     "", &ok);
+                if (ok && !text.isEmpty()) {
+
+                    varselect.value=text;
+                }
             }
-        }     
-        if(varMain1!=""&&diagramItem->input1)
-        {
-            bool ok;
-            QString text = QInputDialog::getText(0, "Girdi",
-                                                 varMain1, QLineEdit::Normal,
-                                                 "", &ok);
-            if (ok && !text.isEmpty()) {
-                 varAnswerMain1=text;
-            }
-        }
-        if(varMain2!=""&&diagramItem->input2)
-        {
-            bool ok;
-            QString text = QInputDialog::getText(0, "Girdi",
-                                                 varMain2, QLineEdit::Normal,
-                                                 "", &ok);
-            if (ok && !text.isEmpty()) {
-               // diagramItems[index]->varAnswer0= text;
-               varAnswerMain2=text;
+            for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
+                const VariableRecord var = Variable::onlineVariableList[j];
+                if(varselect.label==var.label)
+                {
+                    Variable::onlineVariableList[j].value=varselect.value;
+                    variableWidget->loadVariables();
+                }
             }
         }
+
     }
     if(diagramItem->myDiagramType==Diagram::DiagramType::Output)
     {
-        if(diagramItem->var0!=""&&varAnswerMain0!="")
-        {     diagramItem->varAnswer0= varAnswerMain0;
-            QMessageBox::information (0, "Çıktı\t",
-            QString(diagramItem->var0+"= %1").arg( diagramItem->varAnswer0));
+        for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
+            VariableRecord varselect =diagramItem->selectedVariables[j];
+            //qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.type<<varselect.value<<varselect.isInput;
+            for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
+                VariableRecord var = Variable::onlineVariableList[j];
+                if(varselect.label==var.label)
+                {
+                    QMessageBox::information (0, "Çıktı\t",
+                   QString(var.label+"= %1").arg( var.value));
+                }
+            }
+
         }
-        if(diagramItem->var1!=""&&varAnswerMain1!="")
-        {     diagramItem->varAnswer1= varAnswerMain1;
-            QMessageBox::information (0, "Çıktı\t",
-            QString(diagramItem->var1+"= %1").arg( diagramItem->varAnswer1));
-        }
-        if(diagramItem->var2!=""&&varAnswerMain2!="")
-        {     diagramItem->varAnswer2= varAnswerMain2;
-            QMessageBox::information (0, "Çıktı\t",
-            QString(diagramItem->var2+"= %1").arg( diagramItem->varAnswer2));
-        }
+
     }
     if(diagramItem->myDiagramType==Diagram::DiagramType::Process)
     {
-        bool okvar0=false,okvar1=false,okvar2=false,x0x1=false,x0x2=false;
-        int x0 = diagramItem->var0.toInt(&okvar0, 10);
-        int x1 = diagramItem->var1.toInt(&okvar1, 10);
-        int x2 = diagramItem->var2.toInt(&okvar2, 10);
-        ///qDebug()<<"a1"<<okvar0<<okvar1<<okvar2<<x0<<x1<<x2;
-       // if(diagramItem->var0==varMain0&&diagramItem->var0==diagramItem->var1&&!okvar1) x0x1=true;
-        //if(diagramItem->var0==varMain0&&diagramItem->var0==diagramItem->var2&&!okvar2) x0x2=true;
-        ///qDebug()<<"a2"<<okvar0<<okvar1<<okvar2<<x0<<x1<<x2;
+        qDebug() << diagramItem->selectedVariables.size();
+        for (int j = 0; j < diagramItem->selectedVariables.size(); ++j) {
+             VariableRecord varselect = diagramItem->selectedVariables[j];
+            qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
 
-        if(!okvar0&&diagramItem->var0==varMain0){x0=varAnswerMain0.toInt();}
-        if(!okvar0&&diagramItem->var0==varMain1){x0=varAnswerMain1.toInt();}
-        if(!okvar0&&diagramItem->var0==varMain2){x0=varAnswerMain2.toInt();}
+            for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
+                 VariableRecord var = Variable::onlineVariableList[j];
 
-        if(!okvar1&&diagramItem->var1==varMain0){x1=varAnswerMain0.toInt();}
-        if(!okvar1&&diagramItem->var1==varMain1){x1=varAnswerMain1.toInt();}
-        if(!okvar1&&diagramItem->var1==varMain2){x1=varAnswerMain2.toInt();}
+                if(varselect.label==var.label)
+                {
 
-        if(!okvar2&&diagramItem->var2==varMain0){x2=varAnswerMain0.toInt();}
-        if(!okvar2&&diagramItem->var2==varMain1){x2=varAnswerMain1.toInt();}
-        if(!okvar2&&diagramItem->var2==varMain2){x2=varAnswerMain2.toInt();}
 
-       // if(!okvar1&&x0x1){x1=x0;okvar1=true;}
-        //if(!okvar2&&x0x2){x2=x0;okvar2=true;}
-        ///qDebug()<<"a3"<<okvar0<<okvar1<<okvar2<<x0<<x1<<x2;
+                     bool test=varselect.evaluate(Variable::onlineVariableList);
+                    if (test) {
+                       // qDebug() << "Sonuç:" << varselect.value;
+                        Variable::onlineVariableList[j].value=varselect.value;
+                        variableWidget->loadVariables();
+                    } else {
+                        qDebug() << "Hesaplama başarısız!";
+                    }
 
-        if(diagramItem->varOperator0=="+"){x0=x1+x2;}
-        if(diagramItem->varOperator0=="-"){x0=x1-x2;}
-        if(diagramItem->varOperator0=="/"){x0=x1/x2;}
-        if(diagramItem->varOperator0=="*"){x0=x1*x2;}
-       /// qDebug()<<"a4"<<okvar0<<okvar1<<okvar2<<x0<<x1<<x2;
 
-        if(diagramItem->var0==varMain0)
-        {
-            diagramItem->varAnswer0=QString::number(x0);
-            varAnswerMain0=QString::number(x0);
+                }
+            }
         }
-        if(diagramItem->var0==varMain1)
-        {
-            diagramItem->varAnswer1=QString::number(x0);
-            varAnswerMain1=QString::number(x0);
-        }
-        if(diagramItem->var0==varMain2)
-        {
-            diagramItem->varAnswer2=QString::number(x0);
-            varAnswerMain2=QString::number(x0);
-        }
-     }
+    }
+
     if(diagramItem->myDiagramType==Diagram::DiagramType::Loop)
     {
 
@@ -813,6 +785,7 @@ void MainWindow::createToolBox()
     toolBox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
     toolBox->setMinimumWidth(itemWidget->sizeHint().width());
     toolBox->addItem(itemWidget, tr("Akış Şekilleri"));
+    toolBox->addItem(variableWidget, tr("Değişkenler"));
     toolBox->addItem(backgroundWidget, tr("Arka Planlar"));
 }
 //! [22]
