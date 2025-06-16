@@ -69,6 +69,7 @@
 #include<variableexpressiondialog.h>
 #include<variable_selection_dialog.h>
 #include<variableoutputdialog.h>
+#include<variableconditiondialog.h>
 
 extern QString varMain0;
 extern QString varMain1;

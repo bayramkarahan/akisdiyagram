@@ -461,45 +461,13 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     }
     if(this->myDiagramType==Diagram::DiagramType::Conditional)
     {
-
-        QDialog * d = new QDialog();
-        QVBoxLayout * vbox = new QVBoxLayout();
-        QComboBox * comboBoxA0 = new QComboBox();
-        comboBoxA0->addItems(QStringList()<<"" <<varMain0<<varMain1 << varMain2);
-        QComboBox * comboBoxB0 = new QComboBox();
-        comboBoxB0->addItems(QStringList() <<""<< "=" << "<" << ">");
-        QLineEdit * lineEditA0 = new QLineEdit();
-
-        QDialogButtonBox * buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                            | QDialogButtonBox::Cancel);
-
-        QObject::connect(buttonBox, SIGNAL(accepted()), d, SLOT(accept()));
-        QObject::connect(buttonBox, SIGNAL(rejected()), d, SLOT(reject()));
-
-        vbox->addWidget(comboBoxA0);
-        vbox->addWidget(comboBoxB0);
-        vbox->addWidget(lineEditA0);
-        vbox->addWidget(buttonBox);
-
-        d->setLayout(vbox);
-        comboBoxA0->setCurrentText(var0);
-        comboBoxB0->setCurrentText(varOperator0);
-        lineEditA0->setText(varConditional0);
-
-        int result = d->exec();
-        if(result == QDialog::Accepted)
-        {
-            if(comboBoxA0->currentText()!="")var0=comboBoxA0->currentText();else var0="";
-            if(comboBoxB0->currentText()!="")varOperator0=comboBoxB0->currentText();else varOperator0="";
-            if(lineEditA0->text()!="")varConditional0=lineEditA0->text();else varConditional0="";
+        VariableConditionDialog dlg;
+        if (dlg.exec() == QDialog::Accepted) {
+            auto expressions = dlg.getExpressionsWithType();
+            for (const auto &pair : expressions) {
+                qDebug() << "Tür:" << pair.first << "Koşul:" << pair.second;
+            }
         }
-        label.setText("");
-        if(varOperator0!=""&&var0!=""&&varConditional0!="")
-        {
-            label.setText(var0+" "+varOperator0+" "+varConditional0);
-        }
-           else
-            label.setText("");
     }
 
     QGraphicsItem::mouseDoubleClickEvent(event);

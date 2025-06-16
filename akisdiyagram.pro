@@ -10,6 +10,7 @@ HEADERS	    =   mainwindow.h \
     dotsignal.h \
     variable.h \
     variable_selection_dialog.h \
+    variableconditiondialog.h \
     variableeditordialog.h \
     variableexpressiondialog.h \
     variableoutputdialog.h
@@ -22,6 +23,7 @@ SOURCES	    =   mainwindow.cpp \
     dotsignal.cpp \
     variable.cpp \
     variable_selection_dialog.cpp \
+    variableconditiondialog.cpp \
     variableeditordialog.cpp \
     variableexpressiondialog.cpp \
     variableoutputdialog.cpp
