@@ -351,42 +351,6 @@ void VariableExpressionDialog::updateExpressionRowWidgets(int index)
         break;
     }
 }
-/*
-QStringList VariableExpressionDialog::getExpressions() const
-{
-    QStringList exprList;
-    for (ExpressionRow *row : expressionRows) {
-        QString expr;
-        QString target = row->targetVarCombo->currentText();
-        int type = row->operationTypeCombo->currentIndex();
-
-        switch (type) {
-        case 0:
-            expr = QString("%1 = %2").arg(target).arg(row->constEdit->text());
-            break;
-        case 1:
-            expr = QString("%1 = %2").arg(target).arg(row->var1Combo->currentText());
-            break;
-        case 2:
-            expr = QString("%1 = %2 %3 %4")
-                       .arg(target)
-                       .arg(row->var1Combo->currentText())
-                       .arg(row->operatorCombo->currentText())
-                       .arg(row->var2Combo->currentText());
-            break;
-        case 3:
-            expr = QString("%1 = %2 %3 %4")
-                       .arg(target)
-                       .arg(row->var1Combo->currentText())
-                       .arg(row->operatorCombo->currentText())
-                       .arg(row->constEdit->text());
-            break;
-        }
-        exprList.append(expr);
-    }
-    return exprList;
-}
-*/
 
 QList<QPair<int, QString>> VariableExpressionDialog::getExpressionsWithType() const
 {

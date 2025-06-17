@@ -462,12 +462,40 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     if(this->myDiagramType==Diagram::DiagramType::Conditional)
     {
         VariableConditionDialog dlg;
+        for (int j = 0; j < selectedVariables.size(); ++j) {
+            const VariableRecord &varselect = selectedVariables[j];
+            qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
+            dlg.addExpressionRowparametre(varselect.operationType, varselect.expression);
+        }
         if (dlg.exec() == QDialog::Accepted) {
-            auto expressions = dlg.getExpressionsWithType();
-            for (const auto &pair : expressions) {
-                qDebug() << "Tür:" << pair.first << "Koşul:" << pair.second;
+            selectedVariables.clear();
+            auto exprList = dlg.getExpressionsWithType();
+            label.setText("");
+            label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+            for (const auto &pair : exprList) {
+                int type = pair.first;
+                QString expr = pair.second;
+                if(expr.split(" ")[1].trimmed()!=""){
+                    ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
+                    VariableRecord selected;
+                    selected.label = expr.split(" ")[0].trimmed();
+                    selected.expression=expr;
+                    selected.operationType=type;
+                    selectedVariables.append(selected);
+                    /**********************************************/
+                    if(label.text()=="")
+                    {
+                        label.setText(selected.expression);
+                      }
+                    else
+                    {
+                        label.setText(label.text()+"<br>"+selected.expression);
+                    }
+                    /*********************************************/
+              }
             }
         }
+
     }
 
     QGraphicsItem::mouseDoubleClickEvent(event);
