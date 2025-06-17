@@ -19,6 +19,45 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     tableWidget->setColumnWidth(0, 60); // Label
     tableWidget->setColumnWidth(1, 60); // Value
     tableWidget->setColumnWidth(2, 60); // Type
+   /* connect(tableWidget, &QTableWidget::cellChanged, this, [=](int row, int column) {
+        qDebug() << "Satır " << row << " üzerinde değişiklik oldu.";
+           if(tableWidget->rowCount()>0) updateVariablesFromTable();
+    });*/
+    /*connect(tableWidget, &QTableWidget::itemChanged, this, [=](QTableWidgetItem *item) {
+        qDebug() << "Item değişti. Satır:" << item->row() << "Sütun:" << item->column()
+            << "Yeni değer:" << item->text();
+        updateVariablesFromTable();
+    });*/
+    // Header'da veya sınıf içinde önceki değeri tut
+
+    bool isUserEditing = false;
+
+    // Editing başladıysa kullanıcı düzenliyor demektir
+    connect(tableWidget, &QTableWidget::itemSelectionChanged, this, [&]() {
+        QTableWidgetItem *item = tableWidget->currentItem();
+
+        if (item) {
+            previousValue = item->text();
+        }
+    });
+
+    // Editing başladığında (kullanıcı hücreye tıkladıysa)
+    connect(tableWidget, &QTableWidget::cellActivated, this, [&](int row, int col) {
+        //qDebug()<<"b1";
+        isUserEditing = true;
+    });
+
+    // Değişiklik olduğunda kontrol et
+    connect(tableWidget, &QTableWidget::itemChanged, this, [&](QTableWidgetItem *item) {
+        //qDebug()<<"c1";
+        if (isUserEditing) {
+            isUserEditing = false;
+            if (item->text() != previousValue&&previousValue!="") {
+                qDebug() << "Kullanıcı hücreyi değiştirdi. Yeni değer:" << item->text();
+                //updateVariablesFromTable();
+            }
+        }
+    });
 
     addButton = new QPushButton("Ekle", this);
     removeButton = new QPushButton("Sil", this);
@@ -91,13 +130,19 @@ void VariableEditorDialog::removeSelectedVariable()
 
 void VariableEditorDialog::updateVariablesFromTable()
 {
+   // qDebug()<<"aa1";
     Variable::onlineVariableList.clear();
+    //qDebug()<<"aa2";
     for (int row = 0; row < tableWidget->rowCount(); ++row) {
+        // qDebug()<<"aa21";
         VariableRecord rec;
+       //   qDebug()<<"aa222";
         rec.label = tableWidget->item(row, 0)->text();
+        //   qDebug()<<"aa333";
         rec.value = tableWidget->item(row, 1)->text();
-
+/// qDebug()<<"aa22";
         QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(row, 2));
+        //qDebug()<<"aa3";
         if (combo)
         {
             rec.type = combo->currentText();

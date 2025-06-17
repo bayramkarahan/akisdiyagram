@@ -8,7 +8,7 @@
 VariableConditionDialog::VariableConditionDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("Koşul Tanımla");
-    resize(1200, 200);
+    resize(900, 200);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -23,15 +23,14 @@ VariableConditionDialog::VariableConditionDialog(QWidget *parent) : QDialog(pare
     expressionsLayout->setContentsMargins(5,5,5,5);
     expressionsLayout->setSpacing(10);
 
-    // İlk işlem satırı veya boş başlat
-    //addExpressionRow();
+
 
     // "Yeni İşlem Ekle" butonu
-    addButton = new QPushButton("Yeni İşlem Ekle", this);
-    connect(addButton, &QPushButton::clicked, this, &VariableConditionDialog::addExpressionRow);
+    //addButton = new QPushButton("Yeni İşlem Ekle", this);
+    //connect(addButton, &QPushButton::clicked, this, &VariableConditionDialog::addExpressionRow);
 
     // Expressions ve addButton aynı layoutta (scroll içinde)
-    expressionsLayout->addWidget(addButton);
+    ///expressionsLayout->addWidget(addButton);
 
     // Ana layouta scrollArea ekle
     mainLayout->addWidget(scrollArea);
@@ -55,14 +54,7 @@ QStringList VariableConditionDialog::variableLabels() const
 
 void VariableConditionDialog::addExpressionRow()
 {
-   /* if (!expressionRows.isEmpty()) {
-        ExpressionRow *lastRow = expressionRows.last();
-        if (lastRow->targetVarCombo->currentText().isEmpty() &&
-            lastRow->operationTypeCombo->currentIndex() == 0 &&
-            lastRow->constEdit1->text().isEmpty()) {
-            return; // Son satır boş, yeni satır ekleme
-        }
-    }*/
+
     ExpressionRow *row = new ExpressionRow;
 
     row->widget = new QWidget(this);
@@ -73,11 +65,11 @@ void VariableConditionDialog::addExpressionRow()
     // İşlem türü combo
     row->operationTypeCombo = new QComboBox(row->widget);
     row->operationTypeCombo->addItems({
-        "📥 Değişken Sabit Koşulu (var0 > 5)",
-        "🧮 Değişken Değişken Koşulu (var0 > var1)",
-        "➕ Değişken Sabit Koşulu ve  Değişken Değişken Koşulu (var0 > 5 && var2 > var2)",
-        "➕ Değişken Sabit Koşulu ve Değişken Sabit Koşulu (var0 > 5 && var2 > 6)",
-        "➕ Değişken Değişken Koşulu ve Değişken Değişken Koşulu (var0 > var1 && var2 > var3)",
+        "📥 var0 > 5 ",
+        "📥  var0 > var1 ",
+        "📥  var0 > 5 && var2 > var2 ",
+        "📥  var0 > 5 && var2 > 6 ",
+        "📥  var0 > var1 && var2 > var3 ",
     });
     layout->addWidget(row->operationTypeCombo);
 
@@ -104,7 +96,7 @@ void VariableConditionDialog::addExpressionRow()
 
     // logicOperatör2 combo
     row->logicOperatorCombo = new QComboBox(row->widget);
-    row->logicOperatorCombo->addItems({"&&", "||", "!"});
+    row->logicOperatorCombo->addItems({"&&", "||"});
     layout->addWidget(row->logicOperatorCombo);
 
 
@@ -163,14 +155,7 @@ void VariableConditionDialog::addExpressionRow()
 
 void VariableConditionDialog::addExpressionRowparametre(int operationType, const QString &expression)
 {
-   /* if (!expressionRows.isEmpty()) {
-        ExpressionRow *lastRow = expressionRows.last();
-        if (lastRow->targetVarCombo->currentText().isEmpty() &&
-            lastRow->operationTypeCombo->currentIndex() == 0 &&
-            lastRow->constEdit1->text().isEmpty()&&lastRow->constEdit2->text().isEmpty()) {
-            return; // Son satır boş, yeni satır ekleme
-        }
-    }*/
+
     ExpressionRow* row = new ExpressionRow;
 
     row->widget = new QWidget(this);
@@ -180,11 +165,11 @@ void VariableConditionDialog::addExpressionRowparametre(int operationType, const
     // İşlem türü combo
     row->operationTypeCombo = new QComboBox(row->widget);
     row->operationTypeCombo->addItems({
-        "📥 Değişken Sabit Koşulu (var0 > 5)",
-        "🧮 Değişken Değişken Koşulu (var0 > var1)",
-        "➕ Değişken Sabit Koşulu ve  Değişken Değişken Koşulu (var0 > 5 && var2 > var2)",
-        "➕ Değişken Sabit Koşulu ve Değişken Sabit Koşulu (var0 > 5 && var2 > 6)",
-        "➕ Değişken Değişken Koşulu ve Değişken Değişken Koşulu (var0 > var1 && var2 > var3)",
+        "📥 var0 > 5 ",
+        "📥  var0 > var1 ",
+        "📥  var0 > 5 && var2 > var2 ",
+        "📥  var0 > 5 && var2 > 6 ",
+        "📥  var0 > var1 && var2 > var3 ",
     });
     layout->addWidget(row->operationTypeCombo);
 
@@ -211,7 +196,7 @@ void VariableConditionDialog::addExpressionRowparametre(int operationType, const
 
     // logicOperatör2 combo
     row->logicOperatorCombo = new QComboBox(row->widget);
-    row->logicOperatorCombo->addItems({"&&", "||", "!"});
+    row->logicOperatorCombo->addItems({"&&", "||"});
     layout->addWidget(row->logicOperatorCombo);
 
 
@@ -270,77 +255,119 @@ void VariableConditionDialog::addExpressionRowparametre(int operationType, const
             row->constEdit1->setText(num1);
         }
             break;
+        case 1: // var == var1
+        {
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString var2 = parts[2].trimmed();
+
+            int var1Index = row->var1Combo->findText(var1);
+            if(var1Index >= 0) row->var1Combo->setCurrentIndex(var1Index);
+
+            int opt1Index = row->operator1Combo->findText(opt1);
+            if(opt1Index >= 0) row->operator1Combo->setCurrentIndex(opt1Index);
+
+            int var2Index = row->var2Combo->findText(var2);
+            if(var2Index >= 0) row->var2Combo->setCurrentIndex(var2Index);
+        }
+        break;
+        case 2: // var0 > 5 && var2 > var2
+        {
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString num1 = parts[2].trimmed();
+            QString logicopt = parts[3].trimmed();
+            QString var3 = parts[4].trimmed();
+            QString opt2 = parts[5].trimmed();
+            QString var4 = parts[6].trimmed();
+
+            int var1Index = row->var1Combo->findText(var1);
+            if(var1Index >= 0) row->var1Combo->setCurrentIndex(var1Index);
+
+            int opt1Index = row->operator1Combo->findText(opt1);
+            if(opt1Index >= 0) row->operator1Combo->setCurrentIndex(opt1Index);
+            row->constEdit1->setText(num1);
+
+            int logicIndex = row->var2Combo->findText(logicopt);
+            if(logicIndex >= 0) row->var2Combo->setCurrentIndex(logicIndex);
+
+
+            int var3Index = row->var1Combo->findText(var3);
+            if(var3Index >= 0) row->var1Combo->setCurrentIndex(var3Index);
+
+            int opt2Index = row->operator1Combo->findText(opt2);
+            if(opt2Index >= 0) row->operator1Combo->setCurrentIndex(opt2Index);
+
+            int var4Index = row->var2Combo->findText(var4);
+            if(var4Index >= 0) row->var2Combo->setCurrentIndex(var4Index);
+
+        }
+        break;
+        case 3: // var0 > 5 && var2 > 6
+        {
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString num1 = parts[2].trimmed();
+            QString logicopt = parts[3].trimmed();
+            QString var3 = parts[4].trimmed();
+            QString opt2 = parts[5].trimmed();
+            QString num2 = parts[6].trimmed();
+
+            int var1Index = row->var1Combo->findText(var1);
+            if(var1Index >= 0) row->var1Combo->setCurrentIndex(var1Index);
+
+            int opt1Index = row->operator1Combo->findText(opt1);
+            if(opt1Index >= 0) row->operator1Combo->setCurrentIndex(opt1Index);
+            row->constEdit1->setText(num1);
+
+            int logicIndex = row->var2Combo->findText(logicopt);
+            if(logicIndex >= 0) row->var2Combo->setCurrentIndex(logicIndex);
+
+
+            int var3Index = row->var1Combo->findText(var3);
+            if(var3Index >= 0) row->var1Combo->setCurrentIndex(var3Index);
+
+            int opt2Index = row->operator1Combo->findText(opt2);
+            if(opt2Index >= 0) row->operator1Combo->setCurrentIndex(opt2Index);
+
+            row->constEdit2->setText(num2);
+
+        }
+        break;
+        case 4: // var0 > var1 && var2 < var
+        {
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString num1 = parts[2].trimmed();
+            QString logicopt = parts[3].trimmed();
+            QString var3 = parts[4].trimmed();
+            QString opt2 = parts[5].trimmed();
+            QString var4 = parts[6].trimmed();
+
+            int var1Index = row->var1Combo->findText(var1);
+            if(var1Index >= 0) row->var1Combo->setCurrentIndex(var1Index);
+
+            int opt1Index = row->operator1Combo->findText(opt1);
+            if(opt1Index >= 0) row->operator1Combo->setCurrentIndex(opt1Index);
+            row->constEdit1->setText(num1);
+
+            int logicIndex = row->var2Combo->findText(logicopt);
+            if(logicIndex >= 0) row->var2Combo->setCurrentIndex(logicIndex);
+
+
+            int var3Index = row->var1Combo->findText(var3);
+            if(var3Index >= 0) row->var1Combo->setCurrentIndex(var3Index);
+
+            int opt2Index = row->operator1Combo->findText(opt2);
+            if(opt2Index >= 0) row->operator1Combo->setCurrentIndex(opt2Index);
+
+            int var4Index = row->var2Combo->findText(var4);
+            if(var4Index >= 0) row->var2Combo->setCurrentIndex(var4Index);
+        }
+        break;
         }
     }
-       /* case 1: // Değişken Atama (var = var1)
-        {
-            int idx = row->var1Combo->findText(rightExpr);
-            if (idx >= 0) row->var1Combo->setCurrentIndex(idx);
-        }
-        break;
-        case 2: // İki Değişkenli İşlem (var = var1 + var2)
-        {
-            // rightExpr örn: "var1 + var2"
-            QStringList parts2 = rightExpr.split(QRegExp("\\s*[+\\-*////]\\s*"));
-           /* if(parts2.size() == 2) {
-                int idx1 = row->var1Combo->findText(parts2[0]);
-                int idx2 = row->var2Combo->findText(parts2[1]);
-                if(idx1 >= 0) row->var1Combo->setCurrentIndex(idx1);
-                if(idx2 >= 0) row->var2Combo->setCurrentIndex(idx2);
 
-                // operatör bul
-                QRegExp opRx("\\+|\\-|\\*|\\/");
-                if(opRx.indexIn(rightExpr) >= 0) {
-                    QString op = opRx.cap(0);
-                    int opIdx = row->operatorCombo->findText(op);
-                    if(opIdx >= 0) row->operatorCombo->setCurrentIndex(opIdx);
-                }
-            }
-        }
-        break;
-        case 3: // Değişken + Sabit İşlem (var = var1 + 5)
-        {
-            // örnek: "var1 + 6"
-            QRegExp expRx("^(\\w+)\\s*([+\\-*////])\\s*(\\d+)$");
-           /* if (expRx.exactMatch(rightExpr)) {
-                QString var1 = expRx.cap(1);
-                QString op = expRx.cap(2);
-                QString num = expRx.cap(3);
-
-                int idx1 = row->var1Combo->findText(var1);
-                if (idx1 >= 0) row->var1Combo->setCurrentIndex(idx1);
-
-                int opIdx = row->operatorCombo->findText(op);
-                if (opIdx >= 0) row->operatorCombo->setCurrentIndex(opIdx);
-
-                row->constEdit1->setText(num);
-            }
-        }
-        break;
-        case 4: // Değişken + Sabit İşlem (var = 3 + 5)
-        {
-            // örnek: "3 + 6"
-            QRegExp expRx("^(\\w+)\\s*([+\\-*////])\\s*(\\d+)$");
-          /*  if (expRx.exactMatch(rightExpr)) {
-                QString num1 = expRx.cap(1);
-                QString op = expRx.cap(2);
-                QString num2 = expRx.cap(3);
-
-                // int idx1 = row->var1Combo->findText(var1);
-                // if (idx1 >= 0) row->var1Combo->setCurrentIndex(idx1);
-
-                int opIdx = row->operatorCombo->findText(op);
-                if (opIdx >= 0) row->operatorCombo->setCurrentIndex(opIdx);
-
-                row->constEdit1->setText(num1);
-                row->constEdit2->setText(num2);
-
-            }
-        }
-        break;
-        }
-    }
-*/
     connect(row->operationTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){
         int idx = expressionRows.indexOf(row);
         if(idx >= 0) updateExpressionRowWidgets(idx);

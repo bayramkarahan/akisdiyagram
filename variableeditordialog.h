@@ -30,6 +30,7 @@ private:
     QPushButton *addButton;
     QPushButton *removeButton;
     QPushButton *saveButton;
+    QString previousValue; // ✅ BU ŞEKİLDE OLMALI
 };
 
 #endif // VARIABLEEDITORDIALOG_H

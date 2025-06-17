@@ -92,7 +92,7 @@ MainWindow::MainWindow()
     setWindowTitle("Akış Diyagramı 1.3");
 
     this->setWindowState(Qt::WindowMaximized);
-   // sceneScaleChanged("75%");
+    sceneScaleChanged("75%");
     stopAction->setEnabled(false);
    // auto  dlg=new VariableEditorDialog(this);
     //dlg->show();
@@ -616,41 +616,223 @@ if(item->myDiagramType==Diagram::End) return item;
     bool result=true;
     if(item->myDiagramType==Diagram::DiagramType::Conditional)
     {
-       //varMain0,varConditionalMain0,varOperatorMain0
-        bool okvar=false,okoperator=false,okconditional=false,okanswermain=false;
-        QString itemconditional,varanswermain;
-
-        if(diagramItem->var0==varMain0)
+        QString expression=item->selectedVariables.first().expression;
+        int operationType=item->selectedVariables.first().operationType;
+        //qDebug()<<"işlem"<<item->selectedVariables.first().expression;
+        //qDebug()<<"işlem türü"<<item->selectedVariables.first().operationType;
+        QStringList parts = expression.split(' ');
+        switch(operationType) {
+        case 0: // Sabit Atama (var0 > 5)
         {
-            itemconditional=item->varConditional0;
-            varanswermain=varAnswerMain0;
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString num1 = parts[2].trimmed();
+            double var1val = 0, numval1 = 0;
+            bool ok;
+            //qDebug()<<"şart parçalanmış: "<<var1<<opt1<<num1;
+            for (const auto& v : Variable::onlineVariableList) {
+                if (v.label == var1) {
+                    qDebug()<<"var1 değer: "<<var1<<v.value;
+                    var1val = v.value.toDouble(&ok);
+                }
+            }
+            numval1 = num1.toDouble(&ok);
+
+            if (opt1 == "<") result = var1val < numval1;
+            else if (opt1 == "<=") result = var1val <= numval1;
+            else if (opt1 == ">") result = var1val > numval1;
+            else if (opt1 == ">=") result = var1val >= numval1;
+            else if (opt1 == "==") result = var1val == numval1;
+            else if (opt1 == "!=") result = var1val != numval1;
+            qDebug()<<"şart sonucu: "<<var1val<<numval1<<result;
         }
-        if(diagramItem->var0==varMain1)
+        break;
+        case 1: // var1 == var2
         {
-            itemconditional=item->varConditional1;
-            varanswermain=varAnswerMain1;
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString var2 = parts[2].trimmed();
+            double var1val = 0, var2val = 0;
+            bool ok;
+            //qDebug()<<"şart parçalanmış: "<<var1<<opt1<<num1;
+            for (const auto& v : Variable::onlineVariableList) {
+                if (v.label == var1) {
+                    qDebug()<<"var1 değer: "<<var1<<v.value;
+                    var1val = v.value.toDouble(&ok);
+                }
+            }
+            for (const auto& v : Variable::onlineVariableList) {
+                if (v.label == var2) {
+                    qDebug()<<"var2 değer: "<<var2<<v.value;
+                    var2val = v.value.toDouble(&ok);
+                }
+            }
 
+            if (opt1 == "<") result = var1val < var2val;
+            else if (opt1 == "<=") result = var1val <= var2val;
+            else if (opt1 == ">") result = var1val > var2val;
+            else if (opt1 == ">=") result = var1val >= var2val;
+            else if (opt1 == "==") result = var1val == var2val;
+            else if (opt1 == "!=") result = var1val != var2val;
+            qDebug()<<"şart sonucu: "<<var1val<<var2val<<result;
         }
-        if(diagramItem->var0==varMain2)
+        break;
+        case 2: // var0 > 5 && var3 > var4
         {
-            itemconditional=item->varConditional2;
-            varanswermain=varAnswerMain2;
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString num1 = parts[2].trimmed();
+            QString logic = parts[3].trimmed();
+            QString var3 = parts[4].trimmed();
+            QString opt2 = parts[5].trimmed();
+            QString var4 = parts[6].trimmed();
+
+            double var1val = 0,num1val = 0, var3val = 0,var4val = 0;
+            bool ok;
+            //qDebug()<<"şart parçalanmış: "<<var1<<opt1<<num1;
+            for (const auto& v : Variable::onlineVariableList) {
+                if (v.label == var1) {
+                    qDebug()<<"var1 değer: "<<var1<<v.value;
+                    var1val = v.value.toDouble(&ok);
+                }
+                if (v.label == var3) {
+                    qDebug()<<"var3 değer: "<<var3<<v.value;
+                    var3val = v.value.toDouble(&ok);
+                }
+                if (v.label == var4) {
+                    qDebug()<<"var4 değer: "<<var4<<v.value;
+                    var4val = v.value.toDouble(&ok);
+                }
+            }
+
+           num1val = num1.toDouble(&ok);
+            bool result1=false;
+            if (opt1 == "<") result1 = var1val < num1val;
+            else if (opt1 == "<=") result1 = var1val <= num1val;
+            else if (opt1 == ">") result1 = var1val > num1val;
+            else if (opt1 == ">=") result1 = var1val >= num1val;
+            else if (opt1 == "==") result1 = var1val == num1val;
+            else if (opt1 == "!=") result1 = var1val != num1val;
+            qDebug()<<"şart sonucu1: "<<var1val<<num1val<<result1;
+            bool result2=false;
+            if (opt2 == "<") result2 = var3val < var4val;
+            else if (opt2 == "<=") result2 = var3val <= var4val;
+            else if (opt2 == ">") result2 = var3val > var4val;
+            else if (opt2 == ">=") result2 = var3val >= var4val;
+            else if (opt2 == "==") result2 = var3val == var4val;
+            else if (opt2 == "!=") result2 = var3val != var4val;
+            qDebug()<<"şart sonucu2: "<<var3val<<var4val<<result2;
+
+            if (logic == "&&") result = result1 && result2;
+            else if (logic == "||") result = result1 || result2;
+
 
         }
-        int varConditional = itemconditional.toInt(&okconditional, 10);
-        int varAnswerMain = varanswermain.toInt(&okanswermain, 10);
+        break;
+        case 3: // var1 > 5 && var3 > 6
+        {
+            QString var1 = parts[0].trimmed();
+            QString opt1 = parts[1].trimmed();
+            QString num1 = parts[2].trimmed();
+            QString logic = parts[3].trimmed();
+            QString var3 = parts[4].trimmed();
+            QString opt2 = parts[5].trimmed();
+            QString num2 = parts[6].trimmed();
 
-    //qDebug()<<item->var0<<item->varOperator0<<varAnswerMain<<varConditional;
-     if(item->var0!=""&&item->varOperator0=="="&&varAnswerMain==varConditional)
-         result=true;
-     else if(item->var0!=""&&item->varOperator0=="<"&&varAnswerMain<varConditional)
-     result=true;
-     else if(item->var0!=""&&item->varOperator0==">"&&varAnswerMain>varConditional)
-         result=true;
-     else
-         result=false;
+            double var1val = 0,num1val = 0, var3val = 0,num2val = 0;
+            bool ok;
+            //qDebug()<<"şart parçalanmış: "<<var1<<opt1<<num1;
+            for (const auto& v : Variable::onlineVariableList) {
+                if (v.label == var1) {
+                    qDebug()<<"var1 değer: "<<var1<<v.value;
+                    var1val = v.value.toDouble(&ok);
+                }
+                if (v.label == var3) {
+                    qDebug()<<"var3 değer: "<<var3<<v.value;
+                    var3val = v.value.toDouble(&ok);
+                }
+            }
 
-     //qDebug()<<"result"<<result;
+            num1val = num1.toDouble(&ok);
+            num2val = num2.toDouble(&ok);
+            bool result1=false;
+            if (opt1 == "<") result1 = var1val < num1val;
+            else if (opt1 == "<=") result1 = var1val <= num1val;
+            else if (opt1 == ">") result1 = var1val > num1val;
+            else if (opt1 == ">=") result1 = var1val >= num1val;
+            else if (opt1 == "==") result1 = var1val == num1val;
+            else if (opt1 == "!=") result1 = var1val != num1val;
+            qDebug()<<"şart sonucu1: "<<var1val<<num1val<<result1;
+            bool result2=false;
+            if (opt2 == "<") result2 = var3val < num2val;
+            else if (opt2 == "<=") result2 = var3val <= num2val;
+            else if (opt2 == ">") result2 = var3val > num2val;
+            else if (opt2 == ">=") result2 = var3val >= num2val;
+            else if (opt2 == "==") result2 = var3val == num2val;
+            else if (opt2 == "!=") result2 = var3val != num2val;
+            qDebug()<<"şart sonucu2: "<<var3val<<num2val<<result2;
+
+            if (logic == "&&") result = result1 && result2;
+            else if (logic == "||") result = result1 || result2;
+
+
+         }
+        break;
+       case 4: // var0 > var1 && var2 < var
+        {
+             QString var1 = parts[0].trimmed();
+             QString opt1 = parts[1].trimmed();
+             QString var2 = parts[2].trimmed();
+             QString logic = parts[3].trimmed();
+             QString var3 = parts[4].trimmed();
+             QString opt2 = parts[5].trimmed();
+             QString var4 = parts[6].trimmed();
+
+             double var1val = 0,var2val = 0, var3val = 0,var4val = 0;
+             bool ok;
+             //qDebug()<<"şart parçalanmış: "<<var1<<opt1<<num1;
+             for (const auto& v : Variable::onlineVariableList) {
+                 if (v.label == var1) {
+                     qDebug()<<"var1 değer: "<<var1<<v.value;
+                     var1val = v.value.toDouble(&ok);
+                 }
+                 if (v.label == var2) {
+                     qDebug()<<"var2 değer: "<<var2<<v.value;
+                     var2val = v.value.toDouble(&ok);
+                 }
+                 if (v.label == var3) {
+                     qDebug()<<"var3 değer: "<<var3<<v.value;
+                     var3val = v.value.toDouble(&ok);
+                 }
+                 if (v.label == var4) {
+                     qDebug()<<"var4 değer: "<<var4<<v.value;
+                     var4val = v.value.toDouble(&ok);
+                 }
+             }
+
+             bool result1=false;
+             if (opt1 == "<") result1 = var1val < var2val;
+             else if (opt1 == "<=") result1 = var1val <= var2val;
+             else if (opt1 == ">") result1 = var1val > var2val;
+             else if (opt1 == ">=") result1 = var1val >= var2val;
+             else if (opt1 == "==") result1 = var1val == var2val;
+             else if (opt1 == "!=") result1 = var1val != var2val;
+             qDebug()<<"şart sonucu1: "<<var1val<<var2val<<result1;
+             bool result2=false;
+             if (opt2 == "<") result2 = var3val < var4val;
+             else if (opt2 == "<=") result2 = var3val <= var4val;
+             else if (opt2 == ">") result2 = var3val > var4val;
+             else if (opt2 == ">=") result2 = var3val >= var4val;
+             else if (opt2 == "==") result2 = var3val == var4val;
+             else if (opt2 == "!=") result2 = var3val != var4val;
+             qDebug()<<"şart sonucu2: "<<var3val<<var4val<<result2;
+
+             if (logic == "&&") result = result1 && result2;
+             else if (logic == "||") result = result1 || result2;
+        }
+        break;
+        }
+
     }
     if(item->myDiagramType==Diagram::DiagramType::Loop)
     {
@@ -956,9 +1138,9 @@ void MainWindow::createToolbars()
 
     sceneScaleCombo = new QComboBox;
     QStringList scales;
-    scales << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
+    scales << tr("50%") << tr("60%") << tr("70%")<< tr("75%") << tr("80%") << tr("90%") << tr("100%") << tr("110%")<< tr("120%")<< tr("130%");
     sceneScaleCombo->addItems(scales);
-    sceneScaleCombo->setCurrentIndex(1);
+    sceneScaleCombo->setCurrentIndex(3);
     connect(sceneScaleCombo, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(sceneScaleChanged(QString)));
 
@@ -966,7 +1148,7 @@ void MainWindow::createToolbars()
     pointerToolbar->addWidget(pointerButton);
     pointerToolbar->addWidget(linePointerButton);
     pointerToolbar->addWidget(sceneScaleCombo);
-//! [27]
+    //! [27]
 }
 //! [27]
 

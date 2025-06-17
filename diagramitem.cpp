@@ -462,6 +462,11 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     if(this->myDiagramType==Diagram::DiagramType::Conditional)
     {
         VariableConditionDialog dlg;
+        if(selectedVariables.size()==0)
+        {
+            // İlk işlem satırı veya boş başlat
+            dlg.addExpressionRow();
+        }
         for (int j = 0; j < selectedVariables.size(); ++j) {
             const VariableRecord &varselect = selectedVariables[j];
             qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
@@ -471,27 +476,20 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             selectedVariables.clear();
             auto exprList = dlg.getExpressionsWithType();
             label.setText("");
-            label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+            //label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+            label.setTextFormat(Qt::PlainText);
             for (const auto &pair : exprList) {
                 int type = pair.first;
                 QString expr = pair.second;
-                if(expr.split(" ")[1].trimmed()!=""){
-                    ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
+                if(expr.split(' ')[2].trimmed()!=""){
+                    qDebug() << "İşlem türü:" << type << "İfade:" << expr;
                     VariableRecord selected;
                     selected.label = expr.split(" ")[0].trimmed();
                     selected.expression=expr;
                     selected.operationType=type;
                     selectedVariables.append(selected);
-                    /**********************************************/
-                    if(label.text()=="")
-                    {
-                        label.setText(selected.expression);
-                      }
-                    else
-                    {
-                        label.setText(label.text()+"<br>"+selected.expression);
-                    }
-                    /*********************************************/
+                    label.setText(expr);
+
               }
             }
         }
@@ -922,8 +920,9 @@ void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // Ortalanmış pozisyon (x, y)
     QPointF textPos(rect.left() + (rect.width()  - textSize.width()) / 2,
                     rect.top()  + (rect.height() - textSize.height()) / 2);
+    //label.setTextWidth(200);
     painter->drawStaticText(textPos, label);// Metni çiz
-
+        //qDebug()<<label.text();
     // qDebug()<<myDiagramType;
    /* if(rotateState)
     {
