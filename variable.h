@@ -157,7 +157,34 @@ public:
             value = QString::number(result);
             return true;
         }
-        default:
+        case 4: { // sabit sayı + sabit sayı
+            QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
+            if (!rx.exactMatch(rightExpr)) return false;
+
+            QString numStr1 = rx.cap(1);
+            QString op = rx.cap(2);
+            QString numStr2 = rx.cap(3);
+
+
+            double val1 = numStr1.toDouble(&ok);
+            if (!ok) return false;
+
+            double val2 = numStr2.toDouble(&ok);
+            if (!ok) return false;
+
+            double result = 0;
+            if (op == "+") result = val1 + val2;
+            else if (op == "-") result = val1 - val2;
+            else if (op == "*") result = val1 * val2;
+            else if (op == "/") {
+                if (val2 == 0) return false;
+                result = val1 / val2;
+            } else return false;
+
+            value = QString::number(result);
+            return true;
+        }
+           default:
             return false;
         }
     }

@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QScrollArea>
 #include <QWidget>
-
+#include<QApplication>
 VariableExpressionDialog::VariableExpressionDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("İşlem Tanımla");
@@ -59,7 +59,7 @@ void VariableExpressionDialog::addExpressionRow()
         ExpressionRow *lastRow = expressionRows.last();
         if (lastRow->targetVarCombo->currentText().isEmpty() &&
             lastRow->operationTypeCombo->currentIndex() == 0 &&
-            lastRow->constEdit->text().isEmpty()) {
+            lastRow->constEdit1->text().isEmpty()) {
             return; // Son satır boş, yeni satır ekleme
         }
     }
@@ -68,6 +68,18 @@ void VariableExpressionDialog::addExpressionRow()
     row->widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(row->widget);
     layout->setContentsMargins(5, 5, 5, 5);
+
+
+     // İşlem türü combo
+    row->operationTypeCombo = new QComboBox(row->widget);
+    row->operationTypeCombo->addItems({
+        "📥 Sabit Atama (var = 5)",
+        "🧮 Değişken Atama (var = var1)",
+        "➕ İki Değişkenli İşlem (var = var1 + var2)",
+        "➕ Değişken + Sabit İşlem (var = var1 + 5)",
+        "➕ Sabit İşlem + Sabit İşlem (var=3 + 5)",
+    });
+    layout->addWidget(row->operationTypeCombo);
 
     // Hedef değişken combo
     row->targetVarCombo = new QComboBox(row->widget);
@@ -78,20 +90,18 @@ void VariableExpressionDialog::addExpressionRow()
     row->equalLabel = new QLabel("=", row->widget);
     layout->addWidget(row->equalLabel);
 
-    // İşlem türü combo
-    row->operationTypeCombo = new QComboBox(row->widget);
-    row->operationTypeCombo->addItems({
-        "📥 Sabit Atama (var = 5)",
-        "🧮 Değişken Atama (var = var1)",
-        "➕ İki Değişkenli İşlem (var = var1 + var2)",
-        "➕ Değişken + Sabit İşlem (var = var1 + 5)"
-    });
-    layout->addWidget(row->operationTypeCombo);
+
 
     // var1 combo
     row->var1Combo = new QComboBox(row->widget);
     row->var1Combo->addItems(variableLabels());
     layout->addWidget(row->var1Combo);
+
+    // Sabit sayı için edit
+    row->constEdit1 = new QLineEdit(row->widget);
+    row->constEdit1->setFixedWidth(50);
+    row->constEdit1->setPlaceholderText("Sayı1");
+    layout->addWidget(row->constEdit1);
 
     // operatör combo
     row->operatorCombo = new QComboBox(row->widget);
@@ -104,10 +114,10 @@ void VariableExpressionDialog::addExpressionRow()
     layout->addWidget(row->var2Combo);
 
     // Sabit sayı için edit
-    row->constEdit = new QLineEdit(row->widget);
-    row->constEdit->setFixedWidth(50);
-    row->constEdit->setPlaceholderText("Sayı");
-    layout->addWidget(row->constEdit);
+    row->constEdit2 = new QLineEdit(row->widget);
+    row->constEdit2->setFixedWidth(50);
+    row->constEdit2->setPlaceholderText("Sayı2");
+    layout->addWidget(row->constEdit2);
 
     // Kaldırma butonu
     row->removeButton = new QPushButton("🗑️", row->widget);
@@ -144,7 +154,7 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
         ExpressionRow *lastRow = expressionRows.last();
         if (lastRow->targetVarCombo->currentText().isEmpty() &&
             lastRow->operationTypeCombo->currentIndex() == 0 &&
-            lastRow->constEdit->text().isEmpty()) {
+            lastRow->constEdit1->text().isEmpty()&&lastRow->constEdit2->text().isEmpty()) {
             return; // Son satır boş, yeni satır ekleme
         }
     }
@@ -166,13 +176,19 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
         "Sabit Atama (var=5)",
         "Değişken Atama (var=var1)",
         "İki Değişkenli İşlem (var=var1 + var2)",
-        "Değişken + Sabit İşlem (var=var1 + 5)"
+        "Değişken + Sabit İşlem (var=var1 + 5)",
+        "Sabit İşlem + Sabit İşlem (var=3 + 5)",
     });
     layout->addWidget(row->operationTypeCombo);
 
     row->var1Combo = new QComboBox(row->widget);
     row->var1Combo->addItems(variableLabels());
     layout->addWidget(row->var1Combo);
+
+    row->constEdit1 = new QLineEdit(row->widget);
+    row->constEdit1->setFixedWidth(50);
+    row->constEdit1->setPlaceholderText("Sayı");
+    layout->addWidget(row->constEdit1);
 
     row->operatorCombo = new QComboBox(row->widget);
     row->operatorCombo->addItems({"+", "-", "*", "/"});
@@ -182,10 +198,11 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
     row->var2Combo->addItems(variableLabels());
     layout->addWidget(row->var2Combo);
 
-    row->constEdit = new QLineEdit(row->widget);
-    row->constEdit->setFixedWidth(50);
-    row->constEdit->setPlaceholderText("Sayı");
-    layout->addWidget(row->constEdit);
+    row->constEdit2 = new QLineEdit(row->widget);
+    row->constEdit2->setFixedWidth(50);
+    row->constEdit2->setPlaceholderText("Sayı");
+    layout->addWidget(row->constEdit2);
+
 
     row->removeButton = new QPushButton("🗑️", row->widget);
     layout->addWidget(row->removeButton);
@@ -208,7 +225,7 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
 
         switch(operationType) {
         case 0: // Sabit Atama (var = 5)
-            row->constEdit->setText(rightExpr);
+            row->constEdit1->setText(rightExpr);
             break;
         case 1: // Değişken Atama (var = var1)
         {
@@ -251,7 +268,28 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
                 int opIdx = row->operatorCombo->findText(op);
                 if (opIdx >= 0) row->operatorCombo->setCurrentIndex(opIdx);
 
-                row->constEdit->setText(num);
+                row->constEdit1->setText(num);
+            }
+        }
+        break;
+        case 4: // Değişken + Sabit İşlem (var = 3 + 5)
+        {
+            // örnek: "3 + 6"
+            QRegExp expRx("^(\\w+)\\s*([+\\-*/])\\s*(\\d+)$");
+            if (expRx.exactMatch(rightExpr)) {
+                QString num1 = expRx.cap(1);
+                QString op = expRx.cap(2);
+                QString num2 = expRx.cap(3);
+
+               // int idx1 = row->var1Combo->findText(var1);
+               // if (idx1 >= 0) row->var1Combo->setCurrentIndex(idx1);
+
+                int opIdx = row->operatorCombo->findText(op);
+                if (opIdx >= 0) row->operatorCombo->setCurrentIndex(opIdx);
+
+                row->constEdit1->setText(num1);
+                row->constEdit2->setText(num2);
+
             }
         }
         break;
@@ -286,11 +324,12 @@ void VariableExpressionDialog::updateExpressionRowWidgets(int index)
     row->var1Combo->setVisible(false);
     row->operatorCombo->setVisible(false);
     row->var2Combo->setVisible(false);
-    row->constEdit->setVisible(false);
+    row->constEdit1->setVisible(false);
+    row->constEdit2->setVisible(false);
 
     switch (type) {
     case 0: // Sabit Atama: var = 5
-        row->constEdit->setVisible(true);
+        row->constEdit2->setVisible(true);
         break;
     case 1: // Değişken Atama: var = var1
         row->var1Combo->setVisible(true);
@@ -303,11 +342,16 @@ void VariableExpressionDialog::updateExpressionRowWidgets(int index)
     case 3: // Değişken + Sabit İşlem: var = var1 + 5
         row->var1Combo->setVisible(true);
         row->operatorCombo->setVisible(true);
-        row->constEdit->setVisible(true);
+        row->constEdit2->setVisible(true);
+        break;
+    case 4: // Değişken + Sabit İşlem: var = 3 + 5
+        row->constEdit1->setVisible(true);
+        row->operatorCombo->setVisible(true);
+        row->constEdit2->setVisible(true);
         break;
     }
 }
-
+/*
 QStringList VariableExpressionDialog::getExpressions() const
 {
     QStringList exprList;
@@ -342,7 +386,7 @@ QStringList VariableExpressionDialog::getExpressions() const
     }
     return exprList;
 }
-
+*/
 
 QList<QPair<int, QString>> VariableExpressionDialog::getExpressionsWithType() const
 {
@@ -354,7 +398,7 @@ QList<QPair<int, QString>> VariableExpressionDialog::getExpressionsWithType() co
 
         switch (type) {
         case 0:
-            expr = QString("%1 = %2").arg(target).arg(row->constEdit->text());
+            expr = QString("%1 = %2").arg(target).arg(row->constEdit2->text());
             break;
         case 1:
             expr = QString("%1 = %2").arg(target).arg(row->var1Combo->currentText());
@@ -371,7 +415,14 @@ QList<QPair<int, QString>> VariableExpressionDialog::getExpressionsWithType() co
                        .arg(target)
                        .arg(row->var1Combo->currentText())
                        .arg(row->operatorCombo->currentText())
-                       .arg(row->constEdit->text());
+                       .arg(row->constEdit2->text());
+            break;
+        case 4:
+            expr = QString("%1 = %2 %3 %4")
+                       .arg(target)
+                       .arg(row->constEdit1->text())
+                       .arg(row->operatorCombo->currentText())
+                       .arg(row->constEdit2->text());
             break;
         }
         list.append(qMakePair(type, expr));

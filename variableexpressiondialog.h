@@ -16,7 +16,7 @@ class VariableExpressionDialog : public QDialog
     Q_OBJECT
 public:
     explicit VariableExpressionDialog(QWidget *parent = nullptr);
-    QStringList getExpressions() const;
+   // QStringList getExpressions() const;
      void addExpressionRowparametre(int operationType, const QString &expression = QString());
 
     void addExpressionRow();
@@ -34,7 +34,8 @@ private:
         QComboBox *var1Combo;
         QComboBox *operatorCombo;
         QComboBox *var2Combo;
-        QLineEdit *constEdit;
+        QLineEdit *constEdit1;
+         QLineEdit *constEdit2;
         QPushButton *removeButton;
     };
 
