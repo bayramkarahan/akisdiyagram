@@ -13,7 +13,7 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     tableWidget->setColumnCount(4);
     tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
 
-    tableWidget->setHorizontalHeaderLabels(QStringList() << "Variable" << "Value" << "Type");
+    tableWidget->setHorizontalHeaderLabels(QStringList() << "Adı" << "Değer" << "Veri Türü");
     tableWidget->horizontalHeader()->setStretchLastSection(true);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setEditTriggers(QAbstractItemView::DoubleClicked);
@@ -62,6 +62,20 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
                 }
             }
         }
+         ////if (dialog.exec() == QDialog::Rejected) {
+            //qDebug()<<"vazgeç";
+            //readonly yapıyor
+            for (int row = 0; row < tableWidget->rowCount(); ++row) {
+                for (int col = 0; col < tableWidget->columnCount(); ++col) {
+                    QTableWidgetItem* item = tableWidget->item(row, col);
+                    if (!item) {
+                        item = new QTableWidgetItem();
+                        tableWidget->setItem(row, col, item);
+                    }
+                    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+                }
+            }
+         ///}
     });
 
     addButton = new QPushButton("Ekle", this);

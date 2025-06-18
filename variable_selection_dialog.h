@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include "variable.h"
+#include<QScrollArea>
 
 class VariableSelectionDialog : public QDialog {
     Q_OBJECT
@@ -28,15 +29,14 @@ private:
         QPushButton *removeButton;
     };
 
-    QVBoxLayout *mainLayout;
+    QVBoxLayout *selectionLayout;
     QVBoxLayout *rowsLayout;
     QPushButton *addButton;
 
-    QList<VariableRecord> allVariables;
     QList<VariableRow*> variableRows;
 
      void removeVariableRow(int index);
-    QStringList variableLabels() const;
+    QList<QPair<QString, QString> > variableLabels() const;
 };
 
 #endif // VARIABLESELECTIONDIALOG_H

@@ -374,12 +374,13 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         VariableExpressionDialog dlg;
         for (int j = 0; j < selectedVariables.size(); ++j) {
             const VariableRecord &varselect = selectedVariables[j];
-            ///qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
+            qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
             dlg.addExpressionRowparametre(varselect.operationType, varselect.expression);
         }
         if (dlg.exec() == QDialog::Accepted) {
-            selectedVariables.clear();
+
             auto exprList = dlg.getExpressionsWithType();
+            selectedVariables.clear();
             label.setText("");
             label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
             for (const auto &pair : exprList) {

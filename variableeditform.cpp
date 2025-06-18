@@ -7,6 +7,7 @@ VariableEditForm::VariableEditForm(const VariableRecord &record, QWidget *parent
     : QDialog(parent), currentRecord(record)
 {
     setWindowTitle("Değişkeni Düzenle");
+    resize(230, 120);
 
     labelEdit = new QLineEdit(record.label, this);
     valueEdit = new QLineEdit(record.value, this);
@@ -19,9 +20,9 @@ VariableEditForm::VariableEditForm(const VariableRecord &record, QWidget *parent
     cancelButton = new QPushButton("İptal", this);
 
     QFormLayout *formLayout = new QFormLayout;
-    formLayout->addRow("Label:", labelEdit);
-    formLayout->addRow("Value:", valueEdit);
-    formLayout->addRow("Type:", typeCombo);
+    formLayout->addRow("Değiken Adı:", labelEdit);
+    formLayout->addRow("Değeri:", valueEdit);
+    formLayout->addRow("Veri Türü:", typeCombo);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();

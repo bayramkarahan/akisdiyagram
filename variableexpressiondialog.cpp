@@ -7,7 +7,7 @@
 VariableExpressionDialog::VariableExpressionDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("İşlem Tanımla");
-    resize(650, 400);
+    resize(650, 300);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -37,6 +37,10 @@ VariableExpressionDialog::VariableExpressionDialog(QWidget *parent) : QDialog(pa
 
     // OK ve Cancel butonları ana layoutun en altında
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
+    QPushButton *cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
+    if (okButton) okButton->setText("Tamam");
+    if (cancelButton) cancelButton->setText("Vazgeç");
     mainLayout->addWidget(buttonBox);
 
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -158,19 +162,12 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
             return; // Son satır boş, yeni satır ekleme
         }
     }
+
     ExpressionRow* row = new ExpressionRow;
 
     row->widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(row->widget);
     layout->setContentsMargins(5,5,5,5);
-
-    row->targetVarCombo = new QComboBox(row->widget);
-    row->targetVarCombo->addItems(variableLabels());
-    layout->addWidget(row->targetVarCombo);
-
-    row->equalLabel = new QLabel("=", row->widget);
-    layout->addWidget(row->equalLabel);
-
     row->operationTypeCombo = new QComboBox(row->widget);
     row->operationTypeCombo->addItems({
         "Sabit Atama (var=5)",
@@ -181,13 +178,22 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
     });
     layout->addWidget(row->operationTypeCombo);
 
+
+    row->targetVarCombo = new QComboBox(row->widget);
+    row->targetVarCombo->addItems(variableLabels());
+    layout->addWidget(row->targetVarCombo);
+
+    row->equalLabel = new QLabel("=", row->widget);
+    layout->addWidget(row->equalLabel);
+
+
     row->var1Combo = new QComboBox(row->widget);
     row->var1Combo->addItems(variableLabels());
     layout->addWidget(row->var1Combo);
 
     row->constEdit1 = new QLineEdit(row->widget);
     row->constEdit1->setFixedWidth(50);
-    row->constEdit1->setPlaceholderText("Sayı");
+    row->constEdit1->setPlaceholderText("Sayı1");
     layout->addWidget(row->constEdit1);
 
     row->operatorCombo = new QComboBox(row->widget);
@@ -200,7 +206,7 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
 
     row->constEdit2 = new QLineEdit(row->widget);
     row->constEdit2->setFixedWidth(50);
-    row->constEdit2->setPlaceholderText("Sayı");
+    row->constEdit2->setPlaceholderText("Sayı2");
     layout->addWidget(row->constEdit2);
 
 
@@ -225,6 +231,7 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
 
         switch(operationType) {
         case 0: // Sabit Atama (var = 5)
+            qDebug()<<"atama0";
             row->constEdit1->setText(rightExpr);
             break;
         case 1: // Değişken Atama (var = var1)
@@ -268,7 +275,7 @@ void VariableExpressionDialog::addExpressionRowparametre(int operationType, cons
                 int opIdx = row->operatorCombo->findText(op);
                 if (opIdx >= 0) row->operatorCombo->setCurrentIndex(opIdx);
 
-                row->constEdit1->setText(num);
+                row->constEdit2->setText(num);
             }
         }
         break;
@@ -329,7 +336,7 @@ void VariableExpressionDialog::updateExpressionRowWidgets(int index)
 
     switch (type) {
     case 0: // Sabit Atama: var = 5
-        row->constEdit2->setVisible(true);
+        row->constEdit1->setVisible(true);
         break;
     case 1: // Değişken Atama: var = var1
         row->var1Combo->setVisible(true);
@@ -362,7 +369,7 @@ QList<QPair<int, QString>> VariableExpressionDialog::getExpressionsWithType() co
 
         switch (type) {
         case 0:
-            expr = QString("%1 = %2").arg(target).arg(row->constEdit2->text());
+            expr = QString("%1 = %2").arg(target).arg(row->constEdit1->text());
             break;
         case 1:
             expr = QString("%1 = %2").arg(target).arg(row->var1Combo->currentText());

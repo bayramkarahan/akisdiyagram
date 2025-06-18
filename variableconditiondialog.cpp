@@ -37,6 +37,10 @@ VariableConditionDialog::VariableConditionDialog(QWidget *parent) : QDialog(pare
 
     // OK ve Cancel butonları ana layoutun en altında
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
+    QPushButton *cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
+    if (okButton) okButton->setText("Tamam");
+    if (cancelButton) cancelButton->setText("Vazgeç");
     mainLayout->addWidget(buttonBox);
 
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);

@@ -21,6 +21,10 @@ VariableOutputDialog::VariableOutputDialog(QWidget *parent)
     mainLayout->addWidget(addButton);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
+    QPushButton *cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
+    if (okButton) okButton->setText("Tamam");
+    if (cancelButton) cancelButton->setText("Vazgeç");
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     mainLayout->addWidget(buttonBox);

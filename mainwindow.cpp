@@ -413,8 +413,8 @@ void MainWindow::worker()
     if(diagramItem->myDiagramType==Diagram::DiagramType::Input)
     {
         for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
-             VariableRecord varselect =diagramItem->selectedVariables[j];
-            qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.type<<varselect.value<<varselect.isInput;
+            VariableRecord varselect =diagramItem->selectedVariables[j];
+            qDebug()<<"kullanılan değişkenim:"<<varselect.name<<varselect.label<<varselect.type<<varselect.value<<varselect.isInput;
             if(varselect.isInput)
             {
                 bool ok;
@@ -428,7 +428,7 @@ void MainWindow::worker()
             }
             for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
                 const VariableRecord var = Variable::onlineVariableList[j];
-                if(varselect.label==var.label)
+                if(varselect.name==var.name)
                 {
                     Variable::onlineVariableList[j].value=varselect.value;
                     variableWidget->loadVariables();
