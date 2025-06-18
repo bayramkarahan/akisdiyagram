@@ -79,10 +79,10 @@ MainWindow::MainWindow()
     createToolbars();
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(toolBox);
+    layout->addWidget(toolBoxLeft);
     view = new QGraphicsView(scene);
     layout->addWidget(view);
-
+    layout->addWidget(toolBoxRight);
     QWidget *widget = new QWidget;
     widget->setLayout(layout);
 
@@ -101,15 +101,15 @@ MainWindow::MainWindow()
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
-qDebug()<<"main move";
+//qDebug()<<"main move";
 }
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-qDebug()<<"mainpress";
+//qDebug()<<"mainpress";
 }
 void MainWindow::mouseReleaseEvent(QMouseEvent *event)
 {
-qDebug()<<"mainrelease";
+//qDebug()<<"mainrelease";
 }
 
 //! [1]
@@ -963,12 +963,21 @@ void MainWindow::createToolBox()
 
 
 //! [22]
-    toolBox = new QToolBox;
-    toolBox->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
-    toolBox->setMinimumWidth(itemWidget->sizeHint().width());
-    toolBox->addItem(itemWidget, tr("Akış Şekilleri"));
-    toolBox->addItem(variableWidget, tr("Değişkenler"));
-    toolBox->addItem(backgroundWidget, tr("Arka Planlar"));
+    toolBoxLeft = new QToolBox;
+    toolBoxLeft->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
+    toolBoxLeft->setMinimumWidth(itemWidget->sizeHint().width());
+    toolBoxLeft->addItem(itemWidget, tr("Akış Şekilleri"));
+    ///toolBoxLeft->addItem(variableWidget, tr("Değişkenler"));
+    toolBoxLeft->addItem(backgroundWidget, tr("Arka Planlar"));
+
+    toolBoxRight = new QToolBox;
+    toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
+    toolBoxRight->setMinimumWidth(variableWidget->width());
+    toolBoxRight->setFixedWidth(variableWidget->width());
+
+   // toolBoxRight->addItem(itemWidget, tr("Akış Şekilleri"));
+    toolBoxRight->addItem(variableWidget, tr("Değişkenler"));
+   // toolBoxRight->addItem(backgroundWidget, tr("Arka Planlar"));
 }
 //! [22]
 
@@ -1000,7 +1009,7 @@ void MainWindow::createActions()
 
     stopAction = new QAction(QIcon(":/images/stop.png"), tr("&Dur"), this);
     stopAction->setShortcut(tr("Dur"));
-    stopAction->setStatusTip(tr("ÇAlışmayı Durdurur"));
+    stopAction->setStatusTip(tr("Çalışmayı Durdurur"));
     connect(stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 
 

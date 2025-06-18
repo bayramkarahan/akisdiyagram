@@ -11,6 +11,7 @@ HEADERS	    =   mainwindow.h \
     variable.h \
     variable_selection_dialog.h \
     variableconditiondialog.h \
+    variableeditform.h \
     variableeditordialog.h \
     variableexpressiondialog.h \
     variableoutputdialog.h
@@ -24,6 +25,7 @@ SOURCES	    =   mainwindow.cpp \
     variable.cpp \
     variable_selection_dialog.cpp \
     variableconditiondialog.cpp \
+    variableeditform.cpp \
     variableeditordialog.cpp \
     variableexpressiondialog.cpp \
     variableoutputdialog.cpp

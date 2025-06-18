@@ -198,7 +198,8 @@ private:
     QComboBox *fontSizeCombo;
     QFontComboBox *fontCombo;
 
-    QToolBox *toolBox;
+    QToolBox *toolBoxLeft;
+    QToolBox *toolBoxRight;
     QButtonGroup *buttonGroup;
     QButtonGroup *pointerTypeGroup;
     QButtonGroup *backgroundButtonGroup;

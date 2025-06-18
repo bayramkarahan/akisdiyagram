@@ -1,6 +1,7 @@
 #include "variableeditordialog.h"
 #include <QHeaderView>
 #include <QMessageBox>
+#include "variableeditform.h"
 
 VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     : QDialog(parent)
@@ -9,7 +10,9 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     resize(230, 200);
 
     tableWidget = new QTableWidget(this);
-    tableWidget->setColumnCount(3);
+    tableWidget->setColumnCount(4);
+    tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
+
     tableWidget->setHorizontalHeaderLabels(QStringList() << "Variable" << "Value" << "Type");
     tableWidget->horizontalHeader()->setStretchLastSection(true);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -19,42 +22,44 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     tableWidget->setColumnWidth(0, 60); // Label
     tableWidget->setColumnWidth(1, 60); // Value
     tableWidget->setColumnWidth(2, 60); // Type
-   /* connect(tableWidget, &QTableWidget::cellChanged, this, [=](int row, int column) {
-        qDebug() << "Satır " << row << " üzerinde değişiklik oldu.";
-           if(tableWidget->rowCount()>0) updateVariablesFromTable();
-    });*/
-    /*connect(tableWidget, &QTableWidget::itemChanged, this, [=](QTableWidgetItem *item) {
-        qDebug() << "Item değişti. Satır:" << item->row() << "Sütun:" << item->column()
-            << "Yeni değer:" << item->text();
-        updateVariablesFromTable();
-    });*/
-    // Header'da veya sınıf içinde önceki değeri tut
+    connect(tableWidget, &QTableWidget::cellDoubleClicked, this, [=](int row, int) {
+        if (row < 0 || row >= tableWidget->rowCount()) return;
 
-    bool isUserEditing = false;
+        VariableRecord rec;
+        rec.label = tableWidget->item(row, 0)->text();
+        rec.value = tableWidget->item(row, 1)->text();
+        QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(row, 2));
+        if (combo) rec.type = combo->currentText();
+        rec.name = tableWidget->item(row, 3)->text();
 
-    // Editing başladıysa kullanıcı düzenliyor demektir
-    connect(tableWidget, &QTableWidget::itemSelectionChanged, this, [&]() {
-        QTableWidgetItem *item = tableWidget->currentItem();
-
-        if (item) {
-            previousValue = item->text();
-        }
-    });
-
-    // Editing başladığında (kullanıcı hücreye tıkladıysa)
-    connect(tableWidget, &QTableWidget::cellActivated, this, [&](int row, int col) {
-        //qDebug()<<"b1";
-        isUserEditing = true;
-    });
-
-    // Değişiklik olduğunda kontrol et
-    connect(tableWidget, &QTableWidget::itemChanged, this, [&](QTableWidgetItem *item) {
-        //qDebug()<<"c1";
-        if (isUserEditing) {
-            isUserEditing = false;
-            if (item->text() != previousValue&&previousValue!="") {
-                qDebug() << "Kullanıcı hücreyi değiştirdi. Yeni değer:" << item->text();
-                //updateVariablesFromTable();
+        VariableEditForm dialog(rec, this);
+        if (dialog.exec() == QDialog::Accepted) {
+            VariableRecord updated = dialog.getRecord();
+            tableWidget->item(row, 0)->setText(updated.label);
+            tableWidget->item(row, 1)->setText(updated.value);
+            tableWidget->item(row, 2)->setText(updated.type);
+            qDebug()<<updated.name<<updated.label<<updated.value<<updated.type;
+            //güncelliyor
+            for (int i=0;i<Variable::onlineVariableList.size();i++) {
+                if(Variable::onlineVariableList[i].name==updated.name)
+                {
+                    Variable::onlineVariableList[i]=updated;
+                }
+            }
+            // güncel halini listeliyor
+           /* for (const VariableRecord &var : Variable::onlineVariableList) {
+                qDebug()<<var.label<<var.value<<var.type;
+            }*/
+            //readonly yapıyor
+            for (int row = 0; row < tableWidget->rowCount(); ++row) {
+                for (int col = 0; col < tableWidget->columnCount(); ++col) {
+                    QTableWidgetItem* item = tableWidget->item(row, col);
+                    if (!item) {
+                        item = new QTableWidgetItem();
+                        tableWidget->setItem(row, col, item);
+                    }
+                    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+                }
             }
         }
     });
@@ -88,38 +93,41 @@ void VariableEditorDialog::loadVariables()
         tableWidget->insertRow(row);
         tableWidget->setItem(row, 0, new QTableWidgetItem(var.label));
         tableWidget->setItem(row, 1, new QTableWidgetItem(var.value));
-
-        // ComboBox oluştur
-        QComboBox *combo = new QComboBox();
-        combo->addItems({"text", "number"});
-        combo->setCurrentText(var.type);
-        connect(combo, &QComboBox::currentTextChanged, this, &VariableEditorDialog::onTypeChanged);
-        tableWidget->setCellWidget(row, 2, combo);
+        tableWidget->setItem(row, 2, new QTableWidgetItem(var.type));
+        tableWidget->setItem(row, 3, new QTableWidgetItem(var.name));
+        tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
+    }
+    for (int row = 0; row < tableWidget->rowCount(); ++row) {
+        for (int col = 0; col < tableWidget->columnCount(); ++col) {
+            QTableWidgetItem* item = tableWidget->item(row, col);
+            if (!item) {
+                item = new QTableWidgetItem();
+                tableWidget->setItem(row, col, item);
+            }
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+        }
     }
 }
 
 void VariableEditorDialog::addVariable()
 {
     int row = tableWidget->rowCount();
-    QComboBox *combo = new QComboBox();
-    combo->addItems({"number", "text"});
-    combo->setCurrentText("number");
-    connect(combo, &QComboBox::currentTextChanged, this, &VariableEditorDialog::onTypeChanged);
-
     // Listeye boş VariableRecord da ekle
     VariableRecord rec;
+    rec.name ="var"+QString::number(row);
     rec.label ="var"+QString::number(row);
     rec.value = "0";
-    rec.type = combo->currentText();
+    rec.type = "number";
 
     Variable::onlineVariableList.append(rec);
 
     tableWidget->insertRow(row);
     tableWidget->setItem(row, 0, new QTableWidgetItem(rec.label));
     tableWidget->setItem(row, 1, new QTableWidgetItem(rec.value));
-    tableWidget->setCellWidget(row, 2, combo);
-
-}
+    tableWidget->setItem(row, 2, new QTableWidgetItem(rec.type));
+    tableWidget->setItem(row, 3, new QTableWidgetItem(rec.name));
+     tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
+  }
 
 void VariableEditorDialog::removeSelectedVariable()
 {
@@ -130,32 +138,19 @@ void VariableEditorDialog::removeSelectedVariable()
 
 void VariableEditorDialog::updateVariablesFromTable()
 {
-   // qDebug()<<"aa1";
-    Variable::onlineVariableList.clear();
-    //qDebug()<<"aa2";
-    for (int row = 0; row < tableWidget->rowCount(); ++row) {
-        // qDebug()<<"aa21";
-        VariableRecord rec;
-       //   qDebug()<<"aa222";
-        rec.label = tableWidget->item(row, 0)->text();
-        //   qDebug()<<"aa333";
-        rec.value = tableWidget->item(row, 1)->text();
-/// qDebug()<<"aa22";
-        QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(row, 2));
-        //qDebug()<<"aa3";
-        if (combo)
-        {
-            rec.type = combo->currentText();
-            if(combo->currentText()=="number")
-            rec.value = "0";
-            else
-            rec.value = "";
 
-            tableWidget->setItem(row, 1, new QTableWidgetItem(rec.value));
+    Variable::onlineVariableList.clear();
+
+    for (int row = 0; row < tableWidget->rowCount(); ++row) {
+        VariableRecord rec;
+        rec.label = tableWidget->item(row, 0)->text();
+        rec.value = tableWidget->item(row, 1)->text();
+        rec.type = tableWidget->item(row, 2)->text();
+        Variable::onlineVariableList.append(rec);
         }
 
-        Variable::onlineVariableList.append(rec);
-    }
+
+
    // QMessageBox::information(this, "Bilgi", "Değişken listesi güncellendi.");
 }
 

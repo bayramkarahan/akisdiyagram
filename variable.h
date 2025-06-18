@@ -16,6 +16,7 @@
 
 class VariableRecord {
 public:
+    QString name;
     QString label;
     QString value;
     QString type;
