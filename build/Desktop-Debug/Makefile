@@ -60,23 +60,23 @@ SOURCES       = ../../mainwindow.cpp \
 		../../diagramscene.cpp \
 		../../dotsignal.cpp \
 		../../variable.cpp \
-		../../variable_selection_dialog.cpp \
 		../../variableconditiondialog.cpp \
 		../../variableeditform.cpp \
 		../../variableeditordialog.cpp \
-		../../variableexpressiondialog.cpp \
-		../../variableoutputdialog.cpp qrc_diagramscene.cpp \
+		../../variableinputdialog.cpp \
+		../../variableoutputdialog.cpp \
+		../../variableprocessdialog.cpp qrc_diagramscene.cpp \
 		moc_mainwindow.cpp \
 		moc_diagramitem.cpp \
 		moc_diagramscene.cpp \
 		moc_diagramtextitem.cpp \
 		moc_dotsignal.cpp \
-		moc_variable_selection_dialog.cpp \
 		moc_variableconditiondialog.cpp \
 		moc_variableeditform.cpp \
 		moc_variableeditordialog.cpp \
-		moc_variableexpressiondialog.cpp \
-		moc_variableoutputdialog.cpp
+		moc_variableinputdialog.cpp \
+		moc_variableoutputdialog.cpp \
+		moc_variableprocessdialog.cpp
 OBJECTS       = mainwindow.o \
 		diagramitem.o \
 		main.o \
@@ -85,24 +85,24 @@ OBJECTS       = mainwindow.o \
 		diagramscene.o \
 		dotsignal.o \
 		variable.o \
-		variable_selection_dialog.o \
 		variableconditiondialog.o \
 		variableeditform.o \
 		variableeditordialog.o \
-		variableexpressiondialog.o \
+		variableinputdialog.o \
 		variableoutputdialog.o \
+		variableprocessdialog.o \
 		qrc_diagramscene.o \
 		moc_mainwindow.o \
 		moc_diagramitem.o \
 		moc_diagramscene.o \
 		moc_diagramtextitem.o \
 		moc_dotsignal.o \
-		moc_variable_selection_dialog.o \
 		moc_variableconditiondialog.o \
 		moc_variableeditform.o \
 		moc_variableeditordialog.o \
-		moc_variableexpressiondialog.o \
-		moc_variableoutputdialog.o
+		moc_variableinputdialog.o \
+		moc_variableoutputdialog.o \
+		moc_variableprocessdialog.o
 DIST          = ../../images/prg.png \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -113,7 +113,6 @@ DIST          = ../../images/prg.png \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_Baloo.pri \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
@@ -199,12 +198,12 @@ DIST          = ../../images/prg.png \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variable_selection_dialog.h \
 		../../variableconditiondialog.h \
 		../../variableeditform.h \
 		../../variableeditordialog.h \
-		../../variableexpressiondialog.h \
-		../../variableoutputdialog.h ../../mainwindow.cpp \
+		../../variableinputdialog.h \
+		../../variableoutputdialog.h \
+		../../variableprocessdialog.h ../../mainwindow.cpp \
 		../../diagramitem.cpp \
 		../../main.cpp \
 		../../arrow.cpp \
@@ -212,12 +211,12 @@ DIST          = ../../images/prg.png \
 		../../diagramscene.cpp \
 		../../dotsignal.cpp \
 		../../variable.cpp \
-		../../variable_selection_dialog.cpp \
 		../../variableconditiondialog.cpp \
 		../../variableeditform.cpp \
 		../../variableeditordialog.cpp \
-		../../variableexpressiondialog.cpp \
-		../../variableoutputdialog.cpp
+		../../variableinputdialog.cpp \
+		../../variableoutputdialog.cpp \
+		../../variableprocessdialog.cpp
 QMAKE_TARGET  = akisdiyagram
 DESTDIR       = 
 TARGET        = akisdiyagram
@@ -238,7 +237,6 @@ Makefile: ../../akisdiyagram.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri \
-		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_Baloo.pri \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri \
@@ -328,7 +326,6 @@ Makefile: ../../akisdiyagram.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-base.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/g++-unix.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/qconfig.pri:
-/usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_Baloo.pri:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_accessibility_support_private.pri:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_concurrent.pri:
@@ -424,8 +421,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../diagramscene.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../mainwindow.h ../../diagramitem.h ../../diagramscene.h ../../arrow.h ../../diagramtextitem.h ../../diagram.h ../../dotsignal.h ../../variable.h ../../variable_selection_dialog.h ../../variableconditiondialog.h ../../variableeditform.h ../../variableeditordialog.h ../../variableexpressiondialog.h ../../variableoutputdialog.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../mainwindow.cpp ../../diagramitem.cpp ../../main.cpp ../../arrow.cpp ../../diagramtextitem.cpp ../../diagramscene.cpp ../../dotsignal.cpp ../../variable.cpp ../../variable_selection_dialog.cpp ../../variableconditiondialog.cpp ../../variableeditform.cpp ../../variableeditordialog.cpp ../../variableexpressiondialog.cpp ../../variableoutputdialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../mainwindow.h ../../diagramitem.h ../../diagramscene.h ../../arrow.h ../../diagramtextitem.h ../../diagram.h ../../dotsignal.h ../../variable.h ../../variableconditiondialog.h ../../variableeditform.h ../../variableeditordialog.h ../../variableinputdialog.h ../../variableoutputdialog.h ../../variableprocessdialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../mainwindow.cpp ../../diagramitem.cpp ../../main.cpp ../../arrow.cpp ../../diagramtextitem.cpp ../../diagramscene.cpp ../../dotsignal.cpp ../../variable.cpp ../../variableconditiondialog.cpp ../../variableeditform.cpp ../../variableeditordialog.cpp ../../variableinputdialog.cpp ../../variableoutputdialog.cpp ../../variableprocessdialog.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -479,16 +476,14 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_mainwindow.cpp moc_diagramitem.cpp moc_diagramscene.cpp moc_diagramtextitem.cpp moc_dotsignal.cpp moc_variable_selection_dialog.cpp moc_variableconditiondialog.cpp moc_variableeditform.cpp moc_variableeditordialog.cpp moc_variableexpressiondialog.cpp moc_variableoutputdialog.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_diagramitem.cpp moc_diagramscene.cpp moc_diagramtextitem.cpp moc_dotsignal.cpp moc_variableconditiondialog.cpp moc_variableeditform.cpp moc_variableeditordialog.cpp moc_variableinputdialog.cpp moc_variableoutputdialog.cpp moc_variableprocessdialog.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp moc_diagramitem.cpp moc_diagramscene.cpp moc_diagramtextitem.cpp moc_dotsignal.cpp moc_variable_selection_dialog.cpp moc_variableconditiondialog.cpp moc_variableeditform.cpp moc_variableeditordialog.cpp moc_variableexpressiondialog.cpp moc_variableoutputdialog.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_diagramitem.cpp moc_diagramscene.cpp moc_diagramtextitem.cpp moc_dotsignal.cpp moc_variableconditiondialog.cpp moc_variableeditform.cpp moc_variableeditordialog.cpp moc_variableinputdialog.cpp moc_variableoutputdialog.cpp moc_variableprocessdialog.cpp
 moc_mainwindow.cpp: ../../mainwindow.h \
 		../../diagramitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../variableeditordialog.h \
@@ -500,8 +495,6 @@ moc_diagramitem.cpp: ../../diagramitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		moc_predefs.h \
@@ -513,8 +506,6 @@ moc_diagramscene.cpp: ../../diagramscene.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../diagramtextitem.h \
@@ -531,12 +522,6 @@ moc_dotsignal.cpp: ../../dotsignal.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../dotsignal.h -o moc_dotsignal.cpp
-
-moc_variable_selection_dialog.cpp: ../../variable_selection_dialog.h \
-		../../variable.h \
-		moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../variable_selection_dialog.h -o moc_variable_selection_dialog.cpp
 
 moc_variableconditiondialog.cpp: ../../variableconditiondialog.h \
 		../../variable.h \
@@ -556,17 +541,23 @@ moc_variableeditordialog.cpp: ../../variableeditordialog.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../variableeditordialog.h -o moc_variableeditordialog.cpp
 
-moc_variableexpressiondialog.cpp: ../../variableexpressiondialog.h \
+moc_variableinputdialog.cpp: ../../variableinputdialog.h \
 		../../variable.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../variableexpressiondialog.h -o moc_variableexpressiondialog.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../variableinputdialog.h -o moc_variableinputdialog.cpp
 
 moc_variableoutputdialog.cpp: ../../variableoutputdialog.h \
 		../../variable.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../variableoutputdialog.h -o moc_variableoutputdialog.cpp
+
+moc_variableprocessdialog.cpp: ../../variableprocessdialog.h \
+		../../variable.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/etapadmin/Masaüstü/akisdiyagram/build/Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/etapadmin/Masaüstü/akisdiyagram -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/12 -I/usr/include/x86_64-linux-gnu/c++/12 -I/usr/include/c++/12/backward -I/usr/lib/gcc/x86_64-linux-gnu/12/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../variableprocessdialog.h -o moc_variableprocessdialog.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -589,8 +580,6 @@ mainwindow.o: ../../mainwindow.cpp ../../arrow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../diagramscene.h \
@@ -603,8 +592,6 @@ diagramitem.o: ../../diagramitem.cpp ../../diagramitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../arrow.h
@@ -615,8 +602,6 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../variableeditordialog.h
@@ -627,8 +612,6 @@ arrow.o: ../../arrow.cpp ../../arrow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o arrow.o ../../arrow.cpp
@@ -639,8 +622,6 @@ diagramtextitem.o: ../../diagramtextitem.cpp ../../diagramtextitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o diagramtextitem.o ../../diagramtextitem.cpp
@@ -650,8 +631,6 @@ diagramscene.o: ../../diagramscene.cpp ../../diagramscene.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
-		../../variableexpressiondialog.h \
-		../../variable_selection_dialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../diagramtextitem.h \
@@ -663,10 +642,6 @@ dotsignal.o: ../../dotsignal.cpp ../../dotsignal.h
 
 variable.o: ../../variable.cpp ../../variable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variable.o ../../variable.cpp
-
-variable_selection_dialog.o: ../../variable_selection_dialog.cpp ../../variable_selection_dialog.h \
-		../../variable.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variable_selection_dialog.o ../../variable_selection_dialog.cpp
 
 variableconditiondialog.o: ../../variableconditiondialog.cpp ../../variableconditiondialog.h \
 		../../variable.h
@@ -681,13 +656,17 @@ variableeditordialog.o: ../../variableeditordialog.cpp ../../variableeditordialo
 		../../variableeditform.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableeditordialog.o ../../variableeditordialog.cpp
 
-variableexpressiondialog.o: ../../variableexpressiondialog.cpp ../../variableexpressiondialog.h \
+variableinputdialog.o: ../../variableinputdialog.cpp ../../variableinputdialog.h \
 		../../variable.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableexpressiondialog.o ../../variableexpressiondialog.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableinputdialog.o ../../variableinputdialog.cpp
 
 variableoutputdialog.o: ../../variableoutputdialog.cpp ../../variableoutputdialog.h \
 		../../variable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableoutputdialog.o ../../variableoutputdialog.cpp
+
+variableprocessdialog.o: ../../variableprocessdialog.cpp ../../variableprocessdialog.h \
+		../../variable.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableprocessdialog.o ../../variableprocessdialog.cpp
 
 qrc_diagramscene.o: qrc_diagramscene.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_diagramscene.o qrc_diagramscene.cpp
@@ -707,9 +686,6 @@ moc_diagramtextitem.o: moc_diagramtextitem.cpp
 moc_dotsignal.o: moc_dotsignal.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_dotsignal.o moc_dotsignal.cpp
 
-moc_variable_selection_dialog.o: moc_variable_selection_dialog.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variable_selection_dialog.o moc_variable_selection_dialog.cpp
-
 moc_variableconditiondialog.o: moc_variableconditiondialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variableconditiondialog.o moc_variableconditiondialog.cpp
 
@@ -719,11 +695,14 @@ moc_variableeditform.o: moc_variableeditform.cpp
 moc_variableeditordialog.o: moc_variableeditordialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variableeditordialog.o moc_variableeditordialog.cpp
 
-moc_variableexpressiondialog.o: moc_variableexpressiondialog.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variableexpressiondialog.o moc_variableexpressiondialog.cpp
+moc_variableinputdialog.o: moc_variableinputdialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variableinputdialog.o moc_variableinputdialog.cpp
 
 moc_variableoutputdialog.o: moc_variableoutputdialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variableoutputdialog.o moc_variableoutputdialog.cpp
+
+moc_variableprocessdialog.o: moc_variableprocessdialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_variableprocessdialog.o moc_variableprocessdialog.cpp
 
 ####### Install
 

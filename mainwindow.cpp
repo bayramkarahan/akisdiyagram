@@ -86,10 +86,22 @@ MainWindow::MainWindow()
     QWidget *widget = new QWidget;
     widget->setLayout(layout);
 
+    /************************version*******************************************/
+    QStringList arguments;
+    arguments << "-c" << "dpkg -s akisdiyagram|grep -i version";
+    QString resultVersion;
+    QProcess process;
+    process.start("/bin/bash",arguments);
+    if(process.waitForFinished())
+    {
+        resultVersion = process.readAll();
+    }
+    resultVersion.chop(1);
+    QString version = resultVersion.right(5);
+    setWindowTitle("Akış Diyagramı "+version);
     setCentralWidget(widget);
     setWindowIcon(QIcon(":images/prg.png"));
     setUnifiedTitleAndToolBarOnMac(true);
-    setWindowTitle("Akış Diyagramı 1.3");
 
     this->setWindowState(Qt::WindowMaximized);
     sceneScaleChanged("75%");
@@ -368,13 +380,14 @@ void MainWindow::itemSelected(QGraphicsItem *item)
 //! [20]
 void MainWindow::about()
 {
+    QString yil=QString::number( QDateTime::currentDateTime().date().year());
     QMessageBox::about(this, tr("Akış Diyagramı"),
                        tr("Bu uygulama Linux tabanlı sistemlerde(<b>Pardus</b>); "
                           "<br/>Programlama mantığını anlama, <b>Akış Diyagramı</b> oluştumak ve"
                           "<br/><b>Gerçek Zamanlı Akış Diyagramı Çalıştırmak</b> için yazılmıştır"
                           "<br/>"
                           "<br/>*****************************************************************************"
-                          "<br/>   Copyright (C) 2025 by Bayram KARAHAN                                    "
+                          "<br/>   Copyright (C) ")+yil+tr(" by Bayram KARAHAN                                    "
                           "<br/>\tkod.pardus.org.tr/karahan/akisdiyagrami"
                           "<br/>\tgithub.com/bayramkarahan/akisdiyagrami"
                           "<br/>\tbayramkarahan.blogspot.com"
@@ -385,6 +398,10 @@ void MainWindow::about()
                           "<br/>akisdiyagramı 1.1:Bağlantı renklendirmeleri eklendi."
                           "<br/>akisdiyagramı 1.2:Ok ve text nesnesine sağtuş menüsü eklendi."
                           "<br/>akisdiyagramı 1.3:Sağtuş menü özellikleri bütün nesnelere eklendi."
+                          "<br/>akisdiyagramı 1.4:Dinamik Değişken yapısı eklendi."
+                          "<br/>akisdiyagramı 1.5: Giriş, İşlem, Karar ve Çıktı işlemleri eklendi."
+                          "<br/>akisdiyagramı 1.6:Değişkenler Bölümü Sağa Bölüme Eklendi."
+                          "<br/>akisdiyagramı 1.7:."
 
                           "<br/>*****************************************************************************"
                            "<br/>   This program is free software; you can redistribute it and/or modify    "

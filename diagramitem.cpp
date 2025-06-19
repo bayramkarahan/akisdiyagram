@@ -316,7 +316,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     //qDebug() <<"çift tıklama1 "<<rotateState;
     if(this->myDiagramType==Diagram::DiagramType::Input)
     {
-        VariableSelectionDialog dlg;
+        VariableInputDialog dlg;
 
         for (int j = 0; j < selectedVariables.size(); ++j) {
             VariableRecord varselect = selectedVariables[j];
@@ -371,7 +371,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     }
     if(this->myDiagramType==Diagram::DiagramType::Process)
     {
-        VariableExpressionDialog dlg;
+        VariableProcessDialog dlg;
         for (int j = 0; j < selectedVariables.size(); ++j) {
             const VariableRecord &varselect = selectedVariables[j];
             qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;

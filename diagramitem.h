@@ -66,8 +66,8 @@
 #include<variable.h>
 #include<QListWidget>
 #include<QPushButton>
-#include<variableexpressiondialog.h>
-#include<variable_selection_dialog.h>
+#include<variableprocessdialog.h>
+#include<variableinputdialog.h>
 #include<variableoutputdialog.h>
 #include<variableconditiondialog.h>
 
