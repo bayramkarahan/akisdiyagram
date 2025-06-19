@@ -347,6 +347,49 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     if(this->myDiagramType==Diagram::DiagramType::Output)
     {
          VariableOutputDialog dlg;
+         for (int j = 0; j < selectedVariables.size(); ++j) {
+             const VariableRecord &varselect = selectedVariables[j];
+             qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
+             dlg.addExpressionRowparametre(varselect.operationType, varselect.expression);
+         }
+         if (dlg.exec() == QDialog::Accepted) {
+
+             auto exprList = dlg.getExpressionsWithType();
+             selectedVariables.clear();
+             label.setText("");
+             label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+             for (const auto &pair : exprList) {
+                 int type = pair.first;
+                 QString expr = pair.second;
+
+                 if(expr!=""){
+                     ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
+                     VariableRecord selected;
+                     selected.label = expr;
+                     selected.expression=expr;
+                     selected.operationType=type;
+                     selectedVariables.append(selected);
+                     /**********************************************/
+                     if(label.text()=="")
+                     {
+                         if(type!=1)
+                         label.setText(selected.expression);
+                         else
+                          label.setText(selected.expression+"="+selected.expression);
+                     }
+                     else
+                     {
+                         if(type!=1)
+                             label.setText(label.text()+"<br>"+selected.expression);
+                         else
+                             label.setText(label.text()+"<br>"+selected.expression+"="+selected.expression);
+
+                        }
+                     /*********************************************/
+                 }
+             }
+         }
+        /* VariableOutputDialog dlg;
 
          // Önceki seçimleri yeniden yükle
          for (const VariableRecord &var : selectedVariables) {
@@ -366,7 +409,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                  else
                      label.setText(label.text()+"<br>"+selected.label);
              }
-         }
+         }*/
 
     }
     if(this->myDiagramType==Diagram::DiagramType::Process)

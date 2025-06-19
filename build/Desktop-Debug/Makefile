@@ -484,6 +484,8 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../variableeditordialog.h \
@@ -495,6 +497,8 @@ moc_diagramitem.cpp: ../../diagramitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		moc_predefs.h \
@@ -506,6 +510,8 @@ moc_diagramscene.cpp: ../../diagramscene.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../diagramtextitem.h \
@@ -580,6 +586,8 @@ mainwindow.o: ../../mainwindow.cpp ../../arrow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../diagramscene.h \
@@ -592,6 +600,8 @@ diagramitem.o: ../../diagramitem.cpp ../../diagramitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../arrow.h
@@ -602,6 +612,8 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../variableeditordialog.h
@@ -612,6 +624,8 @@ arrow.o: ../../arrow.cpp ../../arrow.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o arrow.o ../../arrow.cpp
@@ -622,6 +636,8 @@ diagramtextitem.o: ../../diagramtextitem.cpp ../../diagramtextitem.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o diagramtextitem.o ../../diagramtextitem.cpp
@@ -631,6 +647,8 @@ diagramscene.o: ../../diagramscene.cpp ../../diagramscene.h \
 		../../diagram.h \
 		../../dotsignal.h \
 		../../variable.h \
+		../../variableprocessdialog.h \
+		../../variableinputdialog.h \
 		../../variableoutputdialog.h \
 		../../variableconditiondialog.h \
 		../../diagramtextitem.h \
@@ -660,7 +678,7 @@ variableinputdialog.o: ../../variableinputdialog.cpp ../../variableinputdialog.h
 		../../variable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableinputdialog.o ../../variableinputdialog.cpp
 
-variableoutputdialog.o: ../../variableoutputdialog.cpp ../../variableoutputdialog.h \
+variableoutputdialog.o: ../../variableoutputdialog.cpp ../../variableprocessdialog.h \
 		../../variable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o variableoutputdialog.o ../../variableoutputdialog.cpp
 

@@ -458,16 +458,28 @@ void MainWindow::worker()
     {
         for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
             VariableRecord varselect =diagramItem->selectedVariables[j];
-            //qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.type<<varselect.value<<varselect.isInput;
+            qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.name<<varselect.operationType<<varselect.value<<varselect.expression;
             for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
                 VariableRecord var = Variable::onlineVariableList[j];
                 if(varselect.label==var.label)
                 {
-                    QMessageBox::information (0, "Çıktı\t",
-                   QString(var.label+"= %1").arg( var.value));
+                    if(varselect.operationType==0)
+                    {
+                        QMessageBox::information (0, "Çıktı\t",QString("%1").arg( var.value));
+                    }
+                    if(varselect.operationType==1)
+                    {
+                        QMessageBox::information (0, "Çıktı\t",QString(var.label+"= %1").arg( var.value));
+                    }
                 }
-            }
 
+
+
+            }
+            if(varselect.operationType==2)
+            {
+                QMessageBox::information (0, "Çıktı\t",QString(varselect.expression));
+            }
         }
 
     }

@@ -1,5 +1,5 @@
-#ifndef VARIABLESELECTIONDIALOG_H
-#define VARIABLESELECTIONDIALOG_H
+#ifndef VARIABLEINPUTDIALOG_H
+#define VARIABLEINPUTDIALOG_H
 
 #include <QDialog>
 #include <QVBoxLayout>
@@ -23,6 +23,7 @@ public:
 private:
     struct VariableRow {
         QWidget *widget;
+        QComboBox *operationTypeCombo;
         QComboBox *variableCombo;
         QCheckBox *inputCheckBox;
         QLineEdit *valueEdit;
@@ -39,4 +40,4 @@ private:
     QList<QPair<QString, QString> > variableLabels() const;
 };
 
-#endif // VARIABLESELECTIONDIALOG_H
+#endif // VARIABLEINPUTDIALOG_H

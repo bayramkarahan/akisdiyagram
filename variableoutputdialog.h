@@ -2,36 +2,39 @@
 #define VARIABLEOUTPUTDIALOG_H
 
 #include <QDialog>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QList>
 #include <QComboBox>
+#include <QLineEdit>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QLabel>
+
 #include "variable.h"
 
-class VariableOutputDialog : public QDialog {
+class VariableOutputDialog : public QDialog
+{
     Q_OBJECT
-
 public:
     explicit VariableOutputDialog(QWidget *parent = nullptr);
-    QList<VariableRecord> getSelectedVariables() const;
-    void addVariableRow(const VariableRecord &var = VariableRecord());
+    void addExpressionRowparametre(int operationType, const QString &expression = QString());
+    void addExpressionRow();
+    QList<QPair<int, QString>> getExpressionsWithType() const;
+private slots:
+    void updateExpressionRowWidgets(int index);
 
 private:
-    struct VariableRow {
+    struct ExpressionRow {
         QWidget *widget;
-        QComboBox *variableCombo;
+        QComboBox *var1Combo;
+        QComboBox *operationTypeCombo;
+        QLineEdit *constEdit1;
         QPushButton *removeButton;
     };
 
-    QVBoxLayout *mainLayout;
-    QVBoxLayout *rowsLayout;
+    QVBoxLayout *expressionsLayout;
+    QList<ExpressionRow*> expressionRows;
     QPushButton *addButton;
-    QDialogButtonBox *buttonBox;
 
-    QList<VariableRecord> allVariables;
-    QList<VariableRow*> variableRows;
-
-    void removeVariableRow(int index);
     QStringList variableLabels() const;
 };
 

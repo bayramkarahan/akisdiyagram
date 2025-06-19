@@ -1,106 +1,251 @@
 #include "variableoutputdialog.h"
-#include <QDialogButtonBox>
-#include <QSet>
-
-VariableOutputDialog::VariableOutputDialog(QWidget *parent)
-    : QDialog(parent)
+#include <QHBoxLayout>
+#include <QDebug>
+#include <QScrollArea>
+#include <QWidget>
+#include<QApplication>
+VariableOutputDialog::VariableOutputDialog(QWidget *parent) : QDialog(parent)
 {
-    allVariables = Variable::onlineVariableList;
+    setWindowTitle("İşlem Tanımla");
+    resize(650, 300);
 
-    setWindowTitle("Çıktı Değişkenleri");
-    resize(400, 300);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    mainLayout = new QVBoxLayout(this);
-    rowsLayout = new QVBoxLayout();
-    mainLayout->addLayout(rowsLayout);
+    // Scroll alanı içinde expression widget'ları
+    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
 
-    addButton = new QPushButton("Satır Ekle", this);
-    connect(addButton, &QPushButton::clicked, this, [this]() {
-        addVariableRow();
-    });
-    mainLayout->addWidget(addButton);
+    QWidget *scrollWidget = new QWidget(scrollArea);
+    scrollArea->setWidget(scrollWidget);
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    expressionsLayout = new QVBoxLayout(scrollWidget);
+    expressionsLayout->setContentsMargins(5,5,5,5);
+    expressionsLayout->setSpacing(10);
+
+    // İlk işlem satırı veya boş başlat
+    //addExpressionRow();
+
+    // "Yeni İşlem Ekle" butonu
+    addButton = new QPushButton("Yeni İşlem Ekle", this);
+    connect(addButton, &QPushButton::clicked, this, &VariableOutputDialog::addExpressionRow);
+
+    // Expressions ve addButton aynı layoutta (scroll içinde)
+    expressionsLayout->addWidget(addButton);
+
+    // Ana layouta scrollArea ekle
+    mainLayout->addWidget(scrollArea);
+
+    // OK ve Cancel butonları ana layoutun en altında
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
     QPushButton *cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
     if (okButton) okButton->setText("Tamam");
     if (cancelButton) cancelButton->setText("Vazgeç");
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     mainLayout->addWidget(buttonBox);
 
-    //addVariableRow(); // İlk satır
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
-void VariableOutputDialog::addVariableRow(const VariableRecord &var)
-{
-    VariableRow *row = new VariableRow;
-
-    row->widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(row->widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    row->variableCombo = new QComboBox(row->widget);
-    row->variableCombo->addItems(variableLabels());
-    if (!var.label.isEmpty()) {
-        int index = row->variableCombo->findText(var.label);
-        if (index >= 0)
-            row->variableCombo->setCurrentIndex(index);
-    }
-    layout->addWidget(row->variableCombo);
-
-    row->removeButton = new QPushButton("Sil", row->widget);
-    layout->addWidget(row->removeButton);
-
-    rowsLayout->addWidget(row->widget);
-    variableRows.append(row);
-
-    int rowIndex = variableRows.size() - 1;
-    connect(row->removeButton, &QPushButton::clicked, this, [this, rowIndex]() {
-        removeVariableRow(rowIndex);
-    });
-}
-
-void VariableOutputDialog::removeVariableRow(int index)
-{
-    if (index < 0 || index >= variableRows.size())
-        return;
-
-    VariableRow *row = variableRows.takeAt(index);
-    rowsLayout->removeWidget(row->widget);
-    row->widget->deleteLater();
-
-    // Bağlantıları yeniden kur
-    for (int i = 0; i < variableRows.size(); ++i) {
-        disconnect(variableRows[i]->removeButton, nullptr, nullptr, nullptr);
-        connect(variableRows[i]->removeButton, &QPushButton::clicked, this, [this, i]() {
-            removeVariableRow(i);
-        });
-    }
-}
-
-QList<VariableRecord> VariableOutputDialog::getSelectedVariables() const
-{
-    QList<VariableRecord> selected;
-
-    for (const VariableRow *row : variableRows) {
-        QString label = row->variableCombo->currentText();
-        for (const VariableRecord &var : allVariables) {
-            if (var.label == label) {
-                selected.append(var);
-                break;
-            }
-        }
-    }
-
-    return selected;
-}
 
 QStringList VariableOutputDialog::variableLabels() const
 {
-    QSet<QString> labels;
-    for (const VariableRecord &var : allVariables) {
-        labels.insert(var.label);
+    QStringList labels;
+    for (const VariableRecord &var : Variable::onlineVariableList) {
+        labels.append(var.label);
     }
-    return labels.values();
+    return labels;
+}
+
+void VariableOutputDialog::addExpressionRow()
+{
+
+    ExpressionRow *row = new ExpressionRow;
+
+    row->widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(row->widget);
+    layout->setContentsMargins(5, 5, 5, 5);
+
+
+    // İşlem türü combo
+    row->operationTypeCombo = new QComboBox(row->widget);
+    row->operationTypeCombo->addItems({
+        "📥 Değişken Göster (var0)",
+        "📥 Değişken Adı İle Göster (var0 = 123)",
+        "📥 Sabit Text Göster",
+    });
+    layout->addWidget(row->operationTypeCombo);
+
+
+    // var1 combo
+    row->var1Combo = new QComboBox(row->widget);
+    row->var1Combo->addItems(variableLabels());
+    layout->addWidget(row->var1Combo);
+
+    // Sabit sayı için edit
+    row->constEdit1 = new QLineEdit(row->widget);
+    row->constEdit1->setFixedWidth(50);
+    row->constEdit1->setPlaceholderText("Sayı1");
+    layout->addWidget(row->constEdit1);
+
+    // Kaldırma butonu
+    row->removeButton = new QPushButton("🗑️", row->widget);
+    row->removeButton->setToolTip("İşlemi Sil");
+    layout->addWidget(row->removeButton);
+
+    expressionsLayout->insertWidget(expressionsLayout->count() - 1, row->widget);
+
+    expressionRows.append(row);
+
+    // İlk widget görünürlüğünü ayarla
+    updateExpressionRowWidgets(expressionRows.count() - 1);
+
+    // İşlem türü değiştiğinde widgetları güncelle
+    connect(row->operationTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){
+        updateExpressionRowWidgets(expressionRows.indexOf(row));
+    });
+
+    // Kaldırma butonu
+    connect(row->removeButton, &QPushButton::clicked, this, [=](){
+        int idx = expressionRows.indexOf(row);
+        if (idx >= 0) {
+            expressionRows.removeAt(idx);
+            expressionsLayout->removeWidget(row->widget);
+            row->widget->deleteLater();
+            delete row;
+        }
+    });
+}
+
+void VariableOutputDialog::addExpressionRowparametre(int operationType, const QString &expression)
+{
+
+
+    ExpressionRow* row = new ExpressionRow;
+
+    row->widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(row->widget);
+    layout->setContentsMargins(5,5,5,5);
+    row->operationTypeCombo = new QComboBox(row->widget);
+    row->operationTypeCombo->addItems({
+        "📥 Değişken Göster (var0)",
+        "📥 Değişken Adı İle Göster (var0 = 123)",
+        "📥 Sabit Text Göster",
+    });
+    layout->addWidget(row->operationTypeCombo);
+
+
+
+    row->var1Combo = new QComboBox(row->widget);
+    row->var1Combo->addItems(variableLabels());
+    layout->addWidget(row->var1Combo);
+
+    row->constEdit1 = new QLineEdit(row->widget);
+    row->constEdit1->setFixedWidth(50);
+    row->constEdit1->setPlaceholderText("Sayı1");
+    layout->addWidget(row->constEdit1);
+
+
+    row->removeButton = new QPushButton("🗑️", row->widget);
+    layout->addWidget(row->removeButton);
+
+    expressionsLayout->insertWidget(expressionsLayout->count() - 1, row->widget);
+
+    // İşlem türünü dışarıdan alıyoruz, combo'yu ayarla
+    row->operationTypeCombo->setCurrentIndex(operationType);
+
+    // expression'u parçalayıp ilgili widgetlara ayırmak yerine direkt dolduralım:
+
+    // "=" ile böl
+
+
+        int targetIndex = row->var1Combo->findText(expression.trimmed());
+        if(targetIndex >= 0) row->var1Combo->setCurrentIndex(targetIndex);
+
+        switch(operationType) {
+        case 0: // Değişken Değeri Atama (var0)
+        {
+            int idx = row->var1Combo->findText(expression.trimmed());
+            if (idx >= 0) row->var1Combo->setCurrentIndex(idx);
+        }
+            break;
+        case 1: // Değişken Adı ve Değeri(var0 = 5)
+        {
+            int idx = row->var1Combo->findText(expression.trimmed());
+            if (idx >= 0) row->var1Combo->setCurrentIndex(idx);
+        }
+        break;
+        case 2: // Sabit Text Bilgi ()
+        {
+            row->constEdit1->setText(expression.trimmed());
+        }
+        break;
+         }
+
+
+    connect(row->operationTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){
+        int idx = expressionRows.indexOf(row);
+        if(idx >= 0) updateExpressionRowWidgets(idx);
+    });
+
+    connect(row->removeButton, &QPushButton::clicked, this, [=]() {
+        expressionsLayout->removeWidget(row->widget);
+        row->widget->deleteLater();
+        expressionRows.removeOne(row);
+    });
+
+    expressionRows.append(row);
+
+    updateExpressionRowWidgets(expressionRows.indexOf(row));
+}
+
+void VariableOutputDialog::updateExpressionRowWidgets(int index)
+{
+    if (index < 0 || index >= expressionRows.count())
+        return;
+
+    ExpressionRow *row = expressionRows.at(index);
+    int type = row->operationTypeCombo->currentIndex();
+
+    // Önce tüm ek widgetları gizle
+    row->var1Combo->setVisible(false);
+    row->constEdit1->setVisible(false);
+
+    switch (type) {
+    case 0: // Sabit Değer: var0
+        row->var1Combo->setVisible(true);
+        break;
+    case 1: // Değişken Değer: var0 = 123
+        row->var1Combo->setVisible(true);
+        break;
+    case 2: // Sabit text Değer
+        row->constEdit1->setVisible(true);
+        break;
+    }
+}
+
+QList<QPair<int, QString>> VariableOutputDialog::getExpressionsWithType() const
+{
+    QList<QPair<int, QString>> list;
+    for (ExpressionRow *row : expressionRows) {
+        QString expr;
+        QString target = row->var1Combo->currentText();
+        int type = row->operationTypeCombo->currentIndex();
+
+        switch (type) {
+        case 0:
+            expr = QString("%1").arg(target).arg(row->var1Combo->currentText());
+              break;
+        case 1:
+            expr = QString("%1").arg(target).arg(row->var1Combo->currentText());
+            break;
+        case 2:
+            expr = QString("%1")
+                       .arg(row->constEdit1->text());
+            break;
+
+        }
+        list.append(qMakePair(type, expr));
+    }
+    return list;
 }
