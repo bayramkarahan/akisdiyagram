@@ -13,8 +13,11 @@
 struct ProcessRecord {
     int processType;
     QString expression;
+    QString targetName;
     QString targetLabel;
+    QString var1Name;
     QString var1Label;
+    QString var2Name;
     QString var2Label;
 };
 class VariableProcessDialog : public QDialog
@@ -30,14 +33,20 @@ public:
 private slots:
 
     void updateExpressionRowWidgets(int index);
- private:
+    void updateVariableTargetName(int index, int loopRowIndex);
+    void updateVariableVar1Name(int index, int loopRowIndex);
+    void updateVariableVar2Name(int index, int loopRowIndex);
+private:
     struct ProcessRow {
         QWidget *widget;
+        QLineEdit *variableTargetNameEdit;
         QComboBox *variableTargetCombo;
         QLabel *equalLabel;
         QComboBox *operationTypeCombo;
+        QLineEdit *variableVar1NameEdit;
         QComboBox *var1Combo;
         QComboBox *operatorCombo;
+        QLineEdit *variableVar2NameEdit;
         QComboBox *var2Combo;
         QLineEdit *constEdit1;
          QLineEdit *constEdit2;

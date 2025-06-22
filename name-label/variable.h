@@ -16,9 +16,13 @@
 
 class VariableRecord {
 public:
+    QString name;
     QString label;
+    QString var1Name;
     QString var1Label;
+    QString var2Name;
     QString var2Label;
+
     QString value;
     QString valueType;
     bool isInput = false;

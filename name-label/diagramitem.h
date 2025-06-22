@@ -165,7 +165,6 @@ public:
     QList<Arrow *> arrows;
     QColor myBackground;
     QStaticText label;
-    QString labelText;
     Arrow *startArrow;
     Arrow *endArrow;
     Arrow *leftArrow;
@@ -174,9 +173,28 @@ public:
     QString endArrowRota="";
     QString leftArrowRota="";
     QString rightArrowRota="";
+    QString var0="";
+    QString var1="";
+    QString var2="";
+    QString varAnswer0="";
+    QString varAnswer1="";
+    QString varAnswer2="";
+    QString varOperator0="";
+    QString varOperator1="";
+    QString varOperator2="";
+    QString varConditional0="";
+    QString varConditional1="";
+    QString varConditional2="";
 
+    //loop
+    QString varStartValue0="";
+    QString varEndValue0="";
+    QString varStepValue0="";
+    bool input0=false;
+    bool input1=false;
+    bool input2=false;
 
-
+    int counter=0;
     bool renkdrm;
     // Seçilenler listesi
     QList<VariableRecord> selectedVariables;

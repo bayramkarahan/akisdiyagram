@@ -34,45 +34,6 @@ VariableEditForm::VariableEditForm(const VariableRecord &record, QWidget *parent
     mainLayout->addLayout(buttonLayout);
 
     connect(okButton, &QPushButton::clicked, this, [=]() {
-        /*******************************************/
-        bool findState=false;
-
-            findState=false;
-            for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
-                VariableRecord var = Variable::onlineVariableList[j];
-                ///qDebug()<<var.label<<currentRecord.label<<labelEdit->text();
-                if(labelEdit->text()==var.label&&currentRecord.label!=labelEdit->text())
-                {
-                    findState=true;
-                }
-            }
-            //return;
-            if(findState)
-            {
-                QDialog dialog;
-                 QLabel *label=new QLabel;
-                label->setText("Zaten aynı adda değişken var. Farklı bir ad veriniz.");
-                dialog.setWindowTitle("Uyarı");
-                dialog.resize(200,100);
-                // İçerik metni
-                // "Tamam" butonu
-                QPushButton *button = new QPushButton("Tamam", &dialog);
-                QObject::connect(button, &QPushButton::clicked, &dialog, &QDialog::accept);
-
-                // Dikey düzen yerleşimi
-                QVBoxLayout *layout = new QVBoxLayout(&dialog);
-                layout->addWidget(label);
-                layout->addWidget(button);
-                layout->setAlignment(button, Qt::AlignRight);
-
-                // Diyaloğu göster
-                dialog.exec();
-                return;
-            }
-
-        /*******************************************/
-
-
         currentRecord.label = labelEdit->text();
         currentRecord.value = valueEdit->text();
         currentRecord.valueType = typeCombo->currentText();

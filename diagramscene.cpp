@@ -50,7 +50,10 @@
 
 #include "diagramscene.h"
 #include "arrow.h"
-
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QTextCursor>
 #include <QGraphicsSceneMouseEvent>
 
@@ -182,10 +185,10 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 addItem(endLinkItem);
                 endLinkItem->setPos(mouseEvent->scenePos().x(),mouseEvent->scenePos().y()+150);
                 //sol alt link
-                DiagramItem *leftEndLinkItem = new DiagramItem(Diagram::DiagramType::Link, myItemMenu);
-                leftEndLinkItem->setBrush(myItemColor);
-                addItem(leftEndLinkItem);
-                leftEndLinkItem->setPos(mouseEvent->scenePos().x()-250,mouseEvent->scenePos().y()+150);
+                DiagramItem *leftEndProcessItem = new DiagramItem(Diagram::DiagramType::Process, myItemMenu);
+                leftEndProcessItem->setBrush(myItemColor);
+                addItem(leftEndProcessItem);
+                leftEndProcessItem->setPos(mouseEvent->scenePos().x()-250,mouseEvent->scenePos().y()+150);
                 //sol link
                 DiagramItem *leftLinkItem = new DiagramItem(Diagram::DiagramType::Link, myItemMenu);
                 leftLinkItem->setBrush(myItemColor);
@@ -200,17 +203,17 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 addItem(arrow1);
                 arrow1->updatePosition();
 
-                Arrow *arrow2 = new Arrow(endLinkItem,leftEndLinkItem,"left","right",myItemMenu);
+                Arrow *arrow2 = new Arrow(endLinkItem,leftEndProcessItem,"left","right",myItemMenu);
                 arrow2->setColor(myLineColor);
                 endLinkItem->addArrowState(arrow2,"left","O");
-                leftEndLinkItem->addArrowState(arrow2,"right","I");
+                leftEndProcessItem->addArrowState(arrow2,"right","I");
                 arrow2->setZValue(-1000.0);
                 addItem(arrow2);
                 arrow2->updatePosition();
 
-                Arrow *arrow3 = new Arrow(leftEndLinkItem,leftLinkItem,"start","end",myItemMenu);
+                Arrow *arrow3 = new Arrow(leftEndProcessItem,leftLinkItem,"start","end",myItemMenu);
                 arrow3->setColor(myLineColor);
-                leftEndLinkItem->addArrowState(arrow3,"start","O");
+                leftEndProcessItem->addArrowState(arrow3,"start","O");
                 leftLinkItem->addArrowState(arrow3,"end","I");
                 arrow3->setZValue(-1000.0);
                 addItem(arrow3);
@@ -223,17 +226,6 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 arrow4->setZValue(-1000.0);
                 addItem(arrow4);
                 arrow4->updatePosition();
-                item->var0="k";
-                item->varStartValue0="0";
-                item->varEndValue0="1";
-                item->varStepValue0="1";
-                item->label.setText(item->var0+" = "+
-                                    item->varStartValue0+
-                                    "; "+item->var0+
-                                    " < "+item->varEndValue0+
-                                    "; "+item->var0+" = "+
-                                    item->var0+" + "+
-                                    item->varStepValue0);
 
              }
 
@@ -334,147 +326,128 @@ void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //! [10]
 
 //! [11]
+
 void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    foreach (QGraphicsItem *item, items()) {
+    // Tüm nesnelerin renk bayrağını sıfırla
+    for (QGraphicsItem *item : items()) {
         DiagramItem *eleman = qgraphicsitem_cast<DiagramItem *>(item);
-        if(eleman!=0)
-        {
-        eleman->renkdrm=false;
-        }
+        if (eleman)
+            eleman->renkdrm = false;
     }
 
-    QPointF startPoint,endPoint;
-    if (line != 0 && myMode == InsertLine) {
+    if (line != nullptr && myMode == InsertLine) {
 
-        QList<QGraphicsItem *> startItems = items(line->line().p1());
-        if (startItems.count() && startItems.first() == line)
-            startItems.removeFirst();
-        QList<QGraphicsItem *> endItems = items(line->line().p2());
-        /************************************************/
-        startPoint=line->line().p1();
-        endPoint=line->line().p2();
-        if (endItems.count() && endItems.first() == line)
-            endItems.removeFirst();
+        // Başlangıç ve bitiş noktaları
+        QPointF startPoint = line->line().p1();
+        QPointF endPoint   = line->line().p2();
+
+        // Eski sistem yerine, toleranslı arama kullanılıyor
+        qreal xTol = 25;
+        qreal yTol = 20;
+        DiagramItem *startItem = findDiagramItemNear(startPoint, xTol, yTol);
+        DiagramItem *endItem   = findDiagramItemNear(endPoint,   xTol, yTol);
 
         removeItem(line);
         delete line;
-//! [11] //! [12]
 
-        if (startItems.count() > 0 && endItems.count() > 0 &&
-            startItems.first()->type() == DiagramItem::Type &&
-            endItems.first()->type() == DiagramItem::Type &&
-            startItems.first() != endItems.first()) {
-            DiagramItem *startItem = qgraphicsitem_cast<DiagramItem *>(startItems.first());
-            DiagramItem *endItem = qgraphicsitem_cast<DiagramItem *>(endItems.first());
-            ///burada önemli işlemler yapıldı..
-            QString startPolar=polarDiagramItem(startItem,startPoint,startItem,endItem);
-            QString endPolar= polarDiagramItem(endItem,endPoint,startItem,endItem);
-           /// qDebug()<<"son"<<startPolar<<endPolar;
-            if(startPolar!=""&&endPolar!="")
-            {
-                Arrow *arrow = new Arrow(startItem,endItem,startPolar,endPolar,myItemMenu);
+        if (startItem && endItem && startItem != endItem) {
+            // Yön tespiti
+            QString startPolar = polarDiagramItem(startItem, startPoint);
+            QString endPolar   = polarDiagramItem(endItem,   endPoint);
+
+            if (!startPolar.isEmpty() && !endPolar.isEmpty()) {
+                Arrow *arrow = new Arrow(startItem, endItem, startPolar, endPolar, myItemMenu);
                 arrow->setColor(myLineColor);
-                bool startAddStatus=startItem->addArrowState(arrow,startPolar,"O");
-                bool endAddStatus=endItem->addArrowState(arrow,endPolar,"I");
-               /// qDebug()<<"AddStatus:"<<startAddStatus<<endAddStatus;
-               if(startItem->myDiagramType==Diagram::DiagramType::Loop)arrow->answer="N";
-                if(startAddStatus&&endAddStatus)
-                {
+
+                bool startAddStatus = startItem->addArrowState(arrow, startPolar, "O");
+                bool endAddStatus   = endItem->addArrowState(arrow, endPolar, "I");
+
+                if (startItem->myDiagramType == Diagram::DiagramType::Loop)
+                    arrow->answer = "N";
+
+                if (startAddStatus && endAddStatus) {
                     arrow->setZValue(-1000.0);
                     addItem(arrow);
                     arrow->updatePosition();
-                }else
-                {
-                    if(startAddStatus&&startPolar=="left") {startItem->leftArrow=0;startItem->leftArrowRota="";}
-                    if(startAddStatus&&startPolar=="right") {startItem->rightArrow=0;startItem->rightArrowRota="";}
-                    if(startAddStatus&&startPolar=="start"){ startItem->startArrow=0;startItem->startArrowRota="";}
-                    if(startAddStatus&&startPolar=="end") {startItem->endArrow=0;startItem->endArrowRota="";}
+                } else {
+                    // Başarısızsa temizlik yap
+                    if (startAddStatus) {
+                        if (startPolar == "left")  { startItem->leftArrow = nullptr;  startItem->leftArrowRota = ""; }
+                        if (startPolar == "right") { startItem->rightArrow = nullptr; startItem->rightArrowRota = ""; }
+                        if (startPolar == "start") { startItem->startArrow = nullptr; startItem->startArrowRota = ""; }
+                        if (startPolar == "end")   { startItem->endArrow = nullptr;   startItem->endArrowRota = ""; }
+                    }
 
-                    if(endAddStatus&&endPolar=="left") {endItem->leftArrow=0;endItem->leftArrowRota="";}
-                    if(endAddStatus&&endPolar=="right") {endItem->rightArrow=0;endItem->rightArrowRota="";}
-                    if(endAddStatus&&endPolar=="start") {endItem->startArrow=0;endItem->startArrowRota="";}
-                    if(endAddStatus&&endPolar=="end") {endItem->endArrow=0;endItem->endArrowRota="";}
-
+                    if (endAddStatus) {
+                        if (endPolar == "left")  { endItem->leftArrow = nullptr;  endItem->leftArrowRota = ""; }
+                        if (endPolar == "right") { endItem->rightArrow = nullptr; endItem->rightArrowRota = ""; }
+                        if (endPolar == "start") { endItem->startArrow = nullptr; endItem->startArrowRota = ""; }
+                        if (endPolar == "end")   { endItem->endArrow = nullptr;   endItem->endArrowRota = ""; }
+                    }
                 }
             }
         }
     }
-//! [12] //! [13]
-    line = 0;
+
+    line = nullptr;
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
     update();
 }
+
 //! [13]
-QString DiagramScene::polarDiagramItem(DiagramItem *diagramItem, QPointF point,DiagramItem *myStartItem,DiagramItem *myEndItem)
+//!
+
+DiagramItem* DiagramScene::findDiagramItemNear(QPointF point, qreal xTol, qreal yTol)
 {
-    /****************************************************/
-    /*  QLineF centerLine(myStartItem->pos(), myEndItem->pos());
+    QList<QGraphicsItem*> nearbyItems = items(QRectF(point.x() - xTol,
+                                                      point.y() - yTol,
+                                                      xTol * 2,
+                                                      yTol * 2));
 
-        QPolygonF startPolygon = myStartItem->polygon();
-        QPointF sp1 = startPolygon.first() + myStartItem->pos();
-        QPointF sp2;
-        QLineF startPolyLine;
-        QPointF intersectPointStartPoint;
+    for (QGraphicsItem* item : nearbyItems) {
+        DiagramItem* diagramItem = qgraphicsitem_cast<DiagramItem*>(item);
+        if (diagramItem)
+            return diagramItem;
+    }
 
-        for (int i = 1; i < startPolygon.count(); ++i) {
-           sp2 = startPolygon.at(i) + myStartItem->pos();
-           startPolyLine = QLineF(sp1, sp2);
-           QLineF::IntersectType intersectType =startPolyLine.intersect(centerLine, &intersectPointStartPoint);
+    return nullptr;
+}
 
-           if (intersectType == QLineF::BoundedIntersection)
-               break;
-           sp1 = sp2;
-       }
-    /***********************************************/
-    //int x=intersectPointStartPoint.x();
-    //int y=intersectPointStartPoint.y();
-    int x=point.x();
-    int y=point.y();
+QString DiagramScene::polarDiagramItem(DiagramItem *diagramItem, QPointF point)
+{
+    // Nesnenin local bounding rect ve boyut bilgisi
+    QRectF rect = diagramItem->boundingRect();
+    QSizeF size = rect.size();
 
+    // Genişlik 100px → xTolerance = 25px (örn. %25)
+    // Yükseklik 80px → yTolerance = 20px (örn. %25)
+    qreal xTolerance = size.width() * 0.25;
+    qreal yTolerance = size.height() * 0.25;
 
-     int tx=0,ty=0;
-    bool left=false;
-    bool right=false;
-    bool start=false;
-    bool end=false;
-    tx=diagramItem->boundingRect().width()/4;
-    ty=diagramItem->boundingRect().height()/4;
+    // Kenar merkez noktalarının sahne koordinatları
+    QPointF leftPoint   = diagramItem->mapToScene(QPointF(rect.left(),  rect.center().y()));
+    QPointF rightPoint  = diagramItem->mapToScene(QPointF(rect.right(), rect.center().y()));
+    QPointF topPoint    = diagramItem->mapToScene(QPointF(rect.center().x(), rect.top()));
+    QPointF bottomPoint = diagramItem->mapToScene(QPointF(rect.center().x(), rect.bottom()));
 
-    //auto cxy = diagramItem->mapToScene(diagramItem->boundingRect().center());
-    int startx,starty,leftx,lefty,rightx,righty,endx,endy;
-    int cx=diagramItem->mapToScene(diagramItem->boundingRect().center()).toPoint().x();
-    int cy=diagramItem->mapToScene(diagramItem->boundingRect().center()).toPoint().y();
+    // Tıklanan nokta zaten sahne noktasında veriliyor: point
 
-    startx=cx;
-    starty=cy-ty*2;
-    endx=cx;
-    endy=cy+ty*2;
-    leftx=cx-tx*2;
-    lefty=cy;
-    rightx=cx+tx*2;
-    righty=cy;
-    //qDebug()<<point<<cx<<cy;
-    //tx=tx*3/4;
-    //ty=ty*3/4;
-  /*
-    if(x-tx<leftx&&x+tx>leftx) left=true;
-    if(x-tx<rightx&&x+tx>rightx) right=true;
-    if(y-ty<starty&&y+ty>starty) start=true;
-    if(y-ty<endy&&y+ty>endy) end=true;
-    */
-    if(x>leftx-tx*1.8&&x<leftx+tx*1.8) left=true;
-    if(x>rightx-tx*1.8&&x<rightx+tx*1.8) right=true;
-    if(y>starty-ty*1.8&&y<starty+ty*1.8) start=true;
-    if(y>endy-ty*1.8&&y<endy+ty*1.8) end=true;
-   //qDebug()<<left<<right<<start<<end;
-    if(left&&!right&&!start&&!end) return "left";
-    if(!left&&right&&!start&&!end) return "right";
-    if(!left&&!right&&start&&!end) return "start";
-    if(!left&&!right&&!start&&end) return "end";
+    // Her yön için tolerans dikdörtgeni oluştur (point bu dikdörtgenin içindeyse eşleşir)
+    QRectF leftArea(leftPoint.x() - xTolerance, leftPoint.y() - yTolerance, xTolerance * 2, yTolerance * 2);
+    QRectF rightArea(rightPoint.x() - xTolerance, rightPoint.y() - yTolerance, xTolerance * 2, yTolerance * 2);
+    QRectF topArea(topPoint.x() - xTolerance, topPoint.y() - yTolerance, xTolerance * 2, yTolerance * 2);
+    QRectF bottomArea(bottomPoint.x() - xTolerance, bottomPoint.y() - yTolerance, xTolerance * 2, yTolerance * 2);
+
+    // Nokta hangi bölgedeyse onu döndür
+    if (leftArea.contains(point))   return "left";
+    if (rightArea.contains(point))  return "right";
+    if (topArea.contains(point))    return "start";
+    if (bottomArea.contains(point)) return "end";
 
     return "";
 }
+
 //! [14]
 bool DiagramScene::isItemChange(int type)
 {
@@ -487,3 +460,360 @@ bool DiagramScene::isItemChange(int type)
 
 
 //! [14]
+/*
+void DiagramScene::saveScene(const QString &filePath)
+{
+    QJsonArray itemsArray;
+    QMap<DiagramItem*, int> itemIdMap; // Arrow eşleştirmesi için
+    int nextId = 0;
+
+    for (QGraphicsItem *item : items()) {
+        QJsonObject obj;
+
+        if (auto dItem = qgraphicsitem_cast<DiagramItem*>(item)) {
+            int id = nextId++;
+            itemIdMap[dItem] = id;
+
+            obj["type"] = "DiagramItem";
+            obj["id"] = id;
+            obj["diagramType"] = static_cast<int>(dItem->myDiagramType);
+            obj["x"] = dItem->pos().x();
+            obj["y"] = dItem->pos().y();
+
+            // Polygon noktaları (dilersen ekleyebilirsin)
+            QJsonArray pointsArray;
+            for (const QPointF &pt : dItem->polygon()) {
+                QJsonObject ptObj;
+                ptObj["x"] = pt.x();
+                ptObj["y"] = pt.y();
+                pointsArray.append(ptObj);
+            }
+            obj["polygon"] = pointsArray;
+
+            // labelText'i sakla (QStaticText içeriği)
+            obj["labelText"] = dItem->labelText;
+
+            // Arka plan rengi (optional)
+            obj["backgroundColor"] = dItem->myBackground.name();
+
+            itemsArray.append(obj);
+        }
+        else if (auto tItem = qgraphicsitem_cast<DiagramTextItem*>(item)) {
+            obj["type"] = "DiagramTextItem";
+            obj["text"] = tItem->toPlainText();
+            obj["x"] = tItem->pos().x();
+            obj["y"] = tItem->pos().y();
+            itemsArray.append(obj);
+        }
+    }
+
+    // Arrow'ları ayrı kaydet
+    for (QGraphicsItem *item : items()) {
+        if (auto arrow = qgraphicsitem_cast<Arrow*>(item)) {
+            QJsonObject obj;
+            obj["type"] = "Arrow";
+            obj["startId"] = itemIdMap.value(arrow->myStartItem, -1);
+            obj["endId"] = itemIdMap.value(arrow->myEndItem, -1);
+            obj["startPolar"] = arrow->myStartPolar;
+            obj["endPolar"] = arrow->myEndPolar;
+            obj["answer"] = arrow->answer;
+            itemsArray.append(obj);
+        }
+    }
+
+    QJsonObject root;
+    root["items"] = itemsArray;
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly))
+        file.write(QJsonDocument(root).toJson());
+}
+
+void DiagramScene::loadScene(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    QJsonArray itemsArray = doc["items"].toArray();
+
+    clear(); // Sahneyi temizle
+
+    QMap<int, DiagramItem*> idItemMap; // id → DiagramItem eşleştirme
+
+    // 1. Tur: DiagramItem ve DiagramTextItem oluştur
+    for (const QJsonValue &val : itemsArray) {
+        QJsonObject obj = val.toObject();
+        QString type = obj["type"].toString();
+
+        if (type == "DiagramItem") {
+            int id = obj["id"].toInt();
+            Diagram::DiagramType dt = static_cast<Diagram::DiagramType>(obj["diagramType"].toInt());
+
+            auto item = new DiagramItem(dt, myItemMenu);
+
+            // Pozisyon
+            item->setPos(obj["x"].toDouble(), obj["y"].toDouble());
+
+            // Polygon'u yükle
+            QPolygonF polygon;
+            QJsonArray pointsArray = obj["polygon"].toArray();
+            for (const QJsonValue &ptVal : pointsArray) {
+                QJsonObject ptObj = ptVal.toObject();
+                polygon << QPointF(ptObj["x"].toDouble(), ptObj["y"].toDouble());
+            }
+            item->setPolygon(polygon);
+
+            // LabelText'i yükle
+            QString labelText = obj["labelText"].toString();
+            item->setText(labelText, QColor(obj["backgroundColor"].toString()));
+
+            addItem(item);
+            idItemMap[id] = item;
+        }
+        else if (type == "DiagramTextItem") {
+            auto textItem = new DiagramTextItem(myItemMenu);
+            textItem->setFont(myFont);
+            textItem->setDefaultTextColor(myTextColor);
+            textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
+            textItem->setPlainText(obj["text"].toString());
+            textItem->setPos(obj["x"].toDouble(), obj["y"].toDouble());
+            addItem(textItem);
+        }
+    }
+
+    // 2. Tur: Arrow'ları oluştur
+    for (const QJsonValue &val : itemsArray) {
+        QJsonObject obj = val.toObject();
+        if (obj["type"].toString() != "Arrow") continue;
+
+        int startId = obj["startId"].toInt();
+        int endId = obj["endId"].toInt();
+        QString startPolar = obj["startPolar"].toString();
+        QString endPolar = obj["endPolar"].toString();
+
+        DiagramItem *startItem = idItemMap.value(startId, nullptr);
+        DiagramItem *endItem = idItemMap.value(endId, nullptr);
+
+        if (startItem && endItem && startItem != endItem) {
+            Arrow *arrow = new Arrow(startItem, endItem, startPolar, endPolar, myItemMenu);
+            arrow->setColor(myLineColor);
+            arrow->answer = obj["answer"].toString();
+
+            bool startOk = startItem->addArrowState(arrow, startPolar, "O");
+            bool endOk   = endItem->addArrowState(arrow, endPolar, "I");
+
+            if (startOk && endOk) {
+                arrow->setZValue(-1000.0);
+                addItem(arrow);
+                arrow->updatePosition();
+            }
+        }
+    }
+}
+*/
+void DiagramScene::saveScene(const QString &filePath)
+{
+    QJsonArray itemsArray;
+    QMap<DiagramItem*, int> itemIdMap;
+    int nextId = 0;
+
+    for (QGraphicsItem *item : items()) {
+        QJsonObject obj;
+
+        if (auto dItem = qgraphicsitem_cast<DiagramItem*>(item)) {
+            int id = nextId++;
+            itemIdMap[dItem] = id;
+
+            obj["type"] = "DiagramItem";
+            obj["id"] = id;
+            obj["diagramType"] = static_cast<int>(dItem->myDiagramType);
+            obj["x"] = dItem->pos().x();
+            obj["y"] = dItem->pos().y();
+
+            QJsonArray pointsArray;
+            for (const QPointF &pt : dItem->polygon()) {
+                QJsonObject ptObj;
+                ptObj["x"] = pt.x();
+                ptObj["y"] = pt.y();
+                pointsArray.append(ptObj);
+            }
+            obj["polygon"] = pointsArray;
+            obj["labelText"] = dItem->labelText;
+            obj["backgroundColor"] = dItem->myBackground.name();
+
+            // selectedVariables
+            QJsonArray variableArray;
+            for (const VariableRecord &v : dItem->selectedVariables) {
+                QJsonObject vObj;
+                vObj["label"] = v.label;
+                vObj["value"] = v.value;
+                vObj["valueType"] = v.valueType;
+                vObj["expression"] = v.expression;
+                vObj["operationType"] = v.operationType;
+                vObj["startValue"] = v.startValue;
+                vObj["endValue"] = v.endValue;
+                vObj["stepValue"] = v.stepValue;
+                variableArray.append(vObj);
+            }
+            obj["variables"] = variableArray;
+
+            itemsArray.append(obj);
+        }
+        else if (auto tItem = qgraphicsitem_cast<DiagramTextItem*>(item)) {
+            obj["type"] = "DiagramTextItem";
+            obj["text"] = tItem->toPlainText();
+            obj["x"] = tItem->pos().x();
+            obj["y"] = tItem->pos().y();
+            itemsArray.append(obj);
+        }
+    }
+
+    // Arrow'ları ekle
+    for (QGraphicsItem *item : items()) {
+        if (auto arrow = qgraphicsitem_cast<Arrow*>(item)) {
+            QJsonObject obj;
+            obj["type"] = "Arrow";
+            obj["startId"] = itemIdMap.value(arrow->myStartItem, -1);
+            obj["endId"] = itemIdMap.value(arrow->myEndItem, -1);
+            obj["startPolar"] = arrow->myStartPolar;
+            obj["endPolar"] = arrow->myEndPolar;
+            obj["answer"] = arrow->answer;
+            itemsArray.append(obj);
+        }
+    }
+
+    // Global değişken listesi
+    QJsonArray globalVars;
+    for (const VariableRecord &v : Variable::onlineVariableList) {
+        QJsonObject vObj;
+        vObj["label"] = v.label;
+        vObj["value"] = v.value;
+        vObj["valueType"] = v.valueType;
+        vObj["expression"] = v.expression;
+        vObj["operationType"] = v.operationType;
+        vObj["startValue"] = v.startValue;
+        vObj["endValue"] = v.endValue;
+        vObj["stepValue"] = v.stepValue;
+        globalVars.append(vObj);
+    }
+
+    QJsonObject root;
+    root["items"] = itemsArray;
+    root["globalVariables"] = globalVars;
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly))
+        file.write(QJsonDocument(root).toJson());
+}
+void DiagramScene::loadScene(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    QJsonArray itemsArray = doc["items"].toArray();
+
+    clear();
+
+    QMap<int, DiagramItem*> idItemMap;
+
+    for (const QJsonValue &val : itemsArray) {
+        QJsonObject obj = val.toObject();
+        QString type = obj["type"].toString();
+
+        if (type == "DiagramItem") {
+            int id = obj["id"].toInt();
+            Diagram::DiagramType dt = static_cast<Diagram::DiagramType>(obj["diagramType"].toInt());
+
+            auto item = new DiagramItem(dt, myItemMenu);
+            item->setPos(obj["x"].toDouble(), obj["y"].toDouble());
+
+            QPolygonF polygon;
+            QJsonArray pointsArray = obj["polygon"].toArray();
+            for (const QJsonValue &ptVal : pointsArray) {
+                QJsonObject ptObj = ptVal.toObject();
+                polygon << QPointF(ptObj["x"].toDouble(), ptObj["y"].toDouble());
+            }
+            item->setPolygon(polygon);
+
+            QString labelText = obj["labelText"].toString();
+            QColor bgColor = QColor(obj["backgroundColor"].toString());
+            item->label.setText(labelText);
+
+            // selectedVariables
+            QJsonArray variableArray = obj["variables"].toArray();
+            for (const QJsonValue &vVal : variableArray) {
+                QJsonObject vObj = vVal.toObject();
+                VariableRecord v;
+                v.label = vObj["label"].toString();
+                v.value = vObj["value"].toString();
+                v.valueType = vObj["valueType"].toString();
+                v.expression = vObj["expression"].toString();
+                v.operationType = vObj["operationType"].toInt();
+                v.startValue = vObj["startValue"].toInt();
+                v.endValue = vObj["endValue"].toInt();
+                v.stepValue = vObj["stepValue"].toInt();
+                item->selectedVariables.append(v);
+            }
+
+            addItem(item);
+            idItemMap[id] = item;
+        }
+        else if (type == "DiagramTextItem") {
+            auto textItem = new DiagramTextItem(myItemMenu);
+            textItem->setFont(myFont);
+            textItem->setDefaultTextColor(myTextColor);
+            textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
+            textItem->setPlainText(obj["text"].toString());
+            textItem->setPos(obj["x"].toDouble(), obj["y"].toDouble());
+            addItem(textItem);
+        }
+    }
+
+    // Arrow'ları yükle
+    for (const QJsonValue &val : itemsArray) {
+        QJsonObject obj = val.toObject();
+        if (obj["type"].toString() != "Arrow") continue;
+
+        int startId = obj["startId"].toInt();
+        int endId = obj["endId"].toInt();
+        QString startPolar = obj["startPolar"].toString();
+        QString endPolar = obj["endPolar"].toString();
+
+        DiagramItem *startItem = idItemMap.value(startId, nullptr);
+        DiagramItem *endItem = idItemMap.value(endId, nullptr);
+
+        if (startItem && endItem && startItem != endItem) {
+            Arrow *arrow = new Arrow(startItem, endItem, startPolar, endPolar, myItemMenu);
+            arrow->setColor(myLineColor);
+            arrow->answer = obj["answer"].toString();
+
+            if (startItem->addArrowState(arrow, startPolar, "O") &&
+                endItem->addArrowState(arrow, endPolar, "I")) {
+                arrow->setZValue(-1000.0);
+                addItem(arrow);
+                arrow->updatePosition();
+            }
+        }
+    }
+
+    // Global değişken listesi yükle
+    Variable::onlineVariableList.clear();
+    QJsonArray globalVars = doc["globalVariables"].toArray();
+    for (const QJsonValue &val : globalVars) {
+        QJsonObject vObj = val.toObject();
+        VariableRecord v;
+        v.label = vObj["label"].toString();
+        v.value = vObj["value"].toString();
+        v.valueType = vObj["valueType"].toString();
+        v.expression = vObj["expression"].toString();
+        v.operationType = vObj["operationType"].toInt();
+        v.startValue = vObj["startValue"].toInt();
+        v.endValue = vObj["endValue"].toInt();
+        v.stepValue = vObj["stepValue"].toInt();
+        Variable::onlineVariableList.append(v);
+    }
+}

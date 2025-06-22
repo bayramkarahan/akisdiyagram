@@ -269,18 +269,12 @@ bool DiagramItem::addArrowState(Arrow *arrow,QString polar,QString rota)
 
 void DiagramItem::setText(QString text,QColor color)
 {
-    if(text!="step")
-    {
-    labelText = text; // sakla
-   label = QStaticText(text);
-    }
-  ///  myBackground = color;
-    setBrush(myBackground);         // ⬅️ Görsel rengi uygula!
-    /// label.setText(text);
-    //  label.setText(QString::number(myDiagramType));
+   /// label.setText(text);
+   //  label.setText(QString::number(myDiagramType));
     myBackground=color;
     //painter->setBrush(myBackground);
     update();
+
 }
 //! [3]
 //! [4]
@@ -322,14 +316,8 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     //qDebug() <<"çift tıklama1 "<<rotateState;
     if(this->myDiagramType==Diagram::DiagramType::Input)
     {
-
         VariableInputDialog dlg;
 
-        if(selectedVariables.size()==0)
-        {
-            // İlk işlem satırı veya boş başlat
-            dlg.addVariableRow();
-        }
         for (int j = 0; j < selectedVariables.size(); ++j) {
             VariableRecord varselect = selectedVariables[j];
             ///qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
@@ -342,7 +330,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
             for (const VariableRecord &selected : dlg.getSelectedVariables()) {
                 selectedVariables.append(selected);
-                qDebug() << "seçilen:" << selected.label << selected.value << selected.valueType<<selected.isInput;
+                qDebug() << "seçilen:" <<selected.name<< selected.label << selected.value << selected.valueType<<selected.isInput;
 
                 if (selected.isInput) {
                     label.setText(label.text() + "<br>" + selected.label + " = ?");
@@ -351,18 +339,12 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                 } else {
                     label.setText(label.text() + "<br>" + selected.label + " = \"" + selected.value + "\"");
                 }
-                labelText=label.text();
             }
         }
      }
     if(this->myDiagramType==Diagram::DiagramType::Output)
     {
          VariableOutputDialog dlg;
-        if(selectedVariables.size()==0)
-        {
-            // İlk işlem satırı veya boş başlat
-            dlg.addExpressionRow();
-        }
          for (int j = 0; j < selectedVariables.size(); ++j) {
              const VariableRecord &varselect = selectedVariables[j];
              qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
@@ -379,6 +361,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                      ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
                      VariableRecord selected;
                      selected.label = rec.label;
+                     selected.name = rec.name;
                      selected.expression=rec.expression;
                      selected.operationType=rec.outputType;
                      selectedVariables.append(selected);
@@ -398,7 +381,6 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                              label.setText(label.text()+"<br>"+selected.expression+"="+selected.expression);
                         }
                      /*********************************************/
-                        labelText=label.text();
                  }
              }
          }
@@ -406,11 +388,6 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     if(this->myDiagramType==Diagram::DiagramType::Process)
     {
         VariableProcessDialog dlg;
-        if(selectedVariables.size()==0)
-        {
-            // İlk işlem satırı veya boş başlat
-            dlg.addExpressionRow();
-        }
         for (int j = 0; j < selectedVariables.size(); ++j) {
             const VariableRecord &varselect = selectedVariables[j];
             qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
@@ -424,9 +401,16 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
             for (const auto &rec : processList) {
                 if(rec.expression!=""){
-                     qDebug() << "İşlem türü:"<<rec.targetLabel << rec.processType << "İfade:" << rec.expression;
+                     ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
                     VariableRecord selected;
                     selected.label = rec.targetLabel;
+                    selected.name=rec.targetName;
+
+                    selected.label = rec.var1Label;
+                    selected.name=rec.var1Name;
+                    selected.label = rec.var2Label;
+                    selected.name=rec.var2Name;
+
                     selected.expression=rec.expression;
                     selected.operationType=rec.processType;
                     selectedVariables.append(selected);
@@ -436,7 +420,6 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                     else
                         label.setText(label.text()+"<br>"+selected.expression);
                     /*********************************************/
-                    labelText=label.text();
                 }
             }
         }
@@ -464,6 +447,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             for (const LoopRecord &loop : loops) {
                     qDebug() << "İşlem türü:" << loop.loopType<< "İfade:" << loop.expression<<loop.endValue;
                     VariableRecord selected;
+                    selected.name=loop.name;
                     selected.label = loop.label;
                     selected.expression=loop.expression;
                     selected.operationType=loop.loopType;
@@ -488,7 +472,6 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                     }
            }
         }
-        labelText=label.text();
     }
     if(this->myDiagramType==Diagram::DiagramType::Conditional)
     {

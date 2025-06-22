@@ -6,7 +6,6 @@
 #include<QApplication>
 VariableProcessDialog::VariableProcessDialog(QWidget *parent) : QDialog(parent)
 {
-
     setWindowTitle("İşlem Tanımla");
     resize(650, 300);
 
@@ -53,13 +52,15 @@ QStringList VariableProcessDialog::variableLabels() const
 {
     QStringList labels;
     for (const VariableRecord &var : Variable::onlineVariableList) {
-        labels.append(var.label);
+        labels.append(var.name+"|"+var.label);
     }
     return labels;
 }
 
 void VariableProcessDialog::addExpressionRow()
 {
+
+
     ProcessRow *row = new ProcessRow;
     row->widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(row->widget);
@@ -77,21 +78,45 @@ void VariableProcessDialog::addExpressionRow()
     });
     layout->addWidget(row->operationTypeCombo);
 
-     // Hedef değişken combo
+    row->variableTargetNameEdit = new QLineEdit; row->variableTargetNameEdit->setPlaceholderText("name");
+    layout->addWidget(row->variableTargetNameEdit);
+
+    row->variableVar1NameEdit = new QLineEdit; row->variableVar1NameEdit->setPlaceholderText("name");
+    layout->addWidget(row->variableVar1NameEdit);
+
+    row->variableVar2NameEdit = new QLineEdit; row->variableVar2NameEdit->setPlaceholderText("name");
+    layout->addWidget(row->variableVar2NameEdit);
+
+    // Hedef değişken combo
     row->variableTargetCombo = new QComboBox(row->widget);
-row->variableTargetCombo->addItems(variableLabels());
     layout->addWidget(row->variableTargetCombo);
+    for (QString satir : variableLabels()) {
+        row->variableTargetCombo->addItem(satir.split("|")[1]);
+    }
+    if(row->variableTargetCombo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->variableTargetCombo->currentIndex());
+        row->variableTargetNameEdit->setText(satir.split("|")[0]);
+    }
 
     // "=" etiketi
     row->equalLabel = new QLabel("=", row->widget);
     layout->addWidget(row->equalLabel);
 
+
+
     // var1 combo
     row->var1Combo = new QComboBox(row->widget);
-    row->var1Combo->addItems(variableLabels());
+    //row->var1Combo->addItems(variableLabels());
     layout->addWidget(row->var1Combo);
-
-
+    for (QString satir : variableLabels()) {
+        row->var1Combo->addItem(satir.split("|")[1]);
+    }
+    if(row->var1Combo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->var1Combo->currentIndex());
+        row->variableVar1NameEdit->setText(satir.split("|")[0]);
+    }
     // Sabit sayı için edit
     row->constEdit1 = new QLineEdit(row->widget);
     row->constEdit1->setFixedWidth(50);
@@ -105,10 +130,16 @@ row->variableTargetCombo->addItems(variableLabels());
 
     // var2 combo
     row->var2Combo = new QComboBox(row->widget);
-    row->var2Combo->addItems(variableLabels());
+   //row->var2Combo->addItems(variableLabels());
     layout->addWidget(row->var2Combo);
-
-
+    for (QString satir : variableLabels()) {
+        row->var2Combo->addItem(satir.split("|")[1]);
+    }
+    if(row->var2Combo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->var2Combo->currentIndex());
+        row->variableVar2NameEdit->setText(satir.split("|")[0]);
+    }
 
     // Sabit sayı için edit
     row->constEdit2 = new QLineEdit(row->widget);
@@ -132,7 +163,24 @@ row->variableTargetCombo->addItems(variableLabels());
     connect(row->operationTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){
         updateExpressionRowWidgets(processRows.indexOf(row));
     });
-
+    connect(row->variableTargetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->variableTargetCombo->currentIndex();
+        int lidx = processRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableTargetName(idx,lidx);
+    });
+    connect(row->var1Combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->var1Combo->currentIndex();
+        int lidx = processRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableVar1Name(idx,lidx);
+    });
+    connect(row->var2Combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->var2Combo->currentIndex();
+        int lidx = processRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableVar2Name(idx,lidx);
+    });
     // Kaldırma butonu
     connect(row->removeButton, &QPushButton::clicked, this, [=](){
         int idx = processRows.indexOf(row);
@@ -163,20 +211,46 @@ void VariableProcessDialog::addExpressionRowparametre(int operationType, const Q
     });
     layout->addWidget(row->operationTypeCombo);
 
+
+    row->variableTargetNameEdit = new QLineEdit; row->variableTargetNameEdit->setPlaceholderText("name");
+    layout->addWidget(row->variableTargetNameEdit);
+
+    row->variableVar1NameEdit = new QLineEdit; row->variableVar1NameEdit->setPlaceholderText("name");
+    layout->addWidget(row->variableVar1NameEdit);
+
+    row->variableVar2NameEdit = new QLineEdit; row->variableVar2NameEdit->setPlaceholderText("name");
+    layout->addWidget(row->variableVar2NameEdit);
+
     // Hedef değişken combo
     row->variableTargetCombo = new QComboBox(row->widget);
-    row->variableTargetCombo->addItems(variableLabels());
     layout->addWidget(row->variableTargetCombo);
+    for (QString satir : variableLabels()) {
+        row->variableTargetCombo->addItem(satir.split("|")[1]);
+    }
+    if(row->variableTargetCombo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->variableTargetCombo->currentIndex());
+        row->variableTargetNameEdit->setText(satir.split("|")[0]);
+    }
 
     // "=" etiketi
     row->equalLabel = new QLabel("=", row->widget);
     layout->addWidget(row->equalLabel);
 
+
+
     // var1 combo
     row->var1Combo = new QComboBox(row->widget);
-    row->var1Combo->addItems(variableLabels());
+    //row->var1Combo->addItems(variableLabels());
     layout->addWidget(row->var1Combo);
-
+    for (QString satir : variableLabels()) {
+        row->var1Combo->addItem(satir.split("|")[1]);
+    }
+    if(row->var1Combo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->var1Combo->currentIndex());
+        row->variableVar1NameEdit->setText(satir.split("|")[0]);
+    }
     // Sabit sayı için edit
     row->constEdit1 = new QLineEdit(row->widget);
     row->constEdit1->setFixedWidth(50);
@@ -190,9 +264,16 @@ void VariableProcessDialog::addExpressionRowparametre(int operationType, const Q
 
     // var2 combo
     row->var2Combo = new QComboBox(row->widget);
-    row->var2Combo->addItems(variableLabels());
+    //row->var2Combo->addItems(variableLabels());
     layout->addWidget(row->var2Combo);
-
+    for (QString satir : variableLabels()) {
+        row->var2Combo->addItem(satir.split("|")[1]);
+    }
+    if(row->var2Combo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->var2Combo->currentIndex());
+        row->variableVar2NameEdit->setText(satir.split("|")[0]);
+    }
 
     row->constEdit2 = new QLineEdit(row->widget);
     row->constEdit2->setFixedWidth(50);
@@ -297,7 +378,24 @@ void VariableProcessDialog::addExpressionRowparametre(int operationType, const Q
         int idx = processRows.indexOf(row);
         if(idx >= 0) updateExpressionRowWidgets(idx);
     });
-
+    connect(row->variableTargetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->variableTargetCombo->currentIndex();
+        int lidx = processRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableTargetName(idx,lidx);
+    });
+    connect(row->var1Combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->var1Combo->currentIndex();
+        int lidx = processRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableVar1Name(idx,lidx);
+    });
+    connect(row->var2Combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->var2Combo->currentIndex();
+        int lidx = processRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableVar2Name(idx,lidx);
+    });
     connect(row->removeButton, &QPushButton::clicked, this, [=]() {
         expressionsLayout->removeWidget(row->widget);
         row->widget->deleteLater();
@@ -308,7 +406,33 @@ void VariableProcessDialog::addExpressionRowparametre(int operationType, const Q
 
     updateExpressionRowWidgets(processRows.indexOf(row));
 }
-
+void VariableProcessDialog::updateVariableTargetName(int index,int loopRowIndex)
+{
+    if (index < 0 || index >= variableLabels().size())
+        return;
+    QString row = variableLabels().at(index);
+    qDebug()<<"seçili değiken "<<index<<row.split("|")[0]<<row.split("|")[1];
+    ProcessRow *lrow = processRows.at(loopRowIndex);
+    lrow->variableTargetNameEdit->setText(row.split("|")[0]);
+}
+void VariableProcessDialog::updateVariableVar1Name(int index,int loopRowIndex)
+{
+    if (index < 0 || index >= variableLabels().size())
+        return;
+    QString row = variableLabels().at(index);
+    qDebug()<<"seçili değiken "<<index<<row.split("|")[0]<<row.split("|")[1];
+    ProcessRow *lrow = processRows.at(loopRowIndex);
+    lrow->variableVar1NameEdit->setText(row.split("|")[0]);
+}
+void VariableProcessDialog::updateVariableVar2Name(int index,int loopRowIndex)
+{
+    if (index < 0 || index >= variableLabels().size())
+        return;
+    QString row = variableLabels().at(index);
+    qDebug()<<"seçili değiken "<<index<<row.split("|")[0]<<row.split("|")[1];
+    ProcessRow *lrow = processRows.at(loopRowIndex);
+    lrow->variableVar2NameEdit->setText(row.split("|")[0]);
+}
 void VariableProcessDialog::updateExpressionRowWidgets(int index)
 {
     if (index < 0 || index >= processRows.count())
@@ -319,6 +443,11 @@ void VariableProcessDialog::updateExpressionRowWidgets(int index)
 
     // Önce tüm ek widgetları gizle
     row->variableTargetCombo->setVisible(true);
+    row->variableTargetNameEdit->setVisible(false);
+
+    row->variableVar1NameEdit->setVisible(false);
+    row->variableVar2NameEdit->setVisible(false);
+
     row->var1Combo->setVisible(false);
     row->operatorCombo->setVisible(false);
     row->var2Combo->setVisible(false);
@@ -362,13 +491,14 @@ QList<ProcessRecord> VariableProcessDialog::getExpressionsWithType() const
         case 0:
             rec.expression = QString("%1 = %2").arg(target).arg(row->constEdit1->text());
             rec.targetLabel = row->variableTargetCombo->currentText();
-
+            rec.targetName = row->variableTargetNameEdit->text();
             break;
         case 1:
             rec.expression = QString("%1 = %2").arg(target).arg(row->var1Combo->currentText());
             rec.targetLabel = row->variableTargetCombo->currentText();
-
+            rec.targetName = row->variableTargetNameEdit->text();
             rec.var1Label = row->var1Combo->currentText();
+            rec.var1Name = row->variableVar1NameEdit->text();
             break;
         case 2:
             rec.expression = QString("%1 = %2 %3 %4")
@@ -377,8 +507,11 @@ QList<ProcessRecord> VariableProcessDialog::getExpressionsWithType() const
                        .arg(row->operatorCombo->currentText())
                        .arg(row->var2Combo->currentText());
             rec.targetLabel = row->variableTargetCombo->currentText();
+            rec.targetName = row->variableTargetNameEdit->text();
             rec.var1Label = row->var1Combo->currentText();
+            rec.var1Name = row->variableVar1NameEdit->text();
             rec.var2Label = row->var2Combo->currentText();
+            rec.var2Name = row->variableVar2NameEdit->text();
             break;
         case 3:
             rec.expression = QString("%1 = %2 %3 %4")
@@ -387,7 +520,9 @@ QList<ProcessRecord> VariableProcessDialog::getExpressionsWithType() const
                        .arg(row->operatorCombo->currentText())
                        .arg(row->constEdit2->text());
             rec.targetLabel = row->variableTargetCombo->currentText();
+            rec.targetName = row->variableTargetNameEdit->text();
             rec.var1Label = row->var1Combo->currentText();
+            rec.var1Name = row->variableVar1NameEdit->text();
             break;
         case 4:
             rec.expression = QString("%1 = %2 %3 %4")
@@ -396,6 +531,7 @@ QList<ProcessRecord> VariableProcessDialog::getExpressionsWithType() const
                        .arg(row->operatorCombo->currentText())
                        .arg(row->constEdit2->text());
             rec.targetLabel = row->variableTargetCombo->currentText();
+            rec.targetName = row->variableTargetNameEdit->text();
             break;
         }
         list.append(rec);

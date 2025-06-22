@@ -7,10 +7,11 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle("Variable Editor");
-    resize(220, 200);
+    resize(230, 200);
 
     tableWidget = new QTableWidget(this);
-    tableWidget->setColumnCount(3);
+    tableWidget->setColumnCount(4);
+    tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
 
     tableWidget->setHorizontalHeaderLabels(QStringList() << "Adı" << "Değer" << "Veri Türü");
     tableWidget->horizontalHeader()->setStretchLastSection(true);
@@ -29,6 +30,7 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
         rec.value = tableWidget->item(row, 1)->text();
         QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(row, 2));
         if (combo) rec.valueType = combo->currentText();
+        rec.name = tableWidget->item(row, 3)->text();
 
         VariableEditForm dialog(rec, this);
         if (dialog.exec() == QDialog::Accepted) {
@@ -36,10 +38,10 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
             tableWidget->item(row, 0)->setText(updated.label);
             tableWidget->item(row, 1)->setText(updated.value);
             tableWidget->item(row, 2)->setText(updated.valueType);
-            qDebug()<<updated.label<<updated.value<<updated.valueType;
+            qDebug()<<updated.name<<updated.label<<updated.value<<updated.valueType;
             //güncelliyor
             for (int i=0;i<Variable::onlineVariableList.size();i++) {
-                if(Variable::onlineVariableList[i].label==rec.label)
+                if(Variable::onlineVariableList[i].name==updated.name)
                 {
                     Variable::onlineVariableList[i]=updated;
                 }
@@ -87,7 +89,6 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
    // buttonLayout->addWidget(saveButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0); // Genel boşluk yok
     mainLayout->addWidget(tableWidget);
     mainLayout->addLayout(buttonLayout);
 
@@ -107,7 +108,9 @@ void VariableEditorDialog::loadVariables()
         tableWidget->setItem(row, 0, new QTableWidgetItem(var.label));
         tableWidget->setItem(row, 1, new QTableWidgetItem(var.value));
         tableWidget->setItem(row, 2, new QTableWidgetItem(var.valueType));
-     }
+        tableWidget->setItem(row, 3, new QTableWidgetItem(var.name));
+        tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
+    }
     for (int row = 0; row < tableWidget->rowCount(); ++row) {
         for (int col = 0; col < tableWidget->columnCount(); ++col) {
             QTableWidgetItem* item = tableWidget->item(row, col);
@@ -122,30 +125,11 @@ void VariableEditorDialog::loadVariables()
 
 void VariableEditorDialog::addVariable()
 {
-
     int row = tableWidget->rowCount();
-    int varRow=row;
     // Listeye boş VariableRecord da ekle
     VariableRecord rec;
-    rec.label ="var"+QString::number(varRow);
-    /*******************************************/
-    bool findState=true;
-    while(findState)
-    {
-        findState=false;
-        for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
-            VariableRecord var = Variable::onlineVariableList[j];
-            if(rec.label==var.label)
-            {
-                findState=true;
-                varRow++;
-                rec.label ="var"+QString::number(varRow);
-            }
-        }
-    }
-
-    /*******************************************/
-
+    rec.name ="var"+QString::number(row);
+    rec.label ="var"+QString::number(row);
     rec.value = "0";
     rec.valueType = "number";
 
@@ -155,7 +139,8 @@ void VariableEditorDialog::addVariable()
     tableWidget->setItem(row, 0, new QTableWidgetItem(rec.label));
     tableWidget->setItem(row, 1, new QTableWidgetItem(rec.value));
     tableWidget->setItem(row, 2, new QTableWidgetItem(rec.valueType));
-    tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
+    tableWidget->setItem(row, 3, new QTableWidgetItem(rec.name));
+     tableWidget->hideColumn(3); // 2. sütunu (3. sütun) gizler
   }
 
 void VariableEditorDialog::removeSelectedVariable()
@@ -166,13 +151,13 @@ void VariableEditorDialog::removeSelectedVariable()
         VariableRecord rec;
         rec.label = tableWidget->item(row, 0)->text();
         rec.value = tableWidget->item(row, 1)->text();
-
+        rec.name = tableWidget->item(row, 3)->text();
         tableWidget->removeRow(row);
-    qDebug()<<"silinen kayıt"<<rec.label<<rec.value;
+    qDebug()<<"silinen kayıt"<<rec.name<<rec.label<<rec.value;
 
         for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
             VariableRecord var = Variable::onlineVariableList[j];
-            if(rec.label==var.label)
+            if(rec.name==var.name)
             {
                     //variableWidget->loadVariables();
                 Variable::onlineVariableList.removeAt(j);

@@ -37,7 +37,7 @@ private:
     QList<VariableRow*> variableRows;
 
      void removeVariableRow(int index);
-    QStringList variableLabels() const;
+    QList<QPair<QString, QString> > variableLabels() const;
 };
 
 #endif // VARIABLEINPUTDIALOG_H

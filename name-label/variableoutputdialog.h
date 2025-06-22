@@ -13,6 +13,7 @@
 struct OutputRecord {
     int outputType;
     QString expression;
+    QString name;
     QString label;
 };
 class VariableOutputDialog : public QDialog
@@ -25,9 +26,11 @@ public:
     QList<OutputRecord> getExpressionsWithType() const;
 private slots:
     void updateExpressionRowWidgets(int index);
+    void updateVariableName(int index,int loopRowIndex);
 private:
     struct OutputRow {
         QWidget *widget;
+        QLineEdit *varNameEdit;
         QComboBox *varLabelCombo;
         QComboBox *operationTypeCombo;
         QLineEdit *constEdit1;

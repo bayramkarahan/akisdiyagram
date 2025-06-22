@@ -4,6 +4,8 @@
 VariableInputDialog::VariableInputDialog(QWidget *parent)
     : QDialog(parent)
 {
+
+
     setWindowTitle("Değişken Seçimi");
     resize(500, 300);
 
@@ -12,7 +14,7 @@ VariableInputDialog::VariableInputDialog(QWidget *parent)
     rowsLayout = new QVBoxLayout();
     mainLayout->addLayout(rowsLayout);
 
-    addButton = new QPushButton("✏️ Satır Ekle", this);
+    addButton = new QPushButton("Satır Ekle", this);
     mainLayout->addWidget(addButton);
 
     connect(addButton, &QPushButton::clicked, this, [this]() {
@@ -37,7 +39,6 @@ VariableInputDialog::VariableInputDialog(QWidget *parent)
 
 void VariableInputDialog::addVariableRow(const VariableRecord &var)
 {
-
     VariableRow *row = new VariableRow;
 
     row->widget = new QWidget(this);
@@ -46,7 +47,11 @@ void VariableInputDialog::addVariableRow(const VariableRecord &var)
 
     // Değişken seçimi combobox
     row->variableCombo = new QComboBox(row->widget);
-    row->variableCombo->addItems(variableLabels());
+    ///row->variableCombo->addItems(variableLabels().constFirst().first);
+    for (const auto &pair : variableLabels()) {
+        //row->variableCombo->addItem(pair.second);  // veya .first
+        row->variableCombo->addItem(pair.second, pair.first);  // Görünen label, data olarak name
+    }
     if (!var.label.isEmpty()) {
         int idx = row->variableCombo->findText(var.label);
         if (idx >= 0) row->variableCombo->setCurrentIndex(idx);
@@ -65,7 +70,7 @@ void VariableInputDialog::addVariableRow(const VariableRecord &var)
     hLayout->addWidget(row->valueEdit);
 
     // Sil butonu
-    row->removeButton = new QPushButton("🗑️", row->widget);
+    row->removeButton = new QPushButton("Sil", row->widget);
     hLayout->addWidget(row->removeButton);
 
     rowsLayout->addWidget(row->widget);
@@ -102,13 +107,14 @@ QList<VariableRecord> VariableInputDialog::getSelectedVariables() const
 
     for (const VariableRow *row : variableRows) {
         VariableRecord var;
+        var.name = row->variableCombo->currentText();
         var.label = row->variableCombo->currentText();
         var.isInput = row->inputCheckBox->isChecked();
         var.value = row->valueEdit->text();
 
         // type bilgisi için allVariables'dan eşleştirme
         for (const VariableRecord &v : Variable::onlineVariableList) {
-            if (v.label == var.label) {
+            if (v.name == var.name) {
                 var.valueType = v.valueType;
                 break;
             }
@@ -119,13 +125,13 @@ QList<VariableRecord> VariableInputDialog::getSelectedVariables() const
     return selected;
 }
 
-QStringList VariableInputDialog::variableLabels() const
+QList<QPair<QString, QString>> VariableInputDialog::variableLabels() const
 {
-     QStringList list;
+     QList<QPair<QString, QString>> list;
 
     for (const VariableRecord &var : Variable::onlineVariableList) {
         //labels.insert(var.label);
-        list.append(var.label);
+        list.append(qMakePair(var.name, var.label));
     }
     return list;
 }

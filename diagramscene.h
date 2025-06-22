@@ -88,6 +88,8 @@ public slots:
     void setMode(Mode mode);
     void setItemType(Diagram::DiagramType type);
     void editorLostFocus(DiagramTextItem *item);
+    void saveScene(const QString &filePath);
+    void loadScene(const QString &filePath);
 
 signals:
     void itemInserted(Diagram::DiagramType diagramItemType);
@@ -102,7 +104,8 @@ protected:
 private:
     bool haveStateItem(Diagram::DiagramType diagramItemType);
     bool isItemChange(int type);
-    QString polarDiagramItem(DiagramItem *diagramItem, QPointF point, DiagramItem *myStartItem, DiagramItem *myEndItem);
+    QString polarDiagramItem(DiagramItem *diagramItem, QPointF point);
+    DiagramItem* findDiagramItemNear(QPointF point, qreal xTol, qreal yTol);
     Diagram::DiagramType myItemType;
     QMenu *myItemMenu;
     Mode myMode;

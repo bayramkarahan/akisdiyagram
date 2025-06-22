@@ -176,7 +176,6 @@ void MainWindow::deleteArrow(Arrow *item)
 //! [3]
 void MainWindow::deleteItem()
 {
-
     bool delStatus=false;
     foreach (QGraphicsItem *item, scene->selectedItems()) {
         delStatus=false;
@@ -395,15 +394,15 @@ void MainWindow::about()
                           "<br/>\tbayramk@gmail.com  "
                           "<br/>*****************************************************************************"
 
-                          "<br/>akisdiyagramı 1.0: Temel özellikler."
-                          "<br/>akisdiyagramı 1.1: Bağlantı renklendirmeleri eklendi."
-                          "<br/>akisdiyagramı 1.2: Ok ve text nesnesine sağtuş menüsü eklendi."
-                          "<br/>akisdiyagramı 1.3: Sağtuş menü özellikleri bütün nesnelere eklendi."
-                          "<br/>akisdiyagramı 1.4: Nesneler arası birleştirme iyileştirildi."
-                          "<br/>akisdiyagramı 1.5: Dinamik Değişken yapısı eklendi."
+                          "<br/>akisdiyagramı 1.0:Temel özellikler."
+                          "<br/>akisdiyagramı 1.1:Bağlantı renklendirmeleri eklendi."
+                          "<br/>akisdiyagramı 1.2:Ok ve text nesnesine sağtuş menüsü eklendi."
+                          "<br/>akisdiyagramı 1.3:Sağtuş menü özellikleri bütün nesnelere eklendi."
+                          "<br/>akisdiyagramı 1.4:Nesneler arası birleştirme iyileştirild."
+                          "<br/>akisdiyagramı 1.5:Dinamik Değişken yapısı eklendi."
                           "<br/>akisdiyagramı 1.6: Giriş, İşlem, Karar ve Çıktı işlemleri eklendi."
-                          "<br/>akisdiyagramı 1.7: Değişkenler ve Algoritma sağ bölüme eklendi."
-                          "<br/>akisdiyagramı 1.8: Yeni, Aç ve Kaydet seçenekleri eklendi."
+                          "<br/>akisdiyagramı 1.7:Değişkenler Bölümü Sağa Bölüme Eklendi."
+                          "<br/>akisdiyagramı 1.7:."
 
                           "<br/>*****************************************************************************"
                            "<br/>   This program is free software; you can redistribute it and/or modify    "
@@ -426,14 +425,14 @@ void MainWindow::about()
 void MainWindow::worker()
 {
 
-    diagramItem->setText("step",QColor(255,0,0,100));
+    diagramItem->setText("stop",QColor(255,0,0,100));
     /*************************************************/
 
     if(diagramItem->myDiagramType==Diagram::DiagramType::Input)
     {
         for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
             VariableRecord varselect =diagramItem->selectedVariables[j];
-            qDebug()<<"kullanılan değişkenim:"<<varselect.label<<varselect.valueType<<varselect.value<<varselect.isInput;
+            qDebug()<<"kullanılan değişkenim:"<<varselect.name<<varselect.label<<varselect.valueType<<varselect.value<<varselect.isInput;
             if(varselect.isInput)
             {
                 bool ok = false;
@@ -483,7 +482,7 @@ void MainWindow::worker()
             }
             for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
                 const VariableRecord var = Variable::onlineVariableList[j];
-                if(varselect.label==var.label)
+                if(varselect.name==var.name)
                 {
                     Variable::onlineVariableList[j].value=varselect.value;
                     variableWidget->loadVariables();
@@ -496,10 +495,10 @@ void MainWindow::worker()
     {
         for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
             VariableRecord varselect =diagramItem->selectedVariables[j];
-            qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.operationType<<varselect.value<<varselect.expression;
+            qDebug()<<"kullanılan değişkenim: "<<varselect.label<<varselect.name<<varselect.operationType<<varselect.value<<varselect.expression;
             for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
                 VariableRecord var = Variable::onlineVariableList[j];
-                if(varselect.label==var.label)
+                if(varselect.name==var.name)
                 {
                     QLabel *label=new QLabel;
                     if(varselect.operationType==0)
@@ -560,18 +559,21 @@ void MainWindow::worker()
     {
         qDebug() << diagramItem->selectedVariables.size();
         for (int j = 0; j < diagramItem->selectedVariables.size(); ++j) {
-            VariableRecord varselect = diagramItem->selectedVariables[j];
-            qDebug() << "tanımlı işlemler: "<<varselect.label << varselect.operationType << varselect.expression;
+             VariableRecord varselect = diagramItem->selectedVariables[j];
+            qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
 
-            bool test=varselect.evaluate(Variable::onlineVariableList);
-            if (test) {
-                for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
-                    VariableRecord var = Variable::onlineVariableList[j];
-                    if(varselect.label==var.label)
-                    {
-                        // qDebug() << "Sonuç:" << varselect.value;
+            for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
+                 VariableRecord var = Variable::onlineVariableList[j];
+
+                if(varselect.name==var.name)
+                {
+                     bool test=varselect.evaluate(Variable::onlineVariableList);
+                    if (test) {
+                       // qDebug() << "Sonuç:" << varselect.value;
                         Variable::onlineVariableList[j].value=varselect.value;
                         variableWidget->loadVariables();
+                    } else {
+                        qDebug() << "Hesaplama başarısız!";
                     }
                 }
             }
@@ -581,69 +583,12 @@ void MainWindow::worker()
     scene->update();
     timer.start(1000);
     loop.exec();
-    if(diagramItem->myDiagramType!=Diagram::DiagramType::End)
-    {
-        QString text = algoritmaText->toPlainText();
-        QStringList lines = text.split('\n');
-        int lineCount = lines.count();
-        algoritmaText->insertPlainText(QString::number(lineCount)+"- "+diagramItem->label.text()+"\n");
-     }
-    if(diagramItem->myDiagramType!=Diagram::DiagramType::Link)
-    {
-        QString text = algoritmaText->toPlainText();
-        QStringList lines = text.split('\n');
-        int lineCount = lines.count();
-        algoritmaText->insertPlainText(QString::number(lineCount)+"- "+diagramItem->label.text()+"\n");
-    }
-
-    diagramItem->setText("step",QColor(255,255,0,0));
+    diagramItem->setText("stop",QColor(255,255,0,0));
 }
 void MainWindow::stop()
 {
     runState=false;
 }
-void MainWindow::newFile()
-{
-    scene->clear();
-}
-
-void MainWindow::saveFile()
-{
-    QString defaultFileName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-    + "/flowchart.json";
-
-    QString filePath = QFileDialog::getSaveFileName(
-        this,
-        tr("Diyagramı Kaydet"),
-        defaultFileName,
-        tr("JSON Dosyaları (*.json)")
-        );
-
-    if (!filePath.isEmpty()) {
-        scene->saveScene(filePath);
-    }
-}
-
-
-void MainWindow::openFile()
-{
-    QString startDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-
-    QString filePath = QFileDialog::getOpenFileName(
-        this,
-        tr("Diyagram Aç"),
-        startDir,
-        tr("JSON Dosyaları (*.json)")
-        );
-
-    if (!filePath.isEmpty()) {
-        scene->loadScene(filePath);
-        variableWidget->loadVariables();
-    }
-}
-
-
-
 bool MainWindow::runTest()
 {
     qDebug()<<"test başladı";
@@ -659,7 +604,11 @@ bool MainWindow::runTest()
              if(qgraphicsitem_cast<DiagramItem *>(item)->myDiagramType==Diagram::End) endItemHaveState=false;
              if(qgraphicsitem_cast<DiagramItem *>(item)->myDiagramType==Diagram::Loop)
              {
+                 qgraphicsitem_cast<DiagramItem *>(item)->varAnswer0="0";
+                 qgraphicsitem_cast<DiagramItem *>(item)->counter=0;
                  qgraphicsitem_cast<DiagramItem *>(item)->selectedVariables.first().counter=0;
+                 varLoopAnswerMain0="0";
+
                  if(qgraphicsitem_cast<DiagramItem *>(item)->label.text()=="")
                  {
                      loopSetHaveState=false;
@@ -687,9 +636,8 @@ bool MainWindow::runTest()
 }
 void MainWindow::run()
 {
-    algoritmaText->clear();
     runAction->setEnabled(false);
-    stopAction->setEnabled(true);
+     stopAction->setEnabled(true);
    // qDebug()<<"run:"<<runTest();
     if(runTest()==false){ stopAction->setEnabled(false);
                           runAction->setEnabled(true);return;}
@@ -737,14 +685,7 @@ void MainWindow::run()
         return;
     }
      runAction->setEnabled(true);
-     stopAction->setEnabled(false);
-     /*****************************************/
-     QString text = algoritmaText->toPlainText();
-     QStringList lines = text.split('\n');
-     int lineCount = lines.count();
-     algoritmaText->insertPlainText(QString::number(lineCount)+"- "+diagramItem->label.text());
-
-    // algoritmaText->appendPlainText("Son");
+      stopAction->setEnabled(false);
 }
 DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
 {
@@ -980,32 +921,17 @@ DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
         QStringList parts = rec.expression.split(' ');
         if(rec.operationType==0)
         {
+            qDebug()<<"for"<<rec.name<<rec.label<<rec.value;
             int counterVariable = rec.value.toInt(&ok,10);
             int endValue = rec.endValue;
             int stepValue = rec.stepValue;
-            qDebug()<<"for"<<"label:"<<rec.label
-                <<"counter:"<<rec.counter
-                <<"value:"<<rec.value
-                <<"endValue:"<<endValue
-                <<"stepValue:"<<stepValue;
             if(rec.counter==0)
             {
-                for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
-                    VariableRecord var = Variable::onlineVariableList[j];
-                    if(rec.label==var.label)
-                    {
-                        Variable::onlineVariableList[j].value=rec.startValue;
-                        Variable::onlineVariableList[j].counter=0;
-                        variableWidget->loadVariables();
-                    }
-                }
                 qDebug()<<"atama yapıldı"<<rec.counter<<counterVariable;
                 item->selectedVariables.first().counter++;
                 item->selectedVariables.first().value=QString::number(rec.startValue);
-                counterVariable = rec.startValue;
             }else
             {
-                qDebug()<<"adım sayısı:"<<rec.counter;
                 counterVariable=counterVariable+stepValue;
                 item->selectedVariables.first().counter++;
                 item->selectedVariables.first().value=QString::number(counterVariable);
@@ -1016,7 +942,7 @@ DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
             {
                 for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
                     VariableRecord var = Variable::onlineVariableList[j];
-                    if(rec.label==var.label)
+                    if(rec.name==var.name)
                     {
                         Variable::onlineVariableList[j].value=item->selectedVariables.first().value;
                         Variable::onlineVariableList[j].counter=item->selectedVariables.first().counter;
@@ -1034,7 +960,7 @@ DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
             /************************************************/
             for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
                 VariableRecord var = Variable::onlineVariableList[j];
-                if(rec.label==var.label)
+                if(rec.name==var.name)
                 {
                     var1val=Variable::onlineVariableList[j].value.toInt(&ok,10);
                 }
@@ -1166,55 +1092,17 @@ void MainWindow::createToolBox()
     toolBoxLeft->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
     toolBoxLeft->setMinimumWidth(itemWidget->sizeHint().width());
     toolBoxLeft->addItem(itemWidget, tr("Akış Şekilleri"));
+    ///toolBoxLeft->addItem(variableWidget, tr("Değişkenler"));
     toolBoxLeft->addItem(backgroundWidget, tr("Arka Planlar"));
-/*
+
     toolBoxRight = new QToolBox;
     toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
     toolBoxRight->setMinimumWidth(variableWidget->width());
     toolBoxRight->setFixedWidth(variableWidget->width());
+
+   // toolBoxRight->addItem(itemWidget, tr("Akış Şekilleri"));
     toolBoxRight->addItem(variableWidget, tr("Değişkenler"));
-*/
-    /*
-    toolBoxRight = new QToolBox;
-    toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
-    toolBoxRight->setMinimumWidth(variableWidget->width());
-    toolBoxRight->setFixedWidth(variableWidget->width());
-
-    // Yeni bir widget ve layout oluştur
-    QWidget *compositeWidget = new QWidget;
-    QVBoxLayout *layout1 = new QVBoxLayout(compositeWidget);
-    layout1->setContentsMargins(0, 0, 0, 0); // Sağ ve sol padding: 10px
-    // variableWidget ve textEdit ekle
-    layout1->addWidget(variableWidget, 1); // stretch: 1
-    layout1->addWidget(new QLabel("Algoritma"), 0.1);
-    layout1->addWidget(new QTextEdit, 1);  // eşit oranda yer kaplasın (ya da 2 yaparsın daha fazla yer kaplar)
-    toolBoxRight->addItem(compositeWidget, tr("Değişkenler ve Açıklama"));
-*/
-    toolBoxRight = new QToolBox;
-    toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
-    toolBoxRight->setMinimumWidth(variableWidget->width());
-    toolBoxRight->setFixedWidth(variableWidget->width());
-
-    // Ana konteyner
-    QWidget *compositeWidget = new QWidget;
-    QVBoxLayout *layout1 = new QVBoxLayout(compositeWidget);
-    layout1->setContentsMargins(0, 0, 0, 0); // Genel boşluk yok
-
-    // variableWidget doğrudan eklenir (kenar boşluğu yok)
-    layout1->addWidget(variableWidget, 1);
-
-    // QTextEdit için iç widget ve layout
-    algoritmaText=new QPlainTextEdit();
-    QWidget *textEditContainer = new QWidget;
-    QVBoxLayout *textLayout1 = new QVBoxLayout(textEditContainer);
-    textLayout1->setContentsMargins(0, 0, 0, 0); // Sadece burada sağ/sol padding
-    textLayout1->addWidget(new QLabel("Algoritma"));
-    textLayout1->addWidget(algoritmaText);
-
-    layout1->addWidget(textEditContainer, 1); // Ekleniyor
-
-    toolBoxRight->addItem(compositeWidget, tr("Değişkenler ve Açıklama"));
-
+   // toolBoxRight->addItem(backgroundWidget, tr("Arka Planlar"));
 }
 //! [22]
 
@@ -1249,25 +1137,10 @@ void MainWindow::createActions()
     stopAction->setStatusTip(tr("Çalışmayı Durdurur"));
     connect(stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 
-    saveFileAction = new QAction(QIcon(":/images/save.png"),tr("Kaydet"), this);
-    saveFileAction->setShortcuts(QKeySequence::Save);
-    saveFileAction->setStatusTip(tr("Diyagramı Kaydet"));
-    connect(saveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 
-    newFileAction = new QAction(QIcon(":/images/new.png"),tr("Yeni"), this);
-    newFileAction->setShortcuts(QKeySequence::New);
-    newFileAction->setStatusTip(tr("Yeni Belge"));
-    connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFile()));
-
-    openFileAction = new QAction(QIcon(":/images/open.png"),tr("Aç"), this);
-    openFileAction->setShortcuts(QKeySequence::Open);
-    openFileAction->setStatusTip(tr("Diyagramı Yükle"));
-    connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
-
-
-    exitAction = new QAction(QIcon(":/images/close.png"),tr("Ç&ıkış"), this);
+    exitAction = new QAction(tr("Ç&ıkış"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
-    exitAction->setStatusTip(tr("Uygulamadan Çıkar"));
+    exitAction->setStatusTip(tr("Uygulmadan Çıkılır"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
 
     boldAction = new QAction(tr("Kalın"), this);
@@ -1287,7 +1160,7 @@ void MainWindow::createActions()
     underlineAction->setShortcut(tr("Ctrl+U"));
     connect(underlineAction, SIGNAL(triggered()), this, SLOT(handleFontChange()));
 
-    aboutAction = new QAction(QIcon(":/images/about.png"),tr("H&akkında"), this);
+    aboutAction = new QAction(tr("H&akkında"), this);
     aboutAction->setShortcut(tr("F1"));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 
@@ -1297,9 +1170,6 @@ void MainWindow::createActions()
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&Dosya"));
-    fileMenu->addAction(newFileAction);
-    fileMenu->addAction(openFileAction);
-    fileMenu->addAction(saveFileAction);
     fileMenu->addAction(exitAction);
 
     itemMenu = menuBar()->addMenu(tr("&Düzen"));
@@ -1325,41 +1195,12 @@ void MainWindow::createMenus()
 void MainWindow::createToolbars()
 {
 //! [25]
-    fileToolBar = addToolBar(tr("File"));
-    fileToolBar->addAction(newFileAction);
-    fileToolBar->addAction(openFileAction);
-    fileToolBar->addAction(saveFileAction);
-
-    runToolBar = addToolBar(tr("Run"));
-    runToolBar->addAction(runAction);
-    runToolBar->addAction(stopAction);
-
-    /***************************************************************/
-    QToolButton *pointerButton = new QToolButton;
-    pointerButton->setCheckable(true);
-    pointerButton->setChecked(true);
-    pointerButton->setIcon(QIcon(":/images/pointer.png"));
-    QToolButton *linePointerButton = new QToolButton;
-    linePointerButton->setCheckable(true);
-    linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
-
-    pointerTypeGroup = new QButtonGroup(this);
-    pointerTypeGroup->addButton(pointerButton, int(DiagramScene::MoveItem));
-    pointerTypeGroup->addButton(linePointerButton, int(DiagramScene::InsertLine));
-    connect(pointerTypeGroup, SIGNAL(buttonClicked(int)),
-            this, SLOT(pointerGroupClicked(int)));
-
-
-    pointerToolbar = addToolBar(tr("Pointer type"));
-    pointerToolbar->addWidget(pointerButton);
-    pointerToolbar->addWidget(linePointerButton);
-    /*************************************************************/
     editToolBar = addToolBar(tr("Edit"));
+    editToolBar->addAction(deleteAction);
     editToolBar->addAction(toFrontAction);
     editToolBar->addAction(sendBackAction);
-    editToolBar->addAction(deleteAction);
-
-
+    editToolBar->addAction(runAction);
+    editToolBar->addAction(stopAction);
 
     fontCombo = new QFontComboBox();
     connect(fontCombo, SIGNAL(currentFontChanged(QFont)),
@@ -1415,7 +1256,20 @@ void MainWindow::createToolbars()
     colorToolBar->addWidget(fillColorToolButton);
     colorToolBar->addWidget(lineColorToolButton);
 
-    /******************************************************/
+    QToolButton *pointerButton = new QToolButton;
+    pointerButton->setCheckable(true);
+    pointerButton->setChecked(true);
+    pointerButton->setIcon(QIcon(":/images/pointer.png"));
+    QToolButton *linePointerButton = new QToolButton;
+    linePointerButton->setCheckable(true);
+    linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
+
+    pointerTypeGroup = new QButtonGroup(this);
+    pointerTypeGroup->addButton(pointerButton, int(DiagramScene::MoveItem));
+    pointerTypeGroup->addButton(linePointerButton, int(DiagramScene::InsertLine));
+    connect(pointerTypeGroup, SIGNAL(buttonClicked(int)),
+            this, SLOT(pointerGroupClicked(int)));
+
     sceneScaleCombo = new QComboBox;
     QStringList scales;
     scales << tr("50%") << tr("60%") << tr("70%")<< tr("75%") << tr("80%") << tr("90%") << tr("100%") << tr("110%")<< tr("120%")<< tr("130%");
@@ -1424,9 +1278,10 @@ void MainWindow::createToolbars()
     connect(sceneScaleCombo, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(sceneScaleChanged(QString)));
 
-    viewToolbar = addToolBar(tr("View"));
-    viewToolbar->addWidget(sceneScaleCombo);
-
+    pointerToolbar = addToolBar(tr("Pointer type"));
+    pointerToolbar->addWidget(pointerButton);
+    pointerToolbar->addWidget(linePointerButton);
+    pointerToolbar->addWidget(sceneScaleCombo);
     //! [27]
 }
 //! [27]

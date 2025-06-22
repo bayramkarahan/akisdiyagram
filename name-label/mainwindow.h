@@ -55,8 +55,6 @@
 #include <QMainWindow>
 #include<QEventLoop>
 #include<variableeditordialog.h>
-#include<QPlainTextEdit>
-
 class DiagramScene;
 
 QT_BEGIN_NAMESPACE
@@ -153,10 +151,6 @@ private slots:
     void run();
     bool runTest();
     void stop();
-
-    void newFile();
-    void saveFile();
-    void openFile();
     void worker();
 
 
@@ -178,9 +172,6 @@ private:
     QGraphicsView *view;
 
     QAction *exitAction;
-    QAction *newFileAction;
-     QAction *saveFileAction;
-     QAction *openFileAction;
     QAction *addAction;
     QAction *deleteAction;
 
@@ -197,12 +188,9 @@ private:
      QMenu *runMenu;
 
     QToolBar *textToolBar;
-    QToolBar *fileToolBar;
-    QToolBar *runToolBar;
     QToolBar *editToolBar;
     QToolBar *colorToolBar;
     QToolBar *pointerToolbar;
-    QToolBar *viewToolbar;
 
     QComboBox *sceneScaleCombo;
     QComboBox *itemColorCombo;
@@ -225,7 +213,6 @@ private:
     QAction *fillAction;
     QAction *lineAction;
     VariableEditorDialog *variableWidget;
-    QPlainTextEdit *algoritmaText;
 
 };
 //! [0]

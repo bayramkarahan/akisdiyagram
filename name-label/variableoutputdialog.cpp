@@ -52,7 +52,7 @@ QStringList VariableOutputDialog::variableLabels() const
 {
     QStringList lists;
     for (const VariableRecord &var : Variable::onlineVariableList) {
-        lists.append(var.label);
+        lists.append(var.name+"|"+var.label);
     }
     return lists;
 }
@@ -76,12 +76,21 @@ void VariableOutputDialog::addExpressionRow()
     });
     layout->addWidget(row->operationTypeCombo);
 
-      // var1 combo
+    row->varNameEdit = new QLineEdit; row->varNameEdit->setPlaceholderText("name");
+    layout->addWidget(row->varNameEdit);
+    // var1 combo
     row->varLabelCombo = new QComboBox(row->widget);
-    row->varLabelCombo->addItems(variableLabels());
+    //row->var1Combo->addItems(variableLabels());
+    for (QString satir : variableLabels()) {
+        row->varLabelCombo->addItem(satir.split("|")[1]);
+    }
     layout->addWidget(row->varLabelCombo);
-
-      // Sabit sayı için edit
+    if(row->varLabelCombo->currentIndex()>-1)
+    {
+        QString satir=variableLabels().at(row->varLabelCombo->currentIndex());
+        row->varNameEdit->setText(satir.split("|")[0]);
+    }
+    // Sabit sayı için edit
     row->constEdit1 = new QLineEdit(row->widget);
     row->constEdit1->setFixedWidth(250);
     row->constEdit1->setPlaceholderText("Değer");
@@ -103,7 +112,12 @@ void VariableOutputDialog::addExpressionRow()
     connect(row->operationTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int){
         updateExpressionRowWidgets(outputRows.indexOf(row));
     });
-
+    connect(row->varLabelCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=]() {
+        int idx =row->varLabelCombo->currentIndex();
+        int lidx = outputRows.indexOf(row);
+        if (idx >= 0)
+            updateVariableName(idx,lidx);
+    });
     // Kaldırma butonu
     connect(row->removeButton, &QPushButton::clicked, this, [=](){
         int idx = outputRows.indexOf(row);
@@ -198,7 +212,15 @@ void VariableOutputDialog::addExpressionRowparametre(int operationType, const QS
     updateExpressionRowWidgets(outputRows.indexOf(row));
 }
 
-
+void VariableOutputDialog::updateVariableName(int index,int loopRowIndex)
+{
+    if (index < 0 || index >= variableLabels().size())
+        return;
+    QString row = variableLabels().at(index);
+    qDebug()<<"seçili değiken "<<index<<row.split("|")[0]<<row.split("|")[1];
+    OutputRow *erow = outputRows.at(loopRowIndex);
+    erow->varNameEdit->setText(row.split("|")[0]);
+}
 
 void VariableOutputDialog::updateExpressionRowWidgets(int index)
 {
@@ -209,6 +231,7 @@ void VariableOutputDialog::updateExpressionRowWidgets(int index)
     int type = row->operationTypeCombo->currentIndex();
 
     // Önce tüm ek widgetları gizle
+    row->varNameEdit->setVisible(false);
     row->varLabelCombo->setVisible(false);
     row->constEdit1->setVisible(false);
 
@@ -235,15 +258,18 @@ QList<OutputRecord> VariableOutputDialog::getExpressionsWithType() const
         case 0:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
+            rec.name = row->varNameEdit->text();
               break;
         case 1:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
+            rec.name = row->varNameEdit->text();
             break;
         case 2:
             rec.expression = QString("%1")
                        .arg(row->constEdit1->text());
             rec.label = "";
+            rec.name ="";
             break;
 
         }
