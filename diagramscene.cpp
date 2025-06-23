@@ -649,6 +649,8 @@ void DiagramScene::saveScene(const QString &filePath)
                 QJsonObject vObj;
                 vObj["label"] = v.label;
                 vObj["value"] = v.value;
+                vObj["inputMessage"] = v.inputMessage;
+                vObj["outputMessage"] = v.outputMessage;
                 vObj["valueType"] = v.valueType;
                 vObj["expression"] = v.expression;
                 vObj["operationType"] = v.operationType;
@@ -690,6 +692,8 @@ void DiagramScene::saveScene(const QString &filePath)
         QJsonObject vObj;
         vObj["label"] = v.label;
         vObj["value"] = v.value;
+        vObj["inputMessage"] = v.inputMessage;
+        vObj["outputMessage"] = v.outputMessage;
         vObj["valueType"] = v.valueType;
         vObj["expression"] = v.expression;
         vObj["operationType"] = v.operationType;
@@ -748,6 +752,8 @@ void DiagramScene::loadScene(const QString &filePath)
             for (const QJsonValue &vVal : variableArray) {
                 QJsonObject vObj = vVal.toObject();
                 VariableRecord v;
+                v.inputMessage = vObj["inputMessage"].toString();
+                v.outputMessage = vObj["outputMessage"].toString();
                 v.label = vObj["label"].toString();
                 v.value = vObj["value"].toString();
                 v.valueType = vObj["valueType"].toString();
@@ -806,6 +812,8 @@ void DiagramScene::loadScene(const QString &filePath)
     for (const QJsonValue &val : globalVars) {
         QJsonObject vObj = val.toObject();
         VariableRecord v;
+        v.inputMessage = vObj["inputMessage"].toString();
+        v.outputMessage = vObj["outputMessage"].toString();
         v.label = vObj["label"].toString();
         v.value = vObj["value"].toString();
         v.valueType = vObj["valueType"].toString();

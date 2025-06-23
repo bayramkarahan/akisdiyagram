@@ -76,25 +76,6 @@ class QGraphicsView;
 using namespace std;
 QT_END_NAMESPACE
 
-extern QString varMain0;
-extern QString varMain1;
-extern QString varMain2;
-
-extern QString varAnswerMain0;
-extern QString varAnswerMain1;
-extern QString varAnswerMain2;
-
-extern QString varOperatorMain0;
-extern QString varOperatorMain1;
-extern QString varOperatorMain2;
-
-extern QString varConditionalMain0;
-extern QString varConditionalMain1;
-extern QString varConditionalMain2;
-
-extern QString varLoopAnswerMain0;
-extern QString varLoopAnswerMain1;
-extern QString varLoopAnswerMain2;
 
 //! [0]
 class MainWindow : public QMainWindow
@@ -110,17 +91,7 @@ public:
 
     int index=0;
     DiagramItem* detectRouteItem(DiagramItem *item);
-    /*QString varMain0="";
-    QString varMain1="";
-    QString varMain2="";
 
-    QString varAnswerMain0="";
-    QString varAnswerMain1="";
-    QString varAnswerMain2="";
-
-    QString varOperatorMain0="";
-    QString varOperatorMain1="";
-    QString varOperatorMain2="";*/
     DiagramItem *diagramItem;
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -128,7 +99,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
-
+    void loadExampleFile();
     void backgroundButtonGroupClicked(QAbstractButton *button);
     void buttonGroupClicked(int id);
     void deleteItem();
@@ -193,8 +164,10 @@ private:
 
     QMenu *fileMenu;
     QMenu *itemMenu;
+    QMenu *runMenu;
+    QMenu *programExample;
+    QMenu *mathExample;
     QMenu *aboutMenu;
-     QMenu *runMenu;
 
     QToolBar *textToolBar;
     QToolBar *fileToolBar;

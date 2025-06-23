@@ -27,6 +27,7 @@ private:
         QComboBox *variableCombo;
         QCheckBox *inputCheckBox;
         QLineEdit *valueEdit;
+        QLineEdit *inputMessageEdit;
         QPushButton *removeButton;
     };
 

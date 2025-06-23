@@ -44,6 +44,12 @@ void VariableInputDialog::addVariableRow(const VariableRecord &var)
     QHBoxLayout *hLayout = new QHBoxLayout(row->widget);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
+    // inputMessage edit
+    row->inputMessageEdit = new QLineEdit(row->widget);
+    row->inputMessageEdit->setPlaceholderText("Girdi Mesajı");
+    row->inputMessageEdit->setText(var.inputMessage);
+    hLayout->addWidget(row->inputMessageEdit);
+
     // Değişken seçimi combobox
     row->variableCombo = new QComboBox(row->widget);
     row->variableCombo->addItems(variableLabels());
@@ -105,6 +111,7 @@ QList<VariableRecord> VariableInputDialog::getSelectedVariables() const
         var.label = row->variableCombo->currentText();
         var.isInput = row->inputCheckBox->isChecked();
         var.value = row->valueEdit->text();
+        var.inputMessage=row->inputMessageEdit->text();
 
         // type bilgisi için allVariables'dan eşleştirme
         for (const VariableRecord &v : Variable::onlineVariableList) {

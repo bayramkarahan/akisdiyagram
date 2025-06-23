@@ -6,8 +6,8 @@
 #include<QApplication>
 VariableOutputDialog::VariableOutputDialog(QWidget *parent) : QDialog(parent)
 {
-    setWindowTitle("İşlem Tanımla");
-    resize(650, 300);
+    setWindowTitle("Çıktı Tanımla");
+    resize(700, 300);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -76,6 +76,13 @@ void VariableOutputDialog::addExpressionRow()
     });
     layout->addWidget(row->operationTypeCombo);
 
+    // OutputMessage edit
+    row->outputMessageEdit = new QLineEdit(row->widget);
+    row->outputMessageEdit->setFixedWidth(150);
+    row->outputMessageEdit->setPlaceholderText("Output Message");
+    layout->addWidget(row->outputMessageEdit);
+
+
       // var1 combo
     row->varLabelCombo = new QComboBox(row->widget);
     row->varLabelCombo->addItems(variableLabels());
@@ -83,7 +90,7 @@ void VariableOutputDialog::addExpressionRow()
 
       // Sabit sayı için edit
     row->constEdit1 = new QLineEdit(row->widget);
-    row->constEdit1->setFixedWidth(250);
+    row->constEdit1->setFixedWidth(150);
     row->constEdit1->setPlaceholderText("Değer");
     layout->addWidget(row->constEdit1);
 
@@ -116,7 +123,7 @@ void VariableOutputDialog::addExpressionRow()
     });
 }
 
-void VariableOutputDialog::addExpressionRowparametre(int operationType, const QString &expression)
+void VariableOutputDialog::addExpressionRowparametre(const VariableRecord &var)
 {
 
 
@@ -133,6 +140,12 @@ void VariableOutputDialog::addExpressionRowparametre(int operationType, const QS
     });
     layout->addWidget(row->operationTypeCombo);
 
+    // OutputMessage edit
+    row->outputMessageEdit = new QLineEdit(row->widget);
+    row->outputMessageEdit->setFixedWidth(100);
+    row->outputMessageEdit->setPlaceholderText("Output Mesage");
+    row->outputMessageEdit->setText(var.outputMessage);
+    layout->addWidget(row->outputMessageEdit);
 
 
     row->varLabelCombo = new QComboBox(row->widget);
@@ -140,7 +153,7 @@ void VariableOutputDialog::addExpressionRowparametre(int operationType, const QS
     layout->addWidget(row->varLabelCombo);
 
     row->constEdit1 = new QLineEdit(row->widget);
-    row->constEdit1->setFixedWidth(250);
+    row->constEdit1->setFixedWidth(100);
     row->constEdit1->setPlaceholderText("Değer");
     layout->addWidget(row->constEdit1);
 
@@ -151,32 +164,32 @@ void VariableOutputDialog::addExpressionRowparametre(int operationType, const QS
     expressionsLayout->insertWidget(expressionsLayout->count() - 1, row->widget);
 
     // İşlem türünü dışarıdan alıyoruz, combo'yu ayarla
-    row->operationTypeCombo->setCurrentIndex(operationType);
+    row->operationTypeCombo->setCurrentIndex(var.operationType);
 
     // expression'u parçalayıp ilgili widgetlara ayırmak yerine direkt dolduralım:
 
     // "=" ile böl
 
 
-        int targetIndex = row->varLabelCombo->findText(expression.trimmed());
+        int targetIndex = row->varLabelCombo->findText(var.expression.trimmed());
         if(targetIndex >= 0) row->varLabelCombo->setCurrentIndex(targetIndex);
 
-        switch(operationType) {
+        switch(var.operationType) {
         case 0: // Değişken Değeri Atama (var0)
         {
-            int idx = row->varLabelCombo->findText(expression.trimmed());
+            int idx = row->varLabelCombo->findText(var.expression.trimmed());
             if (idx >= 0) row->varLabelCombo->setCurrentIndex(idx);
         }
             break;
         case 1: // Değişken Adı ve Değeri(var0 = 5)
         {
-            int idx = row->varLabelCombo->findText(expression.trimmed());
+            int idx = row->varLabelCombo->findText(var.expression.trimmed());
             if (idx >= 0) row->varLabelCombo->setCurrentIndex(idx);
         }
         break;
         case 2: // Sabit Text Bilgi ()
         {
-            row->constEdit1->setText(expression.trimmed());
+            row->constEdit1->setText(var.expression.trimmed());
         }
         break;
          }
@@ -235,15 +248,18 @@ QList<OutputRecord> VariableOutputDialog::getExpressionsWithType() const
         case 0:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
+            rec.outputMessage=row->outputMessageEdit->text();
               break;
         case 1:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
+                        rec.outputMessage=row->outputMessageEdit->text();
             break;
         case 2:
             rec.expression = QString("%1")
                        .arg(row->constEdit1->text());
             rec.label = "";
+                        rec.outputMessage=row->outputMessageEdit->text();
             break;
 
         }

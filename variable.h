@@ -28,6 +28,8 @@ public:
     int endValue;
     int stepValue;
     int counter=0;
+    QString inputMessage;
+    QString outputMessage;
     bool evaluate(const QList<VariableRecord>& vars) {
         qDebug() << "işlem" << operationType;
         QStringList parts = expression.split('=');

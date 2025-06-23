@@ -41,8 +41,11 @@ desktop_file.path = /usr/share/applications/
 icon.files = images/prg.png
 icon.path = /usr/share/akisdiyagram
 
+doc.files = doc/*.json
+doc.path = /usr/share/akisdiyagram/doc/
+
 #target.path = $$[QT_INSTALL_EXAMPLES]/widgets/graphicsview/diagramscene
-INSTALLS += target desktop_file icon
+INSTALLS += target desktop_file icon doc
 
 DISTFILES += \
     images/prg.png

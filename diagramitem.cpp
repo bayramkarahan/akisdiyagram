@@ -345,11 +345,11 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                 qDebug() << "seçilen:" << selected.label << selected.value << selected.valueType<<selected.isInput;
 
                 if (selected.isInput) {
-                    label.setText(label.text() + "<br>" + selected.label + " = ?");
+                    label.setText(label.text() + "<br>" +selected.inputMessage+  selected.label + " = ?");
                 } else if (selected.valueType == "number") {
-                    label.setText(label.text() + "<br>" + selected.label + " = " + selected.value);
+                    label.setText(label.text() + "<br>" +selected.inputMessage+ selected.label + " = " + selected.value);
                 } else {
-                    label.setText(label.text() + "<br>" + selected.label + " = \"" + selected.value + "\"");
+                    label.setText(label.text() + "<br>" +selected.inputMessage+ selected.label + " = \"" + selected.value + "\"");
                 }
                 labelText=label.text();
             }
@@ -366,7 +366,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
          for (int j = 0; j < selectedVariables.size(); ++j) {
              const VariableRecord &varselect = selectedVariables[j];
              qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
-             dlg.addExpressionRowparametre(varselect.operationType, varselect.expression);
+             dlg.addExpressionRowparametre(varselect);
          }
          if (dlg.exec() == QDialog::Accepted) {
 
@@ -381,21 +381,22 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                      selected.label = rec.label;
                      selected.expression=rec.expression;
                      selected.operationType=rec.outputType;
+                     selected.outputMessage=rec.outputMessage;
                      selectedVariables.append(selected);
                      /**********************************************/
                      if(label.text()=="")
                      {
                          if(rec.outputType!=1)
-                         label.setText(selected.expression);
+                         label.setText(selected.outputMessage+selected.expression);
                          else
-                          label.setText(selected.expression+"="+selected.expression);
+                          label.setText(selected.outputMessage+selected.expression+"="+selected.expression);
                      }
                      else
                      {
                          if(rec.outputType!=1)
-                             label.setText(label.text()+"<br>"+selected.expression);
+                             label.setText(label.text()+"<br>"+selected.outputMessage+selected.expression);
                          else
-                             label.setText(label.text()+"<br>"+selected.expression+"="+selected.expression);
+                             label.setText(label.text()+"<br>"+selected.outputMessage+selected.expression+"="+selected.expression);
                         }
                      /*********************************************/
                         labelText=label.text();

@@ -14,13 +14,14 @@ struct OutputRecord {
     int outputType;
     QString expression;
     QString label;
+    QString outputMessage;
 };
 class VariableOutputDialog : public QDialog
 {
     Q_OBJECT
 public:
     explicit VariableOutputDialog(QWidget *parent = nullptr);
-    void addExpressionRowparametre(int operationType, const QString &expression = QString());
+    void addExpressionRowparametre(const VariableRecord &var);
     void addExpressionRow();
     QList<OutputRecord> getExpressionsWithType() const;
 private slots:
@@ -28,6 +29,7 @@ private slots:
 private:
     struct OutputRow {
         QWidget *widget;
+        QLineEdit *outputMessageEdit;
         QComboBox *varLabelCombo;
         QComboBox *operationTypeCombo;
         QLineEdit *constEdit1;

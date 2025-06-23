@@ -443,7 +443,7 @@ void MainWindow::worker()
                 dialog.setWindowTitle("Girdi");
 
                 // Açıklama (label)
-                QLabel *label = new QLabel(varselect.label, &dialog);
+                QLabel *label = new QLabel(varselect.inputMessage, &dialog);
 
                 // Giriş kutusu
                 QLineEdit *lineEdit = new QLineEdit(&dialog);
@@ -504,11 +504,11 @@ void MainWindow::worker()
                     QLabel *label=new QLabel;
                     if(varselect.operationType==0)
                     {
-                         label->setText(QString(var.value));
+                         label->setText(QString(varselect.outputMessage+var.value));
                     }
                     if(varselect.operationType==1)
                     {
-                        label->setText(QString(var.label+"= %1").arg( var.value));
+                        label->setText(QString(varselect.outputMessage+var.label+"= %1").arg( var.value));
                     }
                     QDialog dialog;
                     dialog.setWindowTitle("Çıktı");
@@ -537,7 +537,7 @@ void MainWindow::worker()
                 dialog.setWindowTitle("Çıktı");
                 dialog.resize(200,100);
                 // İçerik metni
-                QLabel *label = new QLabel(varselect.expression, &dialog);
+                QLabel *label = new QLabel(varselect.outputMessage+varselect.expression, &dialog);
 
                 // "Tamam" butonu
                 QPushButton *button = new QPushButton("Tamam", &dialog);
@@ -581,20 +581,18 @@ void MainWindow::worker()
     scene->update();
     timer.start(1000);
     loop.exec();
-    if(diagramItem->myDiagramType!=Diagram::DiagramType::End)
+    if(diagramItem->myDiagramType==Diagram::DiagramType::Start||
+        diagramItem->myDiagramType==Diagram::DiagramType::Input||
+        diagramItem->myDiagramType==Diagram::DiagramType::Process||
+        diagramItem->myDiagramType==Diagram::DiagramType::Loop||
+        diagramItem->myDiagramType==Diagram::DiagramType::Output)
     {
         QString text = algoritmaText->toPlainText();
         QStringList lines = text.split('\n');
         int lineCount = lines.count();
-        algoritmaText->insertPlainText(QString::number(lineCount)+"- "+diagramItem->label.text()+"\n");
+        QString escText=diagramItem->label.text().replace("<br>","; ");
+        algoritmaText->insertPlainText(QString::number(lineCount)+"- "+escText+"\n");
      }
-    if(diagramItem->myDiagramType!=Diagram::DiagramType::Link)
-    {
-        QString text = algoritmaText->toPlainText();
-        QStringList lines = text.split('\n');
-        int lineCount = lines.count();
-        algoritmaText->insertPlainText(QString::number(lineCount)+"- "+diagramItem->label.text()+"\n");
-    }
 
     diagramItem->setText("step",QColor(255,255,0,0));
 }
@@ -1296,11 +1294,66 @@ void MainWindow::createActions()
 //! [24]
 void MainWindow::createMenus()
 {
+
+   /* newFileAction = new QAction(QIcon(":/images/new.png"),tr("Yeni"), this);
+    newFileAction->setShortcuts(QKeySequence::New);
+    newFileAction->setStatusTip(tr("Yeni Belge"));
+    connect(newFileAction, SIGNAL(triggered()), this, SLOT(newFile()));*/
+
     fileMenu = menuBar()->addMenu(tr("&Dosya"));
     fileMenu->addAction(newFileAction);
     fileMenu->addAction(openFileAction);
     fileMenu->addAction(saveFileAction);
     fileMenu->addAction(exitAction);
+ QAction* action;
+    programExample=menuBar()->addMenu(tr("&Kodlama"));
+
+    action = programExample->addAction("1- Merhaba Dünya");
+    action->setData("c1.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = programExample->addAction("2- Selamlama");
+    action->setData("c2.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = programExample->addAction("3- İki Sayının Toplamı");
+    action->setData("c3.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = programExample->addAction("4- İki Sayının Ortalaması");
+    action->setData("c4.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = programExample->addAction("5- Karenini Alanı");
+    action->setData("c5.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = programExample->addAction("6- Karenini Çevresi");
+    action->setData("c6.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = programExample->addAction("7- Dairenin Alanı");
+    action->setData("c7.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+
+
+    mathExample=menuBar()->addMenu(tr("&Matematik"));
+    action = mathExample->addAction("1- Sayının İki Katı");
+    action->setData("m1.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = mathExample->addAction("2- İki Sayının  Toplamı");
+    action->setData("m2.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = mathExample->addAction("3- Sayının Karesi");
+    action->setData("m3.json");
+    connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
+
+    action = mathExample->addAction("4- İki Sayının Ortalaması");
+    action->setData("m4.json");
+   connect(action, &QAction::triggered, this, &MainWindow::loadExampleFile);
 
     itemMenu = menuBar()->addMenu(tr("&Düzen"));
     itemMenu->addAction(deleteAction);
@@ -1313,12 +1366,28 @@ void MainWindow::createMenus()
     runMenu->addAction(stopAction);
 
 
+
     aboutMenu = menuBar()->addMenu(tr("&Yardım"));
     aboutMenu->addAction(aboutAction);
    // aboutMenu->addAction(runAction);
 
 
 }
+
+void MainWindow::loadExampleFile()
+{
+    QAction* action = qobject_cast<QAction*>(sender());
+    if (action) {
+        QString filePath ="/usr/share/akisdiyagram/doc/"+action->data().toString();
+        qDebug()<<filePath;
+        if (!filePath.isEmpty()) {
+            scene->loadScene(filePath);
+            variableWidget->loadVariables();
+        }
+
+    }
+}
+
 //! [24]
 
 //! [25]

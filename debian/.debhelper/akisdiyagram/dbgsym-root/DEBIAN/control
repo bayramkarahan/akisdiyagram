@@ -1,0 +1,12 @@
+Package: akisdiyagram-dbgsym
+Source: akisdiyagram
+Version: 1.9
+Auto-Built-Package: debug-symbols
+Architecture: amd64
+Maintainer: Bayram KARAHAN <bayramk@gmail.com>
+Installed-Size: 110
+Depends: akisdiyagram (= 1.9)
+Section: debug
+Priority: optional
+Description: debug symbols for akisdiyagram
+Build-Ids: 0b5b38646a6d4c67315a91db232dc576234add04
