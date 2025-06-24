@@ -786,9 +786,22 @@ uninstall_icon: FORCE
 	-$(DEL_DIR) $(INSTALL_ROOT)/usr/share/akisdiyagram/ 
 
 
-install: install_target install_desktop_file install_icon  FORCE
+install_doc: first FORCE
+	@test -d $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/ || mkdir -p $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/
+	$(QINSTALL) /home/etapadmin/Masaüstü/akisdiyagram/doc/c1.json $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/c1.json
+	$(QINSTALL) /home/etapadmin/Masaüstü/akisdiyagram/doc/c2.json $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/c2.json
+	$(QINSTALL) /home/etapadmin/Masaüstü/akisdiyagram/doc/c3.json $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/c3.json
 
-uninstall: uninstall_target uninstall_desktop_file uninstall_icon  FORCE
+uninstall_doc: FORCE
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/c3.json
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/c2.json
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/c1.json
+	-$(DEL_DIR) $(INSTALL_ROOT)/usr/share/akisdiyagram/doc/ 
+
+
+install: install_target install_desktop_file install_icon install_doc  FORCE
+
+uninstall: uninstall_target uninstall_desktop_file uninstall_icon uninstall_doc  FORCE
 
 FORCE:
 

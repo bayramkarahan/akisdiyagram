@@ -590,7 +590,11 @@ void MainWindow::worker()
         QString text = algoritmaText->toPlainText();
         QStringList lines = text.split('\n');
         int lineCount = lines.count();
-        QString escText=diagramItem->label.text().replace("<br>","; ");
+        QString escText;
+        escText=diagramItem->label.text();
+        if(escText.left(4)=="<br>")
+            escText=escText.mid(4);
+        escText=escText.replace("<br>","\n");
         algoritmaText->insertPlainText(QString::number(lineCount)+"- "+escText+"\n");
      }
 

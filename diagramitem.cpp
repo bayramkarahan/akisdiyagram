@@ -332,8 +332,9 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         }
         for (int j = 0; j < selectedVariables.size(); ++j) {
             VariableRecord varselect = selectedVariables[j];
-            ///qDebug() << "tanımlı işlemler: " << varselect.operationType << varselect.expression;
+            //qDebug() << "labelText: " << labelText;
             dlg.addVariableRow(varselect);
+
         }
         if (dlg.exec() == QDialog::Accepted) {
             selectedVariables.clear();

@@ -657,6 +657,7 @@ void DiagramScene::saveScene(const QString &filePath)
                 vObj["startValue"] = v.startValue;
                 vObj["endValue"] = v.endValue;
                 vObj["stepValue"] = v.stepValue;
+                vObj["isInput"] = v.isInput;
                 variableArray.append(vObj);
             }
             obj["variables"] = variableArray;
@@ -700,6 +701,7 @@ void DiagramScene::saveScene(const QString &filePath)
         vObj["startValue"] = v.startValue;
         vObj["endValue"] = v.endValue;
         vObj["stepValue"] = v.stepValue;
+        vObj["isInput"] = v.isInput;
         globalVars.append(vObj);
     }
 
@@ -745,6 +747,7 @@ void DiagramScene::loadScene(const QString &filePath)
 
             QString labelText = obj["labelText"].toString();
             QColor bgColor = QColor(obj["backgroundColor"].toString());
+            item->labelText=labelText;
             item->label.setText(labelText);
 
             // selectedVariables
@@ -762,6 +765,7 @@ void DiagramScene::loadScene(const QString &filePath)
                 v.startValue = vObj["startValue"].toInt();
                 v.endValue = vObj["endValue"].toInt();
                 v.stepValue = vObj["stepValue"].toInt();
+                v.isInput = vObj["isInput"].toBool();
                 item->selectedVariables.append(v);
             }
 
@@ -822,6 +826,7 @@ void DiagramScene::loadScene(const QString &filePath)
         v.startValue = vObj["startValue"].toInt();
         v.endValue = vObj["endValue"].toInt();
         v.stepValue = vObj["stepValue"].toInt();
+        v.isInput = vObj["isInput"].toBool();
         Variable::onlineVariableList.append(v);
     }
 }
