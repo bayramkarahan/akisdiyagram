@@ -588,14 +588,14 @@ void MainWindow::worker()
         diagramItem->myDiagramType==Diagram::DiagramType::Output)
     {
         QString text = algoritmaText->toPlainText();
-        QStringList lines = text.split('\n');
-        int lineCount = lines.count();
+        //QStringList lines = text.contains.split('Adım');
+        int lineCount = text.count("Adım");
         QString escText;
-        escText=diagramItem->label.text();
-        if(escText.left(4)=="<br>")
-            escText=escText.mid(4);
+        escText=diagramItem->labelAlgoritma.text();
+        //if(escText.left(4)=="<br>")
+         //   escText=escText.mid(4);
         escText=escText.replace("<br>","\n");
-        algoritmaText->insertPlainText(QString::number(lineCount)+"- "+escText+"\n");
+        algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": "+escText+"\n");
      }
 
     diagramItem->setText("step",QColor(255,255,0,0));
@@ -742,9 +742,9 @@ void MainWindow::run()
      stopAction->setEnabled(false);
      /*****************************************/
      QString text = algoritmaText->toPlainText();
-     QStringList lines = text.split('\n');
-     int lineCount = lines.count();
-     algoritmaText->insertPlainText(QString::number(lineCount)+"- "+diagramItem->label.text());
+     //QStringList lines = text.split('\n');
+     int lineCount = text.count("Adım");
+     algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": "+diagramItem->labelAlgoritma.text());
 
     // algoritmaText->appendPlainText("Son");
 }
@@ -1166,9 +1166,30 @@ void MainWindow::createToolBox()
 //! [22]
     toolBoxLeft = new QToolBox;
     toolBoxLeft->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
-    toolBoxLeft->setMinimumWidth(itemWidget->sizeHint().width());
-    toolBoxLeft->addItem(itemWidget, tr("Akış Şekilleri"));
+    toolBoxLeft->setMinimumWidth(itemWidget->sizeHint().width()*1.2);
+    //toolBoxLeft->addItem(itemWidget, tr("Akış Şekilleri"));
+
+
+    // Ana konteyner
+    QWidget *mainWidget = new QWidget;
+    QVBoxLayout *maintWidgetslayout = new QVBoxLayout(mainWidget);
+    maintWidgetslayout->setContentsMargins(0, 0, 0, 0); // Genel boşluk yok
+
+    // variableWidget doğrudan eklenir (kenar boşluğu yok)
+    maintWidgetslayout->addWidget(itemWidget, 1);
+
+    // QTextEdit için iç widget ve layout
+    //algoritmaText=new QPlainTextEdit();
+    QWidget *variablesWidget = new QWidget;
+    QVBoxLayout *variableLayout = new QVBoxLayout(variablesWidget);
+    variableLayout->setContentsMargins(0, 0, 0, 0); // Sadece burada sağ/sol padding
+    variableLayout->addWidget(new QLabel("Değişkenler"));
+    variableLayout->addWidget(variableWidget);
+    maintWidgetslayout->addWidget(variablesWidget, 1);
+
+    toolBoxLeft->addItem(mainWidget, tr("Akış Şekilleri"));
     toolBoxLeft->addItem(backgroundWidget, tr("Arka Planlar"));
+
 /*
     toolBoxRight = new QToolBox;
     toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
@@ -1192,11 +1213,18 @@ void MainWindow::createToolBox()
     layout1->addWidget(new QTextEdit, 1);  // eşit oranda yer kaplasın (ya da 2 yaparsın daha fazla yer kaplar)
     toolBoxRight->addItem(compositeWidget, tr("Değişkenler ve Açıklama"));
 */
+    algoritmaText=new QPlainTextEdit();
+    QWidget *textEditContainer = new QWidget;
+    textEditContainer->setFixedWidth(240);
+    QVBoxLayout *textEditContainerLayout1 = new QVBoxLayout(textEditContainer);
+    textEditContainerLayout1->setContentsMargins(0, 0, 0, 0); // Sadece burada sağ/sol padding
+    //textLayout1->addWidget(new QLabel("Algoritma"));
+    textEditContainerLayout1->addWidget(algoritmaText);
     toolBoxRight = new QToolBox;
     toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
-    toolBoxRight->setMinimumWidth(variableWidget->width());
-    toolBoxRight->setFixedWidth(variableWidget->width());
-
+    toolBoxRight->setMinimumWidth(textEditContainer->width());
+    toolBoxRight->addItem(textEditContainer, tr("Algoritma"));
+/*
     // Ana konteyner
     QWidget *compositeWidget = new QWidget;
     QVBoxLayout *layout1 = new QVBoxLayout(compositeWidget);
@@ -1214,8 +1242,10 @@ void MainWindow::createToolBox()
     textLayout1->addWidget(algoritmaText);
 
     layout1->addWidget(textEditContainer, 1); // Ekleniyor
+toolBoxRight->addItem(compositeWidget, tr("Değişkenler ve Açıklama"));
+*/
+    // QTextEdit için iç widget ve layout
 
-    toolBoxRight->addItem(compositeWidget, tr("Değişkenler ve Açıklama"));
 
 }
 //! [22]
@@ -1531,15 +1561,18 @@ QWidget *MainWindow::createCellWidget(const QString &text, Diagram::DiagramType 
 
     // DiagramItem item(type, itemMenu);
      Diagram *item=new Diagram();
-
+    QWidget *widget = new QWidget;
+    widget->setFixedSize(80,50);
      QIcon icon(item->image(type));
 
-     QToolButton *button = new QToolButton;
-     button->setIcon(icon);
-     button->setIconSize(QSize(50, 50));
+    QToolButton *button = new QToolButton(widget);
+     button->setToolButtonStyle(Qt::ToolButtonIconOnly);
      button->setFixedSize(75,50);
+     button->setIconSize(QSize(70, 45));
+     button->setIcon(icon);
      button->setCheckable(true);
      button->setAutoRaise(true);
+     //button->setText(text);
      buttonGroup->addButton(button, int(type));
 
      QGridLayout *layout = new QGridLayout;
@@ -1547,9 +1580,6 @@ QWidget *MainWindow::createCellWidget(const QString &text, Diagram::DiagramType 
      layout->addWidget(new QLabel(text), 1, 0, Qt::AlignCenter);
      layout->setContentsMargins(1,0, 0,0);
      layout->setSpacing(0);
-
-     QWidget *widget = new QWidget;
-     widget->setFixedSize(80,70);
      widget->setLayout(layout);
 
      return widget;

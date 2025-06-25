@@ -76,6 +76,7 @@ rightArrow=0;
     myContextMenu = contextMenu;
     //label=new QStaticText();
     label.setText("");
+    labelAlgoritma.setText("");
     //label->setStyleSheet("background: red");
     //label->show();
     myBackground=QColor(0,0,0,0);
@@ -273,11 +274,14 @@ void DiagramItem::setText(QString text,QColor color)
     {
     labelText = text; // sakla
    label = QStaticText(text);
+    labelText = text; // sakla
+    label = QStaticText(text);
+
     }
   ///  myBackground = color;
     setBrush(myBackground);         // ⬅️ Görsel rengi uygula!
-    /// label.setText(text);
-    //  label.setText(QString::number(myDiagramType));
+    /// labelDiagram.setText(text);
+    //  labelDiagram.setText(QString::number(myDiagramType));
     myBackground=color;
     //painter->setBrush(myBackground);
     update();
@@ -340,19 +344,25 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             selectedVariables.clear();
             label.setTextFormat(Qt::RichText);
             label.setText("");
+            labelAlgoritma.setTextFormat(Qt::RichText);
+            labelAlgoritma.setText("");
 
             for (const VariableRecord &selected : dlg.getSelectedVariables()) {
                 selectedVariables.append(selected);
                 qDebug() << "seçilen:" << selected.label << selected.value << selected.valueType<<selected.isInput;
 
                 if (selected.isInput) {
-                    label.setText(label.text() + "<br>" +selected.inputMessage+  selected.label + " = ?");
+                    label.setText(label.text() + "<br>" +selected.inputMessage+" "+  selected.label + " = ?");
+                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.inputMessage+" "+  selected.label + " (oku)");
                 } else if (selected.valueType == "number") {
-                    label.setText(label.text() + "<br>" +selected.inputMessage+ selected.label + " = " + selected.value);
-                } else {
-                    label.setText(label.text() + "<br>" +selected.inputMessage+ selected.label + " = \"" + selected.value + "\"");
-                }
+                    label.setText(label.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = " + selected.value);
+                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = " + selected.value);
+                 } else {
+                    label.setText(label.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = \"" + selected.value + "\"");
+                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = \"" + selected.value + "\"");
+                 }
                 labelText=label.text();
+                labelAlgoritmaText=labelAlgoritma.text();
             }
         }
      }
@@ -375,6 +385,9 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
              selectedVariables.clear();
              label.setText("");
              label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+             labelAlgoritma.setText("");
+             labelAlgoritma.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+
              for (const auto &rec : outputList) {
                  if(rec.expression!=""){
                      ///qDebug() << "İşlem türü:" << type << "İfade:" << expr;
@@ -388,19 +401,30 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                      if(label.text()=="")
                      {
                          if(rec.outputType!=1)
-                         label.setText(selected.outputMessage+selected.expression);
+                         {
+                             label.setText(selected.outputMessage+" "+selected.expression);
+                             labelAlgoritma.setText(selected.outputMessage+" "+selected.expression+" (yaz)");
+                         }
                          else
-                          label.setText(selected.outputMessage+selected.expression+"="+selected.expression);
+                         {
+                             label.setText(selected.outputMessage+" "+selected.expression+"="+selected.expression);
+                             labelAlgoritma.setText(selected.outputMessage+" "+selected.expression+"="+selected.expression +" (yaz)");
+                         }
                      }
                      else
                      {
                          if(rec.outputType!=1)
-                             label.setText(label.text()+"<br>"+selected.outputMessage+selected.expression);
-                         else
-                             label.setText(label.text()+"<br>"+selected.outputMessage+selected.expression+"="+selected.expression);
-                        }
+                         {
+                            label.setText(label.text()+"<br>"+selected.outputMessage+" "+selected.expression);
+                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+selected.outputMessage+" "+selected.expression+" (yaz)");
+                         }else{
+                            label.setText(label.text()+"<br>"+selected.outputMessage+" "+selected.expression+"="+selected.expression);
+                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+selected.outputMessage+" "+selected.expression+"="+selected.expression+" (yaz)");
+                         }
+                     }
                      /*********************************************/
                         labelText=label.text();
+                     labelAlgoritmaText=labelAlgoritma.text();
                  }
              }
          }
@@ -434,11 +458,17 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                     selectedVariables.append(selected);
                     /**********************************************/
                     if(label.text()=="")
+                    {
                         label.setText(selected.expression);
+                    }
                     else
+                    {
                         label.setText(label.text()+"<br>"+selected.expression);
+                    }
                     /*********************************************/
                     labelText=label.text();
+                    labelAlgoritmaText=label.text();
+                    labelAlgoritma.setText(label.text());
                 }
             }
         }
@@ -461,7 +491,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             selectedVariables.clear();
             auto loops = dlg.getLoopsWithType();
             label.setText("");
-            //label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+            //labelDiagram.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
             label.setTextFormat(Qt::PlainText);
             for (const LoopRecord &loop : loops) {
                     qDebug() << "İşlem türü:" << loop.loopType<< "İfade:" << loop.expression<<loop.endValue;
@@ -491,6 +521,8 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
            }
         }
         labelText=label.text();
+        labelAlgoritma.setText(label.text());
+        labelAlgoritmaText=label.text();
     }
     if(this->myDiagramType==Diagram::DiagramType::Conditional)
     {
@@ -509,7 +541,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             selectedVariables.clear();
             auto exprList = dlg.getExpressionsWithType();
             label.setText("");
-            //label.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
+            //labelDiagram.setTextFormat(Qt::RichText);  // Bunu mutlaka ekleyin
             label.setTextFormat(Qt::PlainText);
             for (const auto &pair : exprList) {
                 int type = pair.first;
@@ -525,6 +557,8 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
               }
             }
+            labelAlgoritma.setText(label.text());
+            labelAlgoritmaText=label.text();
         }
 
     }
@@ -638,10 +672,8 @@ void DiagramItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         setPreviousPosition(event->scenePos());
         emit clicked(this);
        // qDebug() <<"rectangle nesnesine tıklama yapıldı";
-
-
     }
-  //  QGraphicsItem::mousePressEvent(event);
+    QGraphicsItem::mousePressEvent(event);
 //QGraphicsScene::mousePressEvent(event);
 }
 
@@ -650,6 +682,8 @@ void DiagramItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     //qDebug() <<"rectangle nesnesine release yapıldı";
     if (event->button() & Qt::LeftButton) {
         m_leftMouseButtonPressed = false;
+        //drm=false;
+
         /****************************************************/
 
         /* dclick=(!dclick)?true:false;
@@ -670,7 +704,7 @@ void DiagramItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
         /*****************************************************/
     }
-   // QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsItem::mouseReleaseEvent(event);
 }
 void DiagramItem::renk()
 {
@@ -940,9 +974,15 @@ void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     }
 
     myPolygon=item->sekilStore(myDiagramType,this->boundingRect());
-    if(myDiagramType==Diagram::DiagramType::Start)label.setText("Başla");
-    if(myDiagramType==Diagram::DiagramType::End)label.setText("Son");
-    if(myDiagramType==Diagram::DiagramType::Link)label.setText("Bağ");
+    if(myDiagramType==Diagram::DiagramType::Start){
+        label.setText("Başla");labelAlgoritma.setText("Başla");
+    }
+    if(myDiagramType==Diagram::DiagramType::End){
+        label.setText("Son");labelAlgoritma.setText("Son");
+    }
+    if(myDiagramType==Diagram::DiagramType::Link){
+        label.setText("Bağ");labelAlgoritma.setText("Bağ");
+    }
 
     //if(myDiagramType==Diagram::DiagramType::Input)label.setText("Input");
     //if(myDiagramType==Diagram::DiagramType::Conditional)label.setText("Conditional");
@@ -960,9 +1000,9 @@ void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // Ortalanmış pozisyon (x, y)
     QPointF textPos(rect.left() + (rect.width()  - textSize.width()) / 2,
                     rect.top()  + (rect.height() - textSize.height()) / 2);
-    //label.setTextWidth(200);
+    //labelDiagram.setTextWidth(200);
     painter->drawStaticText(textPos, label);// Metni çiz
-        //qDebug()<<label.text();
+        //qDebug()<<labelDiagram.text();
     // qDebug()<<myDiagramType;
    /* if(rotateState)
     {
@@ -978,9 +1018,14 @@ void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
         text.setText("<font size=1>as</font>");
         painter->drawStaticText(QPoint(this->boundingRect().center().x(),this->boundingRect().center().y()), text);
     }*/
-    if(renkdrm)
+    if (isSelected())
+        painter->setPen(QPen(QColor(255,0,0,75), 3, Qt::DashLine));
+    else
+       painter->setPen(QPen(QColor(0,0,0,255), 3, Qt::SolidLine));
+
+    if(drm)
     {
-        // painter->setPen(QPen(QColor(255,0,0,75), 3, Qt::DashLine));
+         //painter->setPen(QPen(QColor(255,0,0,75), 3, Qt::DashLine));
         // renkdrm=false;
         cornerGrabber[GrabberRight]->renkdrm=renkdrm;
         cornerGrabber[GrabberLeft]->renkdrm=renkdrm;

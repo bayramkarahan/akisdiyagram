@@ -460,159 +460,7 @@ bool DiagramScene::isItemChange(int type)
 
 
 //! [14]
-/*
-void DiagramScene::saveScene(const QString &filePath)
-{
-    QJsonArray itemsArray;
-    QMap<DiagramItem*, int> itemIdMap; // Arrow eşleştirmesi için
-    int nextId = 0;
 
-    for (QGraphicsItem *item : items()) {
-        QJsonObject obj;
-
-        if (auto dItem = qgraphicsitem_cast<DiagramItem*>(item)) {
-            int id = nextId++;
-            itemIdMap[dItem] = id;
-
-            obj["type"] = "DiagramItem";
-            obj["id"] = id;
-            obj["diagramType"] = static_cast<int>(dItem->myDiagramType);
-            obj["x"] = dItem->pos().x();
-            obj["y"] = dItem->pos().y();
-
-            // Polygon noktaları (dilersen ekleyebilirsin)
-            QJsonArray pointsArray;
-            for (const QPointF &pt : dItem->polygon()) {
-                QJsonObject ptObj;
-                ptObj["x"] = pt.x();
-                ptObj["y"] = pt.y();
-                pointsArray.append(ptObj);
-            }
-            obj["polygon"] = pointsArray;
-
-            // labelText'i sakla (QStaticText içeriği)
-            obj["labelText"] = dItem->labelText;
-
-            // Arka plan rengi (optional)
-            obj["backgroundColor"] = dItem->myBackground.name();
-
-            itemsArray.append(obj);
-        }
-        else if (auto tItem = qgraphicsitem_cast<DiagramTextItem*>(item)) {
-            obj["type"] = "DiagramTextItem";
-            obj["text"] = tItem->toPlainText();
-            obj["x"] = tItem->pos().x();
-            obj["y"] = tItem->pos().y();
-            itemsArray.append(obj);
-        }
-    }
-
-    // Arrow'ları ayrı kaydet
-    for (QGraphicsItem *item : items()) {
-        if (auto arrow = qgraphicsitem_cast<Arrow*>(item)) {
-            QJsonObject obj;
-            obj["type"] = "Arrow";
-            obj["startId"] = itemIdMap.value(arrow->myStartItem, -1);
-            obj["endId"] = itemIdMap.value(arrow->myEndItem, -1);
-            obj["startPolar"] = arrow->myStartPolar;
-            obj["endPolar"] = arrow->myEndPolar;
-            obj["answer"] = arrow->answer;
-            itemsArray.append(obj);
-        }
-    }
-
-    QJsonObject root;
-    root["items"] = itemsArray;
-
-    QFile file(filePath);
-    if (file.open(QIODevice::WriteOnly))
-        file.write(QJsonDocument(root).toJson());
-}
-
-void DiagramScene::loadScene(const QString &filePath)
-{
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly))
-        return;
-
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    QJsonArray itemsArray = doc["items"].toArray();
-
-    clear(); // Sahneyi temizle
-
-    QMap<int, DiagramItem*> idItemMap; // id → DiagramItem eşleştirme
-
-    // 1. Tur: DiagramItem ve DiagramTextItem oluştur
-    for (const QJsonValue &val : itemsArray) {
-        QJsonObject obj = val.toObject();
-        QString type = obj["type"].toString();
-
-        if (type == "DiagramItem") {
-            int id = obj["id"].toInt();
-            Diagram::DiagramType dt = static_cast<Diagram::DiagramType>(obj["diagramType"].toInt());
-
-            auto item = new DiagramItem(dt, myItemMenu);
-
-            // Pozisyon
-            item->setPos(obj["x"].toDouble(), obj["y"].toDouble());
-
-            // Polygon'u yükle
-            QPolygonF polygon;
-            QJsonArray pointsArray = obj["polygon"].toArray();
-            for (const QJsonValue &ptVal : pointsArray) {
-                QJsonObject ptObj = ptVal.toObject();
-                polygon << QPointF(ptObj["x"].toDouble(), ptObj["y"].toDouble());
-            }
-            item->setPolygon(polygon);
-
-            // LabelText'i yükle
-            QString labelText = obj["labelText"].toString();
-            item->setText(labelText, QColor(obj["backgroundColor"].toString()));
-
-            addItem(item);
-            idItemMap[id] = item;
-        }
-        else if (type == "DiagramTextItem") {
-            auto textItem = new DiagramTextItem(myItemMenu);
-            textItem->setFont(myFont);
-            textItem->setDefaultTextColor(myTextColor);
-            textItem->setTextInteractionFlags(Qt::TextEditorInteraction);
-            textItem->setPlainText(obj["text"].toString());
-            textItem->setPos(obj["x"].toDouble(), obj["y"].toDouble());
-            addItem(textItem);
-        }
-    }
-
-    // 2. Tur: Arrow'ları oluştur
-    for (const QJsonValue &val : itemsArray) {
-        QJsonObject obj = val.toObject();
-        if (obj["type"].toString() != "Arrow") continue;
-
-        int startId = obj["startId"].toInt();
-        int endId = obj["endId"].toInt();
-        QString startPolar = obj["startPolar"].toString();
-        QString endPolar = obj["endPolar"].toString();
-
-        DiagramItem *startItem = idItemMap.value(startId, nullptr);
-        DiagramItem *endItem = idItemMap.value(endId, nullptr);
-
-        if (startItem && endItem && startItem != endItem) {
-            Arrow *arrow = new Arrow(startItem, endItem, startPolar, endPolar, myItemMenu);
-            arrow->setColor(myLineColor);
-            arrow->answer = obj["answer"].toString();
-
-            bool startOk = startItem->addArrowState(arrow, startPolar, "O");
-            bool endOk   = endItem->addArrowState(arrow, endPolar, "I");
-
-            if (startOk && endOk) {
-                arrow->setZValue(-1000.0);
-                addItem(arrow);
-                arrow->updatePosition();
-            }
-        }
-    }
-}
-*/
 void DiagramScene::saveScene(const QString &filePath)
 {
     QJsonArray itemsArray;
@@ -641,6 +489,7 @@ void DiagramScene::saveScene(const QString &filePath)
             }
             obj["polygon"] = pointsArray;
             obj["labelText"] = dItem->labelText;
+            obj["labelAlgoritmaText"] = dItem->labelAlgoritmaText;
             obj["backgroundColor"] = dItem->myBackground.name();
 
             // selectedVariables
@@ -746,10 +595,14 @@ void DiagramScene::loadScene(const QString &filePath)
             item->setPolygon(polygon);
 
             QString labelText = obj["labelText"].toString();
+            QString labelAlgoritmaText = obj["labelAlgoritmaText"].toString();
+
             QColor bgColor = QColor(obj["backgroundColor"].toString());
             item->labelText=labelText;
             item->label.setText(labelText);
 
+            item->labelAlgoritma.setText(labelAlgoritmaText);
+            item->labelAlgoritmaText=labelAlgoritmaText;
             // selectedVariables
             QJsonArray variableArray = obj["variables"].toArray();
             for (const QJsonValue &vVal : variableArray) {

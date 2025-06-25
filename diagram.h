@@ -48,9 +48,8 @@ public:
          pixmap.fill(Qt::transparent);
          QPainter painter(&pixmap);
          painter.setPen(QPen(Qt::black, 8));
-         painter.translate(125, 125);
+         painter.translate(125, 90);
          painter.drawPolyline(sekilStore(type,QRectF(0,0,200,200)));
-
          return pixmap;
      }
      //! [4]
@@ -111,13 +110,16 @@ public:
      }
      if(sek==Diagram::DiagramType::Output)
      {
-         path.moveTo(-100, -60);
-         path.lineTo(100, -60);
+         path.moveTo(-100, -50);
+         path.lineTo(100, -50);
          path.lineTo(100, 0);
          path.cubicTo(100, 0, 40, 50, 40, 50);
-         path.cubicTo(30,80, -80, 90, -100, 60);
-         path.lineTo(-100, -60);
-         result = path.toFillPolygon();
+         path.cubicTo(30,80, -80, 90, -100, 50);
+         path.lineTo(-100, -40);
+         QTransform transform;
+         transform.scale(1.0, 1.0);  // Sadece Y yönünde küçültme
+         QPainterPath scaledPath = transform.map(path);
+         result = scaledPath.toFillPolygon();
      }
      if(sek==Diagram::DiagramType::Play)
      {

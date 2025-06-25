@@ -72,28 +72,6 @@
 #include<variableconditiondialog.h>
 #include<variableloopdialog.h>
 
-
-extern QString varMain0;
-extern QString varMain1;
-extern QString varMain2;
-
-extern QString varAnswerMain0;
-extern QString varAnswerMain1;
-extern QString varAnswerMain2;
-
-extern QString varOperatorMain0;
-extern QString varOperatorMain1;
-extern QString varOperatorMain2;
-
-extern QString varConditionalMain0;
-extern QString varConditionalMain1;
-extern QString varConditionalMain2;
-
-extern QString varLoopAnswerMain0;
-extern QString varLoopAnswerMain1;
-extern QString varLoopAnswerMain2;
-
-
 QT_BEGIN_NAMESPACE
 class QPixmap;
 class QGraphicsItem;
@@ -165,7 +143,9 @@ public:
     QList<Arrow *> arrows;
     QColor myBackground;
     QStaticText label;
+    QStaticText labelAlgoritma;
     QString labelText;
+    QString labelAlgoritmaText;
     Arrow *startArrow;
     Arrow *endArrow;
     Arrow *leftArrow;

@@ -47,7 +47,6 @@ VariableOutputDialog::VariableOutputDialog(QWidget *parent) : QDialog(parent)
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
-
 QStringList VariableOutputDialog::variableLabels() const
 {
     QStringList lists;
@@ -125,8 +124,6 @@ void VariableOutputDialog::addExpressionRow()
 
 void VariableOutputDialog::addExpressionRowparametre(const VariableRecord &var)
 {
-
-
     OutputRow* row = new OutputRow;
 
     row->widget = new QWidget(this);
@@ -248,18 +245,30 @@ QList<OutputRecord> VariableOutputDialog::getExpressionsWithType() const
         case 0:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
-            rec.outputMessage=row->outputMessageEdit->text();
+            if(row->outputMessageEdit->text()!="")
+                rec.outputMessage="\""+row->outputMessageEdit->text()+"\", ";
+            else
+                rec.outputMessage=row->outputMessageEdit->text();
               break;
         case 1:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
-                        rec.outputMessage=row->outputMessageEdit->text();
+            if(row->outputMessageEdit->text()!="")
+                rec.outputMessage="\""+row->outputMessageEdit->text()+"\", ";
+            else
+                rec.outputMessage=row->outputMessageEdit->text();
+
             break;
         case 2:
             rec.expression = QString("%1")
                        .arg(row->constEdit1->text());
             rec.label = "";
-                        rec.outputMessage=row->outputMessageEdit->text();
+
+            if(row->outputMessageEdit->text()!="")
+                rec.outputMessage="\""+row->outputMessageEdit->text()+"\", ";
+            else
+                rec.outputMessage=row->outputMessageEdit->text();
+
             break;
 
         }

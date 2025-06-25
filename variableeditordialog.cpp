@@ -7,7 +7,7 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle("Variable Editor");
-    resize(220, 200);
+    resize(220, 300);
 
     tableWidget = new QTableWidget(this);
     tableWidget->setColumnCount(3);
@@ -18,9 +18,9 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
     tableWidget->setEditTriggers(QAbstractItemView::DoubleClicked);
     // Sütun başlıklarını sabit tutmak istiyorsanız:
     tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    tableWidget->setColumnWidth(0, 60); // Label
-    tableWidget->setColumnWidth(1, 60); // Value
-    tableWidget->setColumnWidth(2, 60); // Type
+    tableWidget->setColumnWidth(0, 50); // Label
+    tableWidget->setColumnWidth(1, 50); // Value
+    tableWidget->setColumnWidth(2, 50); // Type
     connect(tableWidget, &QTableWidget::cellDoubleClicked, this, [=](int row, int) {
         if (row < 0 || row >= tableWidget->rowCount()) return;
 
