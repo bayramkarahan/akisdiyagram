@@ -18,12 +18,13 @@ public:
     explicit VariableEditorDialog(QWidget *parent = nullptr);
     void updateVariablesFromTable();
     void loadVariables();
+signals:
+    void variableUpdateRecord(VariableRecord rec);
 private slots:
 
     void addVariable();
     void removeSelectedVariable();
-
-        void onTypeChanged(const QString &type);
+    void onTypeChanged(const QString &type);
 
 private:
     QTableWidget *tableWidget;

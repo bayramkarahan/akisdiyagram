@@ -27,9 +27,9 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
         VariableRecord rec;
         rec.label = tableWidget->item(row, 0)->text();
         rec.value = tableWidget->item(row, 1)->text();
-        QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(row, 2));
-        if (combo) rec.valueType = combo->currentText();
-
+        //QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(row, 2));
+        //if (combo) rec.valueType = combo->currentText();
+        rec.valueType = tableWidget->item(row, 2)->text();
         VariableEditForm dialog(rec, this);
         if (dialog.exec() == QDialog::Accepted) {
             VariableRecord updated = dialog.getRecord();
@@ -38,12 +38,8 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
             tableWidget->item(row, 2)->setText(updated.valueType);
             qDebug()<<updated.label<<updated.value<<updated.valueType;
             //güncelliyor
-            for (int i=0;i<Variable::onlineVariableList.size();i++) {
-                if(Variable::onlineVariableList[i].label==rec.label)
-                {
-                    Variable::onlineVariableList[i]=updated;
-                }
-            }
+            emit variableUpdateRecord(updated);
+
             // güncel halini listeliyor
            /* for (const VariableRecord &var : Variable::onlineVariableList) {
                 qDebug()<<var.label<<var.value<<var.type;

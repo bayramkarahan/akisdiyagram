@@ -31,172 +31,223 @@ public:
     QString inputMessage;
     QString outputMessage;
     bool evaluate(const QList<VariableRecord>& vars) {
-        qDebug() << "işlem" << operationType;
+
+            qDebug() << "işlem" << operationType<<valueType;
         QStringList parts = expression.split('=');
         if (parts.size() != 2) return false;
 
         QString rightExpr = parts[1].trimmed();
         bool ok;
-
         // Eğer tip "text" ise sadece string birleştirme yap
         if (valueType == "text") {
-            QRegExp rx(R"((\w+)\s*\+\s*(\w+|\"[^\"]*\"))");
-            if (!rx.exactMatch(rightExpr)) return false;
-
-            QString left = rx.cap(1);
-            QString right = rx.cap(2);
-
-            QString val1, val2;
-            bool found1 = false;
-
-            // 1. değişkeni bul
-            for (const auto& v : vars) {
-                if (v.label == left) {
-                    val1 = v.value;
-                    found1 = true;
-                    break;
-                }
+            qDebug() << "işlemt" <<valueType<<operationType;
+            // Sayısal işlemler:
+            switch (operationType) {
+            case 0: { // Sabit atama
+                value = rightExpr;
+                return true;
             }
-            if (!found1) return false;
-
-            // 2. parça sabit string mi yoksa değişken mi?
-            if (right.startsWith("\"") && right.endsWith("\"")) {
-                val2 = right.mid(1, right.length() - 2);  // "..." => ...
-            } else {
-                bool found2 = false;
+            case 1: { // Değişken atama
                 for (const auto& v : vars) {
-                    if (v.label == right) {
-                        val2 = v.value;
+                    if (v.label == rightExpr) {
+                            value = rightExpr;
+                            return true;
+                    }
+                }
+                return false;
+            }
+            case 2: { // İki değişkenli işlem
+                QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\w+))");
+                if (!rx.exactMatch(rightExpr)) return false;
+
+                QString var1 = rx.cap(1);
+                QString op = rx.cap(2);
+                QString var2 = rx.cap(3);
+                QString varVal1="";
+                QString varVal2="";
+                bool found1 = false, found2 = false;
+                for (const auto& v : vars) {
+                    if (v.label == var1) {
+                        found1 = true;
+                        varVal1 = v.value;
+                    }
+                    if (v.label == var2) {
                         found2 = true;
+                        varVal2 = v.value;
+                    }
+                }
+                if (!found1 || !found2) return false;
+
+                QString result ="";
+                if (op == "+"){ result = varVal1 + varVal2;
+                } else return false;
+
+                value = result;
+                return true;
+            }
+            case 3: { // Değişken + sabit sayı
+                QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
+                if (!rx.exactMatch(rightExpr)) return false;
+
+                QString var1 = rx.cap(1);
+                QString op = rx.cap(2);
+                QString numStr = rx.cap(3);
+                QString varVal1;
+                for (const auto& v : vars) {
+                    if (v.label == var1) {
+                        varVal1 = v.value;
                         break;
                     }
                 }
-                if (!found2) return false;
+
+                QString  result = 0;
+                if (op == "+") {
+                    result = varVal1 + numStr;
+                } else return false;
+                value = result;
+                return true;
             }
+            case 4: { // sabit sayı + sabit sayı
+                QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
+                if (!rx.exactMatch(rightExpr)) return false;
 
-            value = val1 + val2;
-            return true;
-        }
+                QString numStr1 = rx.cap(1);
+                QString op = rx.cap(2);
+                QString numStr2 = rx.cap(3);
 
-        // Sayısal işlemler:
-        switch (operationType) {
-        case 0: { // Sabit atama
-            double val = rightExpr.toDouble(&ok);
-            if (!ok) return false;
-            value = QString::number(val);
-            return true;
+                QString result = "";
+                if (op == "+"){
+                    result = numStr1 + numStr2;
+                } else return false;
+
+                value = result;
+                return true;
+            }
+            default:
+                return false;
+            }
         }
-        case 1: { // Değişken atama
-            for (const auto& v : vars) {
-                if (v.label == rightExpr) {
-                    double val = v.value.toDouble(&ok);
-                    if (ok) {
-                        value = QString::number(val);
-                        return true;
+        if (valueType == "number") {
+            // Sayısal işlemler:
+            qDebug() << "işlems" <<valueType<<operationType;
+            switch (operationType) {
+            case 0: { // Sabit atama
+                double val = rightExpr.toDouble(&ok);
+                if (!ok) return false;
+                value = QString::number(val);
+                return true;
+            }
+            case 1: { // Değişken atama
+                for (const auto& v : vars) {
+                    if (v.label == rightExpr) {
+                        double val = v.value.toDouble(&ok);
+                        if (ok) {
+                            value = QString::number(val);
+                            return true;
+                        }
+                        return false;
                     }
-                    return false;
                 }
+                return false;
             }
-            return false;
-        }
-        case 2: { // İki değişkenli işlem
-            QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\w+))");
-            if (!rx.exactMatch(rightExpr)) return false;
+            case 2: { // İki değişkenli işlem
+                QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\w+))");
+                if (!rx.exactMatch(rightExpr)) return false;
 
-            QString var1 = rx.cap(1);
-            QString op = rx.cap(2);
-            QString var2 = rx.cap(3);
+                QString var1 = rx.cap(1);
+                QString op = rx.cap(2);
+                QString var2 = rx.cap(3);
 
-            double val1 = 0, val2 = 0;
-            bool found1 = false, found2 = false;
-            for (const auto& v : vars) {
-                if (v.label == var1) {
-                    val1 = v.value.toDouble(&ok);
-                    found1 = ok;
+                double val1 = 0, val2 = 0;
+                bool found1 = false, found2 = false;
+                for (const auto& v : vars) {
+                    if (v.label == var1) {
+                        val1 = v.value.toDouble(&ok);
+                        found1 = ok;
+                    }
+                    if (v.label == var2) {
+                        val2 = v.value.toDouble(&ok);
+                        found2 = ok;
+                    }
                 }
-                if (v.label == var2) {
-                    val2 = v.value.toDouble(&ok);
-                    found2 = ok;
-                }
+                if (!found1 || !found2) return false;
+
+                double result = 0;
+                if (op == "+") result = val1 + val2;
+                else if (op == "-") result = val1 - val2;
+                else if (op == "*") result = val1 * val2;
+                else if (op == "/") {
+                    if (val2 == 0) return false;
+                    result = val1 / val2;
+                } else return false;
+
+                value = QString::number(result);
+                return true;
             }
-            if (!found1 || !found2) return false;
+            case 3: { // Değişken + sabit sayı
+                QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
+                if (!rx.exactMatch(rightExpr)) return false;
 
-            double result = 0;
-            if (op == "+") result = val1 + val2;
-            else if (op == "-") result = val1 - val2;
-            else if (op == "*") result = val1 * val2;
-            else if (op == "/") {
-                if (val2 == 0) return false;
-                result = val1 / val2;
-            } else return false;
+                QString var1 = rx.cap(1);
+                QString op = rx.cap(2);
+                QString numStr = rx.cap(3);
 
-            value = QString::number(result);
-            return true;
-        }
-        case 3: { // Değişken + sabit sayı
-            QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
-            if (!rx.exactMatch(rightExpr)) return false;
-
-            QString var1 = rx.cap(1);
-            QString op = rx.cap(2);
-            QString numStr = rx.cap(3);
-
-            double val1 = 0;
-            for (const auto& v : vars) {
-                if (v.label == var1) {
-                    val1 = v.value.toDouble(&ok);
-                    if (!ok) return false;
-                    break;
+                double val1 = 0;
+                for (const auto& v : vars) {
+                    if (v.label == var1) {
+                        val1 = v.value.toDouble(&ok);
+                        if (!ok) return false;
+                        break;
+                    }
                 }
+
+                double val2 = numStr.toDouble(&ok);
+                if (!ok) return false;
+
+                double result = 0;
+                if (op == "+") result = val1 + val2;
+                else if (op == "-") result = val1 - val2;
+                else if (op == "*") result = val1 * val2;
+                else if (op == "/") {
+                    if (val2 == 0) return false;
+                    result = val1 / val2;
+                } else return false;
+
+                value = QString::number(result);
+                return true;
             }
+            case 4: { // sabit sayı + sabit sayı
+                QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
+                if (!rx.exactMatch(rightExpr)) return false;
 
-            double val2 = numStr.toDouble(&ok);
-            if (!ok) return false;
+                QString numStr1 = rx.cap(1);
+                QString op = rx.cap(2);
+                QString numStr2 = rx.cap(3);
 
-            double result = 0;
-            if (op == "+") result = val1 + val2;
-            else if (op == "-") result = val1 - val2;
-            else if (op == "*") result = val1 * val2;
-            else if (op == "/") {
-                if (val2 == 0) return false;
-                result = val1 / val2;
-            } else return false;
 
-            value = QString::number(result);
-            return true;
+                double val1 = numStr1.toDouble(&ok);
+                if (!ok) return false;
+
+                double val2 = numStr2.toDouble(&ok);
+                if (!ok) return false;
+
+                double result = 0;
+                if (op == "+") result = val1 + val2;
+                else if (op == "-") result = val1 - val2;
+                else if (op == "*") result = val1 * val2;
+                else if (op == "/") {
+                    if (val2 == 0) return false;
+                    result = val1 / val2;
+                } else return false;
+
+                value = QString::number(result);
+                return true;
+            }
+            default:
+                return false;
+            }
         }
-        case 4: { // sabit sayı + sabit sayı
-            QRegExp rx(R"((\w+)\s*([\+\-\*/])\s*(\d+))");
-            if (!rx.exactMatch(rightExpr)) return false;
-
-            QString numStr1 = rx.cap(1);
-            QString op = rx.cap(2);
-            QString numStr2 = rx.cap(3);
-
-
-            double val1 = numStr1.toDouble(&ok);
-            if (!ok) return false;
-
-            double val2 = numStr2.toDouble(&ok);
-            if (!ok) return false;
-
-            double result = 0;
-            if (op == "+") result = val1 + val2;
-            else if (op == "-") result = val1 - val2;
-            else if (op == "*") result = val1 * val2;
-            else if (op == "/") {
-                if (val2 == 0) return false;
-                result = val1 / val2;
-            } else return false;
-
-            value = QString::number(result);
-            return true;
-        }
-           default:
-            return false;
-        }
-    }
-
+      }
 };
 
 class Variable {

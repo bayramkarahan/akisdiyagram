@@ -64,6 +64,8 @@ const int InsertTextButton = 10;
 MainWindow::MainWindow()
 {
     variableWidget=new VariableEditorDialog();
+    connect(variableWidget, SIGNAL(variableUpdateRecord(VariableRecord)),
+            this, SLOT(variableUpdateRecordSlot(VariableRecord)));
     createActions();
     createToolBox();
     createMenus();
@@ -78,13 +80,33 @@ MainWindow::MainWindow()
             this, SLOT(itemSelected(QGraphicsItem*)));
     createToolbars();
 
-    QHBoxLayout *layout = new QHBoxLayout;
+    /*QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(toolBoxLeft);
     view = new QGraphicsView(scene);
     layout->addWidget(view);
     layout->addWidget(toolBoxRight);
-    QWidget *widget = new QWidget;
-    widget->setLayout(layout);
+    */
+    view = new QGraphicsView(scene);
+    QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
+    splitter->addWidget(toolBoxLeft);
+    splitter->addWidget(view);
+    splitter->addWidget(toolBoxRight);
+
+    // İsteğe bağlı: Minimum genişlik ayarı
+    toolBoxLeft->setMinimumWidth(100);
+    toolBoxRight->setMinimumWidth(150);
+    view->setMinimumWidth(300);  // Orta view için de gerekirse
+
+    // Stretch ayarı (başlangıçta orta view büyük başlasın)
+    splitter->setStretchFactor(0, 0);  // Sol
+    splitter->setStretchFactor(1, 1);  // Orta (view)
+    splitter->setStretchFactor(2, 0);  // Sağ
+
+    // Son olarak Central Widget ayarı:
+    setCentralWidget(splitter);
+
+   // QWidget *widget = new QWidget;
+   // widget->setLayout(layout);
 
     /************************version*******************************************/
     QStringList arguments;
@@ -99,7 +121,7 @@ MainWindow::MainWindow()
     resultVersion.chop(1);
     QString version = resultVersion.right(5);
     setWindowTitle("Akış Diyagramı "+version);
-    setCentralWidget(widget);
+   //// setCentralWidget(widget);
     setWindowIcon(QIcon(":images/prg.png"));
     setUnifiedTitleAndToolBarOnMac(true);
 
@@ -561,7 +583,7 @@ void MainWindow::worker()
         qDebug() << diagramItem->selectedVariables.size();
         for (int j = 0; j < diagramItem->selectedVariables.size(); ++j) {
             VariableRecord varselect = diagramItem->selectedVariables[j];
-            qDebug() << "tanımlı işlemler: "<<varselect.label << varselect.operationType << varselect.expression;
+           /// qDebug() << "tanımlı işlemler: "<<varselect.label << varselect.operationType << varselect.expression;
 
             bool test=varselect.evaluate(Variable::onlineVariableList);
             if (test) {
@@ -585,6 +607,7 @@ void MainWindow::worker()
         diagramItem->myDiagramType==Diagram::DiagramType::Input||
         diagramItem->myDiagramType==Diagram::DiagramType::Process||
         diagramItem->myDiagramType==Diagram::DiagramType::Loop||
+        diagramItem->myDiagramType==Diagram::DiagramType::Conditional||
         diagramItem->myDiagramType==Diagram::DiagramType::Output)
     {
         QString text = algoritmaText->toPlainText();
@@ -612,13 +635,13 @@ void MainWindow::newFile()
 void MainWindow::saveFile()
 {
     QString defaultFileName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-    + "/flowchart.json";
+    + "/flowchart.aflw";
 
     QString filePath = QFileDialog::getSaveFileName(
         this,
         tr("Diyagramı Kaydet"),
         defaultFileName,
-        tr("JSON Dosyaları (*.json)")
+        tr("JSON Dosyaları (*.aflw)")
         );
 
     if (!filePath.isEmpty()) {
@@ -635,12 +658,14 @@ void MainWindow::openFile()
         this,
         tr("Diyagram Aç"),
         startDir,
-        tr("JSON Dosyaları (*.json)")
+        tr("JSON Dosyaları (*.aflw)")
         );
 
     if (!filePath.isEmpty()) {
         scene->loadScene(filePath);
         variableWidget->loadVariables();
+        this->setWindowTitle(this->windowTitle()+" "+filePath);
+        qDebug()<<this->windowTitle();
     }
 }
 
@@ -1180,12 +1205,6 @@ void MainWindow::createToolBox()
 
     // QTextEdit için iç widget ve layout
     //algoritmaText=new QPlainTextEdit();
-    QWidget *variablesWidget = new QWidget;
-    QVBoxLayout *variableLayout = new QVBoxLayout(variablesWidget);
-    variableLayout->setContentsMargins(0, 0, 0, 0); // Sadece burada sağ/sol padding
-    variableLayout->addWidget(new QLabel("Değişkenler"));
-    variableLayout->addWidget(variableWidget);
-    maintWidgetslayout->addWidget(variablesWidget, 1);
 
     toolBoxLeft->addItem(mainWidget, tr("Akış Şekilleri"));
     toolBoxLeft->addItem(backgroundWidget, tr("Arka Planlar"));
@@ -1213,17 +1232,28 @@ void MainWindow::createToolBox()
     layout1->addWidget(new QTextEdit, 1);  // eşit oranda yer kaplasın (ya da 2 yaparsın daha fazla yer kaplar)
     toolBoxRight->addItem(compositeWidget, tr("Değişkenler ve Açıklama"));
 */
+
     algoritmaText=new QPlainTextEdit();
     QWidget *textEditContainer = new QWidget;
-    textEditContainer->setFixedWidth(240);
+
+    QWidget *variablesWidget = new QWidget;
+    QVBoxLayout *variableLayout = new QVBoxLayout(variablesWidget);
+    variableLayout->setContentsMargins(0, 0, 0, 0); // Sadece burada sağ/sol padding
+    //variableLayout->addWidget(new QLabel("Değişkenler"));
+    variableLayout->addWidget(variableWidget);
+    //maintWidgetslayout->addWidget(variablesWidget, 1);
+
+    //textEditContainer->setFixedWidth(240);
     QVBoxLayout *textEditContainerLayout1 = new QVBoxLayout(textEditContainer);
     textEditContainerLayout1->setContentsMargins(0, 0, 0, 0); // Sadece burada sağ/sol padding
-    //textLayout1->addWidget(new QLabel("Algoritma"));
-    textEditContainerLayout1->addWidget(algoritmaText);
+    textEditContainerLayout1->addWidget(variablesWidget, 1);
+    textEditContainerLayout1->addWidget(new QLabel("Algoritma"));
+    textEditContainerLayout1->addWidget(algoritmaText,1);
+
     toolBoxRight = new QToolBox;
     toolBoxRight->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored));
     toolBoxRight->setMinimumWidth(textEditContainer->width());
-    toolBoxRight->addItem(textEditContainer, tr("Algoritma"));
+    toolBoxRight->addItem(textEditContainer, tr("Değişkenler"));
 /*
     // Ana konteyner
     QWidget *compositeWidget = new QWidget;
@@ -1637,3 +1667,27 @@ QIcon MainWindow::createColorIcon(QColor color)
     return QIcon(pixmap);
 }
 //! [32]
+
+void MainWindow::variableUpdateRecordSlot(VariableRecord updated)
+{
+    qDebug()<<"güncellenecek: "<<updated.label<<updated.value<<updated.valueType;
+    for (int i=0;i<Variable::onlineVariableList.size();i++) {
+        if(Variable::onlineVariableList[i].label==updated.label)
+        {
+            Variable::onlineVariableList[i]=updated;
+        }
+    }
+
+    for (QGraphicsItem *item : scene->items()) {
+        if (auto dItem = qgraphicsitem_cast<DiagramItem*>(item)) {
+            //qDebug()<<"scene nesnesi: "<<dItem->myDiagramType;
+            for (int i=0;i<dItem->selectedVariables.size();i++) {
+                if(dItem->selectedVariables[i].label==updated.label)
+                {
+                    dItem->selectedVariables[i].valueType=updated.valueType;
+                }
+            }
+        }
+    }
+
+}

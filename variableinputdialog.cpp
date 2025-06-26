@@ -111,15 +111,29 @@ QList<VariableRecord> VariableInputDialog::getSelectedVariables() const
         var.label = row->variableCombo->currentText();
         var.isInput = row->inputCheckBox->isChecked();
         var.value = row->valueEdit->text();
-        if(row->inputMessageEdit->text()!="")
-            var.inputMessage="\""+row->inputMessageEdit->text()+"\", ";
-        else
+
+        /*if(row->inputMessageEdit->text()!=""){
+
+            QString strinput = row->inputMessageEdit->text();
+            strinput.remove('\"').remove(',').trimmed();
+            var.inputMessage="\""+strinput+"\", ";
+        var.inputMessage=row->inputMessageEdit->text();
+        }
+        else*/
             var.inputMessage=row->inputMessageEdit->text();
 
         // type bilgisi için allVariables'dan eşleştirme
         for (const VariableRecord &v : Variable::onlineVariableList) {
             if (v.label == var.label) {
                 var.valueType = v.valueType;
+                if(!var.isInput&&var.valueType=="number"&&var.value=="")
+                {
+                    var.value="0";
+                }
+                if(!var.isInput&&var.valueType=="text"&&var.value=="")
+                {
+                    var.value="";
+                }
                 break;
             }
         }

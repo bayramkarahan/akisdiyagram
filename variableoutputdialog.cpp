@@ -245,17 +245,17 @@ QList<OutputRecord> VariableOutputDialog::getExpressionsWithType() const
         case 0:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
-            if(row->outputMessageEdit->text()!="")
+            /*if(row->outputMessageEdit->text()!="")
                 rec.outputMessage="\""+row->outputMessageEdit->text()+"\", ";
-            else
+            else*/
                 rec.outputMessage=row->outputMessageEdit->text();
               break;
         case 1:
             rec.expression  = QString("%1").arg(row->varLabelCombo->currentText());
             rec.label = row->varLabelCombo->currentText();
-            if(row->outputMessageEdit->text()!="")
+           /* if(row->outputMessageEdit->text()!="")
                 rec.outputMessage="\""+row->outputMessageEdit->text()+"\", ";
-            else
+            else*/
                 rec.outputMessage=row->outputMessageEdit->text();
 
             break;
@@ -264,9 +264,9 @@ QList<OutputRecord> VariableOutputDialog::getExpressionsWithType() const
                        .arg(row->constEdit1->text());
             rec.label = "";
 
-            if(row->outputMessageEdit->text()!="")
+            /*if(row->outputMessageEdit->text()!="")
                 rec.outputMessage="\""+row->outputMessageEdit->text()+"\", ";
-            else
+            else*/
                 rec.outputMessage=row->outputMessageEdit->text();
 
             break;

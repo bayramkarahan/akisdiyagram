@@ -326,9 +326,7 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     //qDebug() <<"çift tıklama1 "<<rotateState;
     if(this->myDiagramType==Diagram::DiagramType::Input)
     {
-
         VariableInputDialog dlg;
-
         if(selectedVariables.size()==0)
         {
             // İlk işlem satırı veya boş başlat
@@ -338,7 +336,6 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             VariableRecord varselect = selectedVariables[j];
             //qDebug() << "labelText: " << labelText;
             dlg.addVariableRow(varselect);
-
         }
         if (dlg.exec() == QDialog::Accepted) {
             selectedVariables.clear();
@@ -347,20 +344,37 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
             labelAlgoritma.setTextFormat(Qt::RichText);
             labelAlgoritma.setText("");
 
-            for (const VariableRecord &selected : dlg.getSelectedVariables()) {
+            for (VariableRecord &selected : dlg.getSelectedVariables()) {
                 selectedVariables.append(selected);
                 qDebug() << "seçilen:" << selected.label << selected.value << selected.valueType<<selected.isInput;
+                QString inputMesaj="";
+                if(selected.inputMessage!="")
+                    inputMesaj="\""+selected.inputMessage+"\", ";
 
-                if (selected.isInput) {
-                    label.setText(label.text() + "<br>" +selected.inputMessage+" "+  selected.label + " = ?");
-                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.inputMessage+" "+  selected.label + " (oku)");
-                } else if (selected.valueType == "number") {
+                if (selected.isInput&&selected.valueType == "number") {
+                    label.setText(label.text() + "<br>" +inputMesaj+  selected.label + " = ?");
+                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +inputMesaj+  selected.label + " (oku)");
+                }
+                if (selected.isInput&&selected.valueType == "text") {
+                    label.setText(label.text() + "<br>" +inputMesaj+  selected.label + " = ?");
+                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +inputMesaj+  selected.label + " (oku)");
+                }
+                if (!selected.isInput&&selected.valueType == "number") {
+                    label.setText(label.text() + "<br>" + selected.label + " = " + selected.value);
+                    labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.label + " = " + selected.value);
+                 }
+                if (!selected.isInput&&selected.valueType == "text") {
+                     label.setText(label.text() + "<br>" + selected.label + " = \"" + selected.value + "\"");
+                     labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.label + " = \"" + selected.value + "\"");
+                  }
+                /*
+                else if (selected.valueType == "number") {
                     label.setText(label.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = " + selected.value);
                     labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = " + selected.value);
                  } else {
                     label.setText(label.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = \"" + selected.value + "\"");
                     labelAlgoritma.setText(labelAlgoritma.text() + "<br>" +selected.inputMessage+" "+ selected.label + " = \"" + selected.value + "\"");
-                 }
+                 }*/
                 labelText=label.text();
                 labelAlgoritmaText=labelAlgoritma.text();
             }
@@ -403,12 +417,12 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                          if(rec.outputType!=1)
                          {
                              label.setText(selected.outputMessage+" "+selected.expression);
-                             labelAlgoritma.setText(selected.outputMessage+" "+selected.expression+" (yaz)");
+                             labelAlgoritma.setText("\""+selected.outputMessage+"\", "+selected.expression+" (yaz)");
                          }
                          else
                          {
                              label.setText(selected.outputMessage+" "+selected.expression+"="+selected.expression);
-                             labelAlgoritma.setText(selected.outputMessage+" "+selected.expression+"="+selected.expression +" (yaz)");
+                             labelAlgoritma.setText("\""+selected.outputMessage+"\", "+selected.expression+"="+selected.expression +" (yaz)");
                          }
                      }
                      else
@@ -416,10 +430,10 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                          if(rec.outputType!=1)
                          {
                             label.setText(label.text()+"<br>"+selected.outputMessage+" "+selected.expression);
-                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+selected.outputMessage+" "+selected.expression+" (yaz)");
+                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+"\""+selected.outputMessage+"\", "+selected.expression+" (yaz)");
                          }else{
                             label.setText(label.text()+"<br>"+selected.outputMessage+" "+selected.expression+"="+selected.expression);
-                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+selected.outputMessage+" "+selected.expression+"="+selected.expression+" (yaz)");
+                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+"\""+selected.outputMessage+"\", "+selected.expression+"="+selected.expression+" (yaz)");
                          }
                      }
                      /*********************************************/
@@ -455,6 +469,12 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                     selected.label = rec.targetLabel;
                     selected.expression=rec.expression;
                     selected.operationType=rec.processType;
+                    selected.valueType="number";
+                    for (const auto& v : Variable::onlineVariableList) {
+                        if (v.label == selected.label) {
+                            selected.valueType=v.valueType;
+                        }
+                    }
                     selectedVariables.append(selected);
                     /**********************************************/
                     if(label.text()=="")
@@ -557,8 +577,9 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
               }
             }
-            labelAlgoritma.setText(label.text());
-            labelAlgoritmaText=label.text();
+            labelText=label.text();
+            labelAlgoritma.setText("eğer "+label.text());
+            labelAlgoritmaText="eğer "+label.text();
         }
 
     }
