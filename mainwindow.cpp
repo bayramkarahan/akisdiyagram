@@ -64,8 +64,8 @@ const int InsertTextButton = 10;
 MainWindow::MainWindow()
 {
     variableWidget=new VariableEditorDialog();
-    connect(variableWidget, SIGNAL(variableUpdateRecord(VariableRecord)),
-            this, SLOT(variableUpdateRecordSlot(VariableRecord)));
+    connect(variableWidget, SIGNAL(variableUpdateRecord(VariableRecord,VariableRecord)),
+            this, SLOT(variableUpdateRecordSlot(VariableRecord,VariableRecord)));
     createActions();
     createToolBox();
     createMenus();
@@ -1668,23 +1668,40 @@ QIcon MainWindow::createColorIcon(QColor color)
 }
 //! [32]
 
-void MainWindow::variableUpdateRecordSlot(VariableRecord updated)
+void MainWindow::variableUpdateRecordSlot(VariableRecord oldRec, VariableRecord newRec)
 {
-    qDebug()<<"güncellenecek: "<<updated.label<<updated.value<<updated.valueType;
+    qDebug()<<"güncellenecek: "<<oldRec.label<<newRec.label<<newRec.value<<newRec.valueType;
+
     for (int i=0;i<Variable::onlineVariableList.size();i++) {
-        if(Variable::onlineVariableList[i].label==updated.label)
+        if(Variable::onlineVariableList[i].label==oldRec.label)
         {
-            Variable::onlineVariableList[i]=updated;
+            Variable::onlineVariableList[i].label=newRec.label;
+            Variable::onlineVariableList[i].value=newRec.value;
+            Variable::onlineVariableList[i].valueType=newRec.valueType;
         }
     }
 
     for (QGraphicsItem *item : scene->items()) {
+       // qDebug()<<"scene nesnesi: "<<item;
         if (auto dItem = qgraphicsitem_cast<DiagramItem*>(item)) {
             //qDebug()<<"scene nesnesi: "<<dItem->myDiagramType;
             for (int i=0;i<dItem->selectedVariables.size();i++) {
-                if(dItem->selectedVariables[i].label==updated.label)
+                dItem->selectedVariables[i].expression.replace(oldRec.label,newRec.label);
+
+                QString templabel=dItem->label.text();
+                dItem->label.setText(templabel.replace(oldRec.label,newRec.label));
+                dItem->labelText=dItem->labelText.replace(oldRec.label,newRec.label);
+
+                QString templabelAlgoritma=dItem->labelAlgoritma.text();
+                dItem->labelAlgoritma.setText(templabelAlgoritma.replace(oldRec.label,newRec.label));
+                dItem->labelAlgoritmaText=dItem->labelAlgoritmaText.replace(oldRec.label,newRec.label);
+
+
+                if(dItem->selectedVariables[i].label==oldRec.label)
                 {
-                    dItem->selectedVariables[i].valueType=updated.valueType;
+                    dItem->selectedVariables[i].label=newRec.label;
+                    dItem->selectedVariables[i].value=newRec.value;
+                    dItem->selectedVariables[i].valueType=newRec.valueType;
                 }
             }
         }

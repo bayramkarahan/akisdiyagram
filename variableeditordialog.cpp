@@ -38,14 +38,14 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
             tableWidget->item(row, 2)->setText(updated.valueType);
             qDebug()<<updated.label<<updated.value<<updated.valueType;
             //güncelliyor
-            emit variableUpdateRecord(updated);
+            emit variableUpdateRecord(rec,updated);
 
             // güncel halini listeliyor
            /* for (const VariableRecord &var : Variable::onlineVariableList) {
                 qDebug()<<var.label<<var.value<<var.type;
             }*/
             //readonly yapıyor
-            for (int row = 0; row < tableWidget->rowCount(); ++row) {
+         /*   for (int row = 0; row < tableWidget->rowCount(); ++row) {
                 for (int col = 0; col < tableWidget->columnCount(); ++col) {
                     QTableWidgetItem* item = tableWidget->item(row, col);
                     if (!item) {
@@ -54,7 +54,7 @@ VariableEditorDialog::VariableEditorDialog(QWidget *parent)
                     }
                     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
                 }
-            }
+            }*/
         }
          ////if (dialog.exec() == QDialog::Rejected) {
             //qDebug()<<"vazgeç";

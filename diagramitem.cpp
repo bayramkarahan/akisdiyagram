@@ -411,33 +411,37 @@ void DiagramItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                      selected.operationType=rec.outputType;
                      selected.outputMessage=rec.outputMessage;
                      selectedVariables.append(selected);
+                     QString outputMesaj="";
+                     if(selected.outputMessage!="")
+                         outputMesaj="\""+selected.outputMessage+"\", ";
+
                      /**********************************************/
                      if(label.text()=="")
                      {
                          if(rec.outputType!=1)
                          {
-                             label.setText(selected.outputMessage+" "+selected.expression);
-                             labelAlgoritma.setText("\""+selected.outputMessage+"\", "+selected.expression+" (yaz)");
+                             label.setText(outputMesaj+selected.expression);
+                             labelAlgoritma.setText(outputMesaj+selected.expression+" (yaz)");
                          }
                          else
                          {
-                             label.setText(selected.outputMessage+" "+selected.expression+"="+selected.expression);
-                             labelAlgoritma.setText("\""+selected.outputMessage+"\", "+selected.expression+"="+selected.expression +" (yaz)");
+                             label.setText(outputMesaj+selected.expression+"="+selected.expression);
+                             labelAlgoritma.setText(outputMesaj+selected.expression+"="+selected.expression +" (yaz)");
                          }
                      }
                      else
                      {
                          if(rec.outputType!=1)
                          {
-                            label.setText(label.text()+"<br>"+selected.outputMessage+" "+selected.expression);
+                            label.setText(label.text()+"<br>"+outputMesaj+selected.expression);
                             labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+"\""+selected.outputMessage+"\", "+selected.expression+" (yaz)");
                          }else{
-                            label.setText(label.text()+"<br>"+selected.outputMessage+" "+selected.expression+"="+selected.expression);
-                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+"\""+selected.outputMessage+"\", "+selected.expression+"="+selected.expression+" (yaz)");
+                            label.setText(label.text()+"<br>"+outputMesaj+selected.expression+"="+selected.expression);
+                            labelAlgoritma.setText(labelAlgoritma.text()+"<br>"+outputMesaj+selected.expression+"="+selected.expression+" (yaz)");
                          }
                      }
                      /*********************************************/
-                        labelText=label.text();
+                     labelText=label.text();
                      labelAlgoritmaText=labelAlgoritma.text();
                  }
              }

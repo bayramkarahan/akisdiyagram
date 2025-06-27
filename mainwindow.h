@@ -99,7 +99,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
-    void variableUpdateRecordSlot(VariableRecord rec);
+    void variableUpdateRecordSlot(VariableRecord oldRec,VariableRecord newRec);
     void loadExampleFile();
     void backgroundButtonGroupClicked(QAbstractButton *button);
     void buttonGroupClicked(int id);

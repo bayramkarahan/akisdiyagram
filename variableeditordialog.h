@@ -19,7 +19,7 @@ public:
     void updateVariablesFromTable();
     void loadVariables();
 signals:
-    void variableUpdateRecord(VariableRecord rec);
+    void variableUpdateRecord(VariableRecord oldRec,VariableRecord newRec);
 private slots:
 
     void addVariable();
