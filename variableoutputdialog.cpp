@@ -8,6 +8,12 @@ VariableOutputDialog::VariableOutputDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("Çıktı Tanımla");
     resize(700, 300);
+    // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    // Dialog boyutu
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 

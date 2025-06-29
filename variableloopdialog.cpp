@@ -5,6 +5,13 @@ VariableLoopDialog::VariableLoopDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("Tekrar(Döngü) Tanımla");
     resize(500, 200);
+    // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    // Dialog boyutu
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
+
     mainLayout = new QVBoxLayout(this);
     loopRowsLayout = new QVBoxLayout;
 
@@ -45,7 +52,9 @@ void VariableLoopDialog::addLoopRowparametre(int loopType, const QString &expres
     layout->setContentsMargins(5,5,5,5);
 
     row->loopTypeCombo = new QComboBox;
-    row->loopTypeCombo->addItems({"📥 for", "📥 while"});
+    row->loopTypeCombo->addItems({"📥 for(i=0;i<10;i++)",
+                                  "📥 for(i=10;i>0;i--)",
+                                  "📥 while(i<5)"});
     row->loopTypeCombo->setCurrentIndex(loopType);
     layout->addWidget(row->loopTypeCombo);
 
@@ -93,7 +102,17 @@ void VariableLoopDialog::addLoopRowparametre(int loopType, const QString &expres
         row->endEdit->setText(parts[2]);
         row->stepEdit->setText(parts[3]);
     }
-    else if ((loopType == 1 || loopType == 2) && parts.size() == 3) { // while i < 10
+    if (loopType == 1 && parts.size() == 4) { // for i=10 to 0 step 2
+        int varIdx = row->variableLabelCombo->findText(parts[0]);
+        if (varIdx >= 0) {
+            row->variableLabelCombo->setCurrentIndex(varIdx);
+        }
+
+        row->startEdit->setText(parts[1]);
+        row->endEdit->setText(parts[2]);
+        row->stepEdit->setText(parts[3]);
+    }
+    else if (loopType == 2 && parts.size() == 3) { // while i < 10
         int varIdx = row->conditionVarCombo->findText(parts[0]);
         if (varIdx >= 0) row->conditionVarCombo->setCurrentIndex(varIdx);
         int opIdx = row->conditionOpCombo->findText(parts[1]);
@@ -143,6 +162,14 @@ void VariableLoopDialog::updateLoopRowWidgets(int index)
     }
     if(type == 1)
     {
+        // row->variableNameEdit->setVisible(true);
+        row->variableLabelCombo->setVisible(true);
+        row->startEdit->setVisible(true);
+        row->endEdit->setVisible(true);
+        row->stepEdit->setVisible(true);
+    }
+    if(type == 2)
+    {
        // row->variableNameEdit->setVisible(true);
         row->conditionVarCombo->setVisible(true);
         row->conditionOpCombo->setVisible(true);
@@ -172,6 +199,18 @@ QList<LoopRecord> VariableLoopDialog::getLoopsWithType() const
             rec.stepValue = row->stepEdit->text().toInt(&ok,10);
             rec.label = row->variableLabelCombo->currentText();
         } else if (rec.loopType == 1){
+            // for döngüsü
+            rec.expression = QString("%1 %2 %3 %4")
+                                 .arg(row->variableLabelCombo->currentText())
+                                 .arg(row->startEdit->text())
+                                 .arg(row->endEdit->text())
+                                 .arg(row->stepEdit->text());
+            bool ok;
+            rec.startValue = row->startEdit->text().toInt(&ok,10);
+            rec.endValue = row->endEdit->text().toInt(&ok,10);
+            rec.stepValue = row->stepEdit->text().toInt(&ok,10);
+            rec.label = row->variableLabelCombo->currentText();
+        }else if (rec.loopType == 2){
             // while
             rec.expression = QString("%1 %2 %3")
                                  .arg(row->conditionVarCombo->currentText())
@@ -182,17 +221,7 @@ QList<LoopRecord> VariableLoopDialog::getLoopsWithType() const
             rec.endValue = row->conditionValEdit->text().toInt(&ok,10);
             rec.stepValue = row->stepEdit->text().toInt(&ok,10);
             rec.label = row->variableLabelCombo->currentText();
-        }else if (rec.loopType == 2){
-           // do while
-            rec.expression = QString("%1 %2 %3")
-                                 .arg(row->conditionVarCombo->currentText())
-                                 .arg(row->conditionOpCombo->currentText())
-                                 .arg(row->conditionValEdit->text());
-           bool ok;
-           rec.startValue = row->startEdit->text().toInt(&ok,10);
-           rec.endValue = row->conditionValEdit->text().toInt(&ok,10);
-           rec.stepValue = row->stepEdit->text().toInt(&ok,10);
-           rec.label = row->variableLabelCombo->currentText();
+
         }
 
         list.append(rec);

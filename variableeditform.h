@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include "variable.h"
 #include<QFormLayout>
+#include<QGuiApplication>
+#include<QScreen>
 class VariableEditForm : public QDialog
 {
     Q_OBJECT

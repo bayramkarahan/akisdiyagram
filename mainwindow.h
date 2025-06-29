@@ -128,6 +128,7 @@ private slots:
 
     void newFile();
     void saveFile();
+    void saveImageFile();
     void openFile();
     void worker();
 
@@ -152,6 +153,8 @@ private:
     QAction *exitAction;
     QAction *newFileAction;
      QAction *saveFileAction;
+    QAction *savePngFileAction;
+
      QAction *openFileAction;
     QAction *addAction;
     QAction *deleteAction;
@@ -200,7 +203,9 @@ private:
     QAction *lineAction;
     VariableEditorDialog *variableWidget;
     QPlainTextEdit *algoritmaText;
-
+    QString loopStep="";
+    bool loopRunState=false;
+    QString apptTitle;
 };
 //! [0]
 

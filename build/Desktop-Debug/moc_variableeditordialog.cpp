@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_VariableEditorDialog_t {
-    QByteArrayData data[9];
-    char stringdata0[116];
+    QByteArrayData data[10];
+    char stringdata0[126];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,15 +36,16 @@ QT_MOC_LITERAL(0, 0, 20), // "VariableEditorDialog"
 QT_MOC_LITERAL(1, 21, 20), // "variableUpdateRecord"
 QT_MOC_LITERAL(2, 42, 0), // ""
 QT_MOC_LITERAL(3, 43, 14), // "VariableRecord"
-QT_MOC_LITERAL(4, 58, 3), // "rec"
-QT_MOC_LITERAL(5, 62, 11), // "addVariable"
-QT_MOC_LITERAL(6, 74, 22), // "removeSelectedVariable"
-QT_MOC_LITERAL(7, 97, 13), // "onTypeChanged"
-QT_MOC_LITERAL(8, 111, 4) // "type"
+QT_MOC_LITERAL(4, 58, 6), // "oldRec"
+QT_MOC_LITERAL(5, 65, 6), // "newRec"
+QT_MOC_LITERAL(6, 72, 11), // "addVariable"
+QT_MOC_LITERAL(7, 84, 22), // "removeSelectedVariable"
+QT_MOC_LITERAL(8, 107, 13), // "onTypeChanged"
+QT_MOC_LITERAL(9, 121, 4) // "type"
 
     },
     "VariableEditorDialog\0variableUpdateRecord\0"
-    "\0VariableRecord\0rec\0addVariable\0"
+    "\0VariableRecord\0oldRec\0newRec\0addVariable\0"
     "removeSelectedVariable\0onTypeChanged\0"
     "type"
 };
@@ -64,20 +65,20 @@ static const uint qt_meta_data_VariableEditorDialog[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   34,    2, 0x06 /* Public */,
+       1,    2,   34,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       5,    0,   37,    2, 0x08 /* Private */,
-       6,    0,   38,    2, 0x08 /* Private */,
-       7,    1,   39,    2, 0x08 /* Private */,
+       6,    0,   39,    2, 0x08 /* Private */,
+       7,    0,   40,    2, 0x08 /* Private */,
+       8,    1,   41,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    4,    5,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString,    9,
 
        0        // eod
 };
@@ -88,7 +89,7 @@ void VariableEditorDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
         auto *_t = static_cast<VariableEditorDialog *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->variableUpdateRecord((*reinterpret_cast< VariableRecord(*)>(_a[1]))); break;
+        case 0: _t->variableUpdateRecord((*reinterpret_cast< VariableRecord(*)>(_a[1])),(*reinterpret_cast< VariableRecord(*)>(_a[2]))); break;
         case 1: _t->addVariable(); break;
         case 2: _t->removeSelectedVariable(); break;
         case 3: _t->onTypeChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
@@ -97,7 +98,7 @@ void VariableEditorDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (VariableEditorDialog::*)(VariableRecord );
+            using _t = void (VariableEditorDialog::*)(VariableRecord , VariableRecord );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&VariableEditorDialog::variableUpdateRecord)) {
                 *result = 0;
                 return;
@@ -147,9 +148,9 @@ int VariableEditorDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void VariableEditorDialog::variableUpdateRecord(VariableRecord _t1)
+void VariableEditorDialog::variableUpdateRecord(VariableRecord _t1, VariableRecord _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP

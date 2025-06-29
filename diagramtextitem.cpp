@@ -49,7 +49,7 @@
 ****************************************************************************/
 
 #include "diagramtextitem.h"
-#include "diagramscene.h"
+#include "DiagramScene.h"
 #include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
 

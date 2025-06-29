@@ -6,6 +6,12 @@ VariableInputDialog::VariableInputDialog(QWidget *parent)
 {
     setWindowTitle("Değişken Seçimi");
     resize(500, 300);
+    // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    // Dialog boyutu
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
 
     auto mainLayout = new QVBoxLayout(this);
 
@@ -37,6 +43,7 @@ VariableInputDialog::VariableInputDialog(QWidget *parent)
 
 void VariableInputDialog::addVariableRow(const VariableRecord &var)
 {
+
 
     VariableRow *row = new VariableRow;
 

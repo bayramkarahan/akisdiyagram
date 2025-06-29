@@ -11,6 +11,8 @@
 #include <QDialogButtonBox>
 #include "variable.h"
 #include<QScrollArea>
+#include<QGuiApplication>
+#include<QScreen>
 
 class VariableInputDialog : public QDialog {
     Q_OBJECT

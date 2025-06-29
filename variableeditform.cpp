@@ -8,6 +8,12 @@ VariableEditForm::VariableEditForm(const VariableRecord &record, QWidget *parent
 {
     setWindowTitle("Değişkeni Düzenle");
     resize(230, 120);
+    // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    // Dialog boyutu
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
 
     labelEdit = new QLineEdit(record.label, this);
     valueEdit = new QLineEdit(record.value, this);

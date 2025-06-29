@@ -9,7 +9,8 @@
 #include "variable.h"
 #include <QComboBox>
 #include <QDebug>
-
+#include<QGuiApplication>
+#include<QScreen>
 class VariableEditorDialog : public QDialog
 {
     Q_OBJECT

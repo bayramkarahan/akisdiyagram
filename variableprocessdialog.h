@@ -8,7 +8,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLabel>
-
+#include<QGuiApplication>
+#include<QScreen>
 #include "variable.h"
 struct ProcessRecord {
     int processType;

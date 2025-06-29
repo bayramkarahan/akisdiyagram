@@ -10,7 +10,8 @@
 #include <QLabel>
 
 #include "variable.h"
-
+#include<QGuiApplication>
+#include<QScreen>
 class VariableConditionDialog : public QDialog
 {
     Q_OBJECT

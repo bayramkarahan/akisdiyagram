@@ -50,7 +50,7 @@
 
 #include "arrow.h"
 #include "diagramitem.h"
-#include "diagramscene.h"
+#include "DiagramScene.h"
 #include "diagramtextitem.h"
 #include "mainwindow.h"
 
@@ -110,7 +110,7 @@ MainWindow::MainWindow()
 
     /************************version*******************************************/
     QStringList arguments;
-    arguments << "-c" << "dpkg -s akisdiyagram|grep -i version";
+    arguments << "-c" << "dpkg -s flowingtr|grep -i version";
     QString resultVersion;
     QProcess process;
     process.start("/bin/bash",arguments);
@@ -120,9 +120,10 @@ MainWindow::MainWindow()
     }
     resultVersion.chop(1);
     QString version = resultVersion.right(5);
-    setWindowTitle("Akış Diyagramı "+version);
+    apptTitle="flowingtr"+version;
+    setWindowTitle(apptTitle);
    //// setCentralWidget(widget);
-    setWindowIcon(QIcon(":images/prg.png"));
+    setWindowIcon(QIcon(":/images/prg.png"));
     setUnifiedTitleAndToolBarOnMac(true);
 
     this->setWindowState(Qt::WindowMaximized);
@@ -404,28 +405,28 @@ void MainWindow::itemSelected(QGraphicsItem *item)
 void MainWindow::about()
 {
     QString yil=QString::number( QDateTime::currentDateTime().date().year());
-    QMessageBox::about(this, tr("Akış Diyagramı"),
+    QMessageBox::about(this, tr("flowingtr"),
                        tr("Bu uygulama Linux tabanlı sistemlerde(<b>Pardus</b>); "
                           "<br/>Programlama mantığını anlama, <b>Akış Diyagramı</b> oluştumak ve"
                           "<br/><b>Gerçek Zamanlı Akış Diyagramı Çalıştırmak</b> için yazılmıştır"
                           "<br/>"
                           "<br/>*****************************************************************************"
                           "<br/>   Copyright (C) ")+yil+tr(" by Bayram KARAHAN                                    "
-                          "<br/>\tkod.pardus.org.tr/karahan/akisdiyagrami"
-                          "<br/>\tgithub.com/bayramkarahan/akisdiyagrami"
+                          "<br/>\tkod.pardus.org.tr/karahan/flowingtr"
+                          "<br/>\tgithub.com/bayramkarahan/flowingtr"
                           "<br/>\tbayramkarahan.blogspot.com"
                           "<br/>\tbayramk@gmail.com  "
                           "<br/>*****************************************************************************"
 
-                          "<br/>akisdiyagramı 1.0: Temel özellikler."
-                          "<br/>akisdiyagramı 1.1: Bağlantı renklendirmeleri eklendi."
-                          "<br/>akisdiyagramı 1.2: Ok ve text nesnesine sağtuş menüsü eklendi."
-                          "<br/>akisdiyagramı 1.3: Sağtuş menü özellikleri bütün nesnelere eklendi."
-                          "<br/>akisdiyagramı 1.4: Nesneler arası birleştirme iyileştirildi."
-                          "<br/>akisdiyagramı 1.5: Dinamik Değişken yapısı eklendi."
-                          "<br/>akisdiyagramı 1.6: Giriş, İşlem, Karar ve Çıktı işlemleri eklendi."
-                          "<br/>akisdiyagramı 1.7: Değişkenler ve Algoritma sağ bölüme eklendi."
-                          "<br/>akisdiyagramı 1.8: Yeni, Aç ve Kaydet seçenekleri eklendi."
+                          "<br/>flowingtr 1.0: Temel özellikler."
+                          "<br/>flowingtr 1.1: Bağlantı renklendirmeleri eklendi."
+                          "<br/>flowingtr 1.2: Ok ve text nesnesine sağtuş menüsü eklendi."
+                          "<br/>flowingtr 1.3: Sağtuş menü özellikleri bütün nesnelere eklendi."
+                          "<br/>flowingtr 1.4: Nesneler arası birleştirme iyileştirildi."
+                          "<br/>flowingtr 1.5: Dinamik Değişken yapısı eklendi."
+                          "<br/>flowingtr 1.6: Giriş, İşlem, Karar ve Çıktı işlemleri eklendi."
+                          "<br/>flowingtr 1.7: Değişkenler ve Algoritma sağ bölüme eklendi."
+                          "<br/>flowingtr 1.8: Yeni, Aç ve Kaydet seçenekleri eklendi."
 
                           "<br/>*****************************************************************************"
                            "<br/>   This program is free software; you can redistribute it and/or modify    "
@@ -450,7 +451,7 @@ void MainWindow::worker()
 
     diagramItem->setText("step",QColor(255,0,0,100));
     /*************************************************/
-
+    if(!loopRunState) diagramItem->loopItemRun=false;
     if(diagramItem->myDiagramType==Diagram::DiagramType::Input)
     {
         for (int j = 0; j <diagramItem->selectedVariables.size(); ++j) {
@@ -463,9 +464,12 @@ void MainWindow::worker()
 
                 QDialog dialog;
                 dialog.setWindowTitle("Girdi");
+                dialog.setFixedSize(200,100);
+                // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+                QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
 
                 // Açıklama (label)
-                QLabel *label = new QLabel(varselect.inputMessage, &dialog);
+                QLabel *label = new QLabel(varselect.inputMessage+" ", &dialog);
 
                 // Giriş kutusu
                 QLineEdit *lineEdit = new QLineEdit(&dialog);
@@ -492,13 +496,23 @@ void MainWindow::worker()
                     text = lineEdit->text();
                     ok = true;
                     dialog.accept();
+                    // varselect.value = text;
                 });
                 QObject::connect(cancelButton, &QPushButton::clicked, [&]() {
                     dialog.reject();
                 });
+                // Dialog boyutunu hesaplat
+               // dialog.adjustSize();
+
+                // Ortaya taşı
+                int x = (screenGeometry.width() - dialog.width()) / 2;
+                int y = (screenGeometry.height() - dialog.height()) / 2;
+                dialog.move(x, y);
 
                 // Diyaloğu göster
+
                 if (dialog.exec() == QDialog::Accepted && ok && !text.isEmpty()) {
+
                     varselect.value = text;
                 }
 
@@ -526,7 +540,7 @@ void MainWindow::worker()
                     QLabel *label=new QLabel;
                     if(varselect.operationType==0)
                     {
-                         label->setText(QString(varselect.outputMessage+var.value));
+                         label->setText(QString(varselect.outputMessage+" "+var.value));
                     }
                     if(varselect.operationType==1)
                     {
@@ -534,7 +548,10 @@ void MainWindow::worker()
                     }
                     QDialog dialog;
                     dialog.setWindowTitle("Çıktı");
-                    dialog.resize(200,100);
+                    dialog.setFixedSize(200,100);
+                    // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+                    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+
                     // İçerik metni
                     // "Tamam" butonu
                     QPushButton *button = new QPushButton("Tamam", &dialog);
@@ -545,9 +562,16 @@ void MainWindow::worker()
                     layout->addWidget(label);
                     layout->addWidget(button);
                     layout->setAlignment(button, Qt::AlignRight);
+                    // Dialog boyutunu hesaplat
+                    //dialog.adjustSize();
 
+                    // Ortaya taşı
+                    int x = (screenGeometry.width() - dialog.width()) / 2;
+                    int y = (screenGeometry.height() - dialog.height()) / 2;
+                    dialog.move(x, y);
                     // Diyaloğu göster
                     dialog.exec();
+
                 }
 
 
@@ -557,8 +581,11 @@ void MainWindow::worker()
             {
                 QDialog dialog;
                 dialog.setWindowTitle("Çıktı");
-                dialog.resize(200,100);
                 // İçerik metni
+                dialog.resize(200,100);
+                // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+                QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+
                 QLabel *label = new QLabel(varselect.outputMessage+varselect.expression, &dialog);
 
                 // "Tamam" butonu
@@ -570,7 +597,10 @@ void MainWindow::worker()
                 layout->addWidget(label);
                 layout->addWidget(button);
                 layout->setAlignment(button, Qt::AlignRight);
-
+                // Ortaya taşı
+                int x = (screenGeometry.width() - dialog.width()) / 2;
+                int y = (screenGeometry.height() - dialog.height()) / 2;
+                dialog.move(x, y);
                 // Diyaloğu göster
                 dialog.exec();
 
@@ -606,20 +636,27 @@ void MainWindow::worker()
     if(diagramItem->myDiagramType==Diagram::DiagramType::Start||
         diagramItem->myDiagramType==Diagram::DiagramType::Input||
         diagramItem->myDiagramType==Diagram::DiagramType::Process||
-        diagramItem->myDiagramType==Diagram::DiagramType::Loop||
+        //diagramItem->myDiagramType==Diagram::DiagramType::Loop||
         diagramItem->myDiagramType==Diagram::DiagramType::Conditional||
         diagramItem->myDiagramType==Diagram::DiagramType::Output)
-    {
-        QString text = algoritmaText->toPlainText();
-        //QStringList lines = text.contains.split('Adım');
-        int lineCount = text.count("Adım");
-        QString escText;
-        escText=diagramItem->labelAlgoritma.text();
-        //if(escText.left(4)=="<br>")
-         //   escText=escText.mid(4);
-        escText=escText.replace("<br>","\n");
-        algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": "+escText+"\n");
-     }
+            {
+        if(diagramItem->loopItemRun==false)
+        {
+        if(loopRunState&&diagramItem->loopItemRun==false)
+            diagramItem->loopItemRun=true;
+
+
+            QString text = algoritmaText->toPlainText();
+            //QStringList lines = text.contains.split('Adım');
+            int lineCount = text.count("Adım");
+            QString escText;
+            escText=diagramItem->labelAlgoritma.text();
+            //if(escText.left(4)=="<br>")
+             //   escText=escText.mid(4);
+            escText=escText.replace("<br>","\n");
+            algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": "+escText+"\n");
+          }
+        }
 
     diagramItem->setText("step",QColor(255,255,0,0));
 }
@@ -635,13 +672,22 @@ void MainWindow::newFile()
 void MainWindow::saveFile()
 {
     QString defaultFileName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-    + "/flowchart.aflw";
+    + "/flowingtr.ftr";
+
+   /* QString filePath = QFileDialog::getSaveFileName(
+        this,
+        tr("Diyagramı Kaydet"),
+        defaultFileName,
+        tr("ftr(json) Dosyaları (*.ftr)")
+        );*/
 
     QString filePath = QFileDialog::getSaveFileName(
         this,
         tr("Diyagramı Kaydet"),
         defaultFileName,
-        tr("JSON Dosyaları (*.aflw)")
+        tr("ftr (JSON) Dosyaları (*.ftr)"),
+        nullptr,
+        QFileDialog::DontUseNativeDialog
         );
 
     if (!filePath.isEmpty()) {
@@ -649,7 +695,22 @@ void MainWindow::saveFile()
     }
 }
 
+void MainWindow::saveImageFile()
+{
+    QString defaultFileName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+    + "/flowingtr.png";
 
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        tr("Diyagramı Resim Olarak Kaydet"),
+        defaultFileName,
+        tr("Png Dosyaları (*.png)")
+        );
+
+    if (!filePath.isEmpty()) {
+        scene->saveAsPng(filePath);
+    }
+}
 void MainWindow::openFile()
 {
     QString startDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
@@ -658,13 +719,13 @@ void MainWindow::openFile()
         this,
         tr("Diyagram Aç"),
         startDir,
-        tr("JSON Dosyaları (*.aflw)")
+        tr("JSON Dosyaları (*.ftr)")
         );
 
     if (!filePath.isEmpty()) {
         scene->loadScene(filePath);
         variableWidget->loadVariables();
-        this->setWindowTitle(this->windowTitle()+" "+filePath);
+        this->setWindowTitle(apptTitle+" "+filePath);
         qDebug()<<this->windowTitle();
     }
 }
@@ -1030,6 +1091,21 @@ DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
                 item->selectedVariables.first().counter++;
                 item->selectedVariables.first().value=QString::number(rec.startValue);
                 counterVariable = rec.startValue;
+
+                /*********************algoritma ilk *****************************/
+                QString text = algoritmaText->toPlainText();
+                //QStringList lines = text.contains.split('Adım');
+                int lineCount = text.count("Adım");
+                QString escText;
+                escText=diagramItem->labelAlgoritma.text();
+                //if(escText.left(4)=="<br>")
+                //   escText=escText.mid(4);
+                escText=escText.replace("<br>","\n");
+                algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": loop:\n");
+                ///algoritmaText->insertPlainText("Adım"+QString::number(lineCount+1)+": "+escText+"\n");
+                /*******************************************************/
+                loopStep="Adım"+QString::number(lineCount);
+                loopRunState=true;
             }else
             {
                 qDebug()<<"adım sayısı:"<<rec.counter;
@@ -1050,9 +1126,105 @@ DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
                         variableWidget->loadVariables();
                     }
                 }
+            }else
+            {
+                /*********************algoritma döngü sonu*****************************/
+                QString text = algoritmaText->toPlainText();
+                //QStringList lines = text.contains.split('Adım');
+                int lineCount = text.count("Adım");
+                QString escText;
+                escText=diagramItem->labelAlgoritma.text();
+                escText=escText.replace("<br>","\n");
+                /*******************************************************/
+                loopRunState=false;
+                QString sart="";//= item->selectedVariables.first().expression;
+                sart = rec.label + "<" + QString::number(rec.endValue);
+                algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": Eğer "+sart+" ise, "+loopStep+" Git \n");
             }
         }
         if(rec.operationType==1)
+        {
+            int counterVariable = rec.value.toInt(&ok,10);
+            int endValue = rec.endValue;
+            int stepValue = rec.stepValue;
+            if(stepValue>0)stepValue=stepValue*-1;
+            qDebug()<<"for"<<"label:"<<rec.label
+                     <<"counter:"<<rec.counter
+                     <<"value:"<<rec.value
+                     <<"endValue:"<<endValue
+                     <<"stepValue:"<<stepValue;
+            if(rec.counter==0)
+            {
+                for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
+                    VariableRecord var = Variable::onlineVariableList[j];
+                    if(rec.label==var.label)
+                    {
+                        Variable::onlineVariableList[j].value=rec.startValue;
+                        Variable::onlineVariableList[j].counter=0;
+                        variableWidget->loadVariables();
+                    }
+                }
+                qDebug()<<"atama yapıldı"<<rec.counter<<counterVariable;
+                item->selectedVariables.first().counter++;
+                item->selectedVariables.first().value=QString::number(rec.startValue);
+                counterVariable = rec.startValue;
+
+                /*********************algoritma ilk *****************************/
+                QString text = algoritmaText->toPlainText();
+                //QStringList lines = text.contains.split('Adım');
+                int lineCount = text.count("Adım");
+                QString escText;
+                escText=diagramItem->labelAlgoritma.text();
+                //if(escText.left(4)=="<br>")
+                //   escText=escText.mid(4);
+                escText=escText.replace("<br>","\n");
+                algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": loop:\n");
+                ///algoritmaText->insertPlainText("Adım"+QString::number(lineCount+1)+": "+escText+"\n");
+                /*******************************************************/
+                loopStep="Adım"+QString::number(lineCount);
+                loopRunState=true;
+                ///loopRunStateOtherRun=false;
+                /* for (QGraphicsItem *item : scene->items()) {
+                    // qDebug()<<"scene nesnesi: "<<item;
+                    if (auto dItem = qgraphicsitem_cast<DiagramItem*>(item)) {
+                        dItem
+                    }*/
+            }else
+            {
+                qDebug()<<"adım sayısı:"<<rec.counter;
+                counterVariable=counterVariable+stepValue;
+                item->selectedVariables.first().counter++;
+                item->selectedVariables.first().value=QString::number(counterVariable);
+            }
+            result=counterVariable>endValue;
+            /*********************onlineVariableList güncelleniyor**********************/
+            if(result)
+            {
+                for (int j = 0; j < Variable::onlineVariableList.size(); ++j) {
+                    VariableRecord var = Variable::onlineVariableList[j];
+                    if(rec.label==var.label)
+                    {
+                        Variable::onlineVariableList[j].value=item->selectedVariables.first().value;
+                        Variable::onlineVariableList[j].counter=item->selectedVariables.first().counter;
+                        variableWidget->loadVariables();
+                    }
+                }
+            }else
+            {
+                /*********************algoritma döngü sonu*****************************/
+                QString text = algoritmaText->toPlainText();
+                int lineCount = text.count("Adım");
+                QString escText;
+                escText=diagramItem->labelAlgoritma.text();
+                escText=escText.replace("<br>","\n");
+                /*******************************************************/
+                loopRunState=false;
+                QString sart="";//= item->selectedVariables.first().expression;
+                sart = rec.label + ">" + QString::number(rec.endValue);
+                algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": Eğer "+sart+" ise, "+loopStep+" Git \n");
+            }
+        }
+        if(rec.operationType==2)
         {
             qDebug()<<"while"<<rec.label<<rec.expression<<parts[0]<<parts[1]<<parts[2];
             QString var1 = parts[0].trimmed();
@@ -1073,7 +1245,35 @@ DiagramItem* MainWindow::detectRouteItem(DiagramItem *item)
             else if (opt1 == ">=") result = var1val >= rec.endValue;
             else if (opt1 == "==") result = var1val == rec.endValue;
             else if (opt1 == "!=") result = var1val != rec.endValue;
-           // qDebug()<<"şart sonucu: "<<var1val<<rec.endValue<<result;
+            qDebug()<<"şart sonucu: "<<var1val<<rec.endValue<<result;
+            if(!loopRunState) //döngü başı
+            {
+                /*********************algoritma ilk *****************************/
+                QString text = algoritmaText->toPlainText();
+                //QStringList lines = text.contains.split('Adım');
+                int lineCount = text.count("Adım");
+                QString escText;
+                escText=diagramItem->labelAlgoritma.text();
+                escText=escText.replace("<br>","\n");
+                algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": loop:\n");
+                 /*******************************************************/
+                loopStep="Adım"+QString::number(lineCount);
+                loopRunState=true;
+            }
+           if(!result)// döngü sonu
+           {
+                /*********************algoritma döngü sonu*****************************/
+                QString text = algoritmaText->toPlainText();
+                int lineCount = text.count("Adım");
+                QString escText;
+                escText=diagramItem->labelAlgoritma.text();
+                escText=escText.replace("<br>","\n");
+                /*******************************************************/
+                loopRunState=false;
+                algoritmaText->insertPlainText("Adım"+QString::number(lineCount)+": Eğer "+rec.expression+" ise, "+loopStep+" Git \n");
+            }
+
+
         }
         //qDebug()<<"loop:"<<rec.name<<rec.label<<rec.value<<rec.endValue<<result;
     }
@@ -1316,6 +1516,11 @@ void MainWindow::createActions()
     saveFileAction->setStatusTip(tr("Diyagramı Kaydet"));
     connect(saveFileAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 
+    savePngFileAction = new QAction(QIcon(":/images/savepicture.png"),tr("Resim Kaydet"), this);
+    savePngFileAction->setShortcuts(QKeySequence::Save);
+    savePngFileAction->setStatusTip(tr("Resim Kaydet"));
+    connect(savePngFileAction, SIGNAL(triggered()), this, SLOT(saveImageFile()));
+
     newFileAction = new QAction(QIcon(":/images/new.png"),tr("Yeni"), this);
     newFileAction->setShortcuts(QKeySequence::New);
     newFileAction->setStatusTip(tr("Yeni Belge"));
@@ -1368,6 +1573,8 @@ void MainWindow::createMenus()
     fileMenu->addAction(newFileAction);
     fileMenu->addAction(openFileAction);
     fileMenu->addAction(saveFileAction);
+    fileMenu->addAction(savePngFileAction);
+
     fileMenu->addAction(exitAction);
  QAction* action;
     programExample=menuBar()->addMenu(tr("&Kodlama"));
@@ -1442,7 +1649,7 @@ void MainWindow::loadExampleFile()
 {
     QAction* action = qobject_cast<QAction*>(sender());
     if (action) {
-        QString filePath ="/usr/share/akisdiyagram/doc/"+action->data().toString();
+        QString filePath ="/usr/share/flowingtr/doc/"+action->data().toString();
         qDebug()<<filePath;
         if (!filePath.isEmpty()) {
             scene->loadScene(filePath);
@@ -1462,6 +1669,7 @@ void MainWindow::createToolbars()
     fileToolBar->addAction(newFileAction);
     fileToolBar->addAction(openFileAction);
     fileToolBar->addAction(saveFileAction);
+    fileToolBar->addAction(savePngFileAction);
 
     runToolBar = addToolBar(tr("Run"));
     runToolBar->addAction(runAction);

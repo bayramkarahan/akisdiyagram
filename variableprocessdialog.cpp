@@ -9,6 +9,12 @@ VariableProcessDialog::VariableProcessDialog(QWidget *parent) : QDialog(parent)
 
     setWindowTitle("İşlem Tanımla");
     resize(650, 300);
+    // Geçerli ekranı al (çoklu ekran varsa aktif ekranı alır)
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    // Dialog boyutu
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 

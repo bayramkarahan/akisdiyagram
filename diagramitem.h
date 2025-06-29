@@ -154,7 +154,7 @@ public:
     QString endArrowRota="";
     QString leftArrowRota="";
     QString rightArrowRota="";
-
+    bool loopItemRun=false;
 
 
     bool renkdrm;

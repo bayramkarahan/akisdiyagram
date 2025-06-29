@@ -10,7 +10,8 @@
 #include <QPushButton>
 #include <QList>
 #include <QDialogButtonBox>
-
+#include<QGuiApplication>
+#include<QScreen>
 struct LoopRow {
     QWidget *widget;
     QComboBox *loopTypeCombo;

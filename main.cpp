@@ -51,31 +51,12 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-QString varMain0;
-QString varMain1;
-QString varMain2;
 
-QString varAnswerMain0;
-QString varAnswerMain1;
-QString varAnswerMain2;
-
-QString varOperatorMain0;
-QString varOperatorMain1;
-QString varOperatorMain2;
-
-QString varConditionalMain0;
-QString varConditionalMain1;
-QString varConditionalMain2;
-
-
-QString varLoopAnswerMain0;
-QString varLoopAnswerMain1;
-QString varLoopAnswerMain2;
 
 
 int main(int argv, char *args[])
 {
-    Q_INIT_RESOURCE(diagramscene);
+  ///  Q_INIT_RESOURCE(diagramscene);
 
     QApplication app(argv, args);
     MainWindow mainWindow;
